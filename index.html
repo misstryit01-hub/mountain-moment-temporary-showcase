@@ -15,7 +15,7 @@
 <section class="nutrition"><div class="nutrition-head"><h2>今日營養</h2><span>介面示意 · 未連接飲食資料</span></div><p class="muted">今日可用額度</p><div class="balance">1,768 <small>kcal</small><span>展示數值<br>不會修改飲食紀錄</span></div>
 <div id="stage-wrap"><section id="experience" aria-label="可操作的山景與原版紙娃娃">
 <canvas id="landscape" aria-label="夕陽、層疊山谷與會活動的鹿"></canvas><div id="actor-placement"><iframe id="actor" title="原版紙娃娃登山者" tabindex="-1" aria-hidden="true"></iframe></div><canvas id="atmosphere" aria-hidden="true"></canvas>
-<div class="scene-top"><span id="view-label">近景 · 紙偶細節</span><div><button id="world-pause" aria-label="暫停所有動畫" title="暫停動畫">Ⅱ</button><button id="fullscreen" aria-label="放大山景" title="放大山景">⤢</button></div></div>
+<div class="scene-top"><span id="view-label">近景 · 紙偶細節</span><div><button id="world-pause" aria-label="暫停所有動畫" title="暫停動畫">Ⅱ</button><button id="fullscreen" aria-label="放大山景" title="放大山景">⤢</button><button id="quick-gear" class="quick-gear" type="button" aria-label="換裝" title="換裝">衣</button></div></div>
 <div class="scene-bottom"><span id="trail-status">山腳 · 歇一會兒</span><span id="weather-label">夕照 · 濃霧</span></div><p id="notice" class="notice" role="status"></p><div id="loading" class="loading">等一陣山風</div></section>
 <section class="director" aria-label="山景操作">
 <div class="scene-picker"><label for="scene-select">今日風景</label><select id="scene-select" aria-label="預覽場景"><option value="yilan">宜蘭・望龜山</option><option value="forest">霧杉山谷</option></select><span id="scene-stage">01 海岸啟程</span></div>
@@ -1736,12 +1736,12 @@ function createYilanScene(env) {
   };
   const addGearButton = () => {
     const top = document.querySelector('.scene-top>div');
-    if (!top || document.getElementById('quick-gear')) return;
-    const button=document.createElement('button');
+    if (!top) return;
+    const button=document.getElementById('quick-gear') || document.createElement('button');
     button.id='quick-gear'; button.type='button'; button.className='quick-gear'; button.textContent='衣';
     button.title='換裝'; button.setAttribute('aria-label','換裝');
     button.addEventListener('click',()=>document.getElementById('gear-toggle')?.click());
-    top.appendChild(button);
+    if (!button.parentElement) top.appendChild(button);
   };
   const addForestMusic = () => {
     if (document.getElementById('forest-background-music')) return;
