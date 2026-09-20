@@ -1652,9 +1652,9 @@ function createYilanScene(env) {
     const settings = document.getElementById('settings-panel');
     if (settings && !settings.textContent.trim()) settings.hidden = true;
     // 預設採用最大畫面、最遠景剪影，人物直接開始走路。
-    zoom.value = '100';
+    zoom.value = '0';
     const applyDefaultView = () => {
-      window.mountainDemo?.setDistance(1);
+      window.mountainDemo?.setDistance(0);
       const fullscreen = document.getElementById('fullscreen');
       if (fullscreen && !document.body.classList.contains('expanded')) fullscreen.click();
       [250, 800, 1600].forEach(delay => setTimeout(() => {
@@ -1846,7 +1846,7 @@ function createYilanScene(env) {
     const stage = document.getElementById('experience');
     if (!stage || document.getElementById('scene-rails')) return;
     const rail = document.createElement('div'); rail.id='scene-rails'; rail.className='scene-rails'; rail.style.cssText='position:fixed;right:22px;top:50%;transform:translateY(-50%);z-index:100;';
-    rail.innerHTML='<label><span>鏡頭</span><input id="scene-rail-zoom" type="range" min="0" max="100" value="100" aria-label="鏡頭距離"></label><label><span>速度</span><input id="scene-rail-speed" type="range" min="0.35" max="2.2" step="0.05" value="1" aria-label="移動速度"></label>';
+    rail.innerHTML='<label><span>鏡頭</span><input id="scene-rail-zoom" type="range" min="0" max="100" value="0" aria-label="鏡頭距離"></label><label><span>速度</span><input id="scene-rail-speed" type="range" min="0.35" max="2.2" step="0.05" value="1" aria-label="移動速度"></label>';
     stage.appendChild(rail);
     const bottom = document.querySelector('.scene-bottom');
     if (bottom) Object.assign(bottom.style, {bottom:'4px', left:'20px', right:'20px', display:'flex', justifyContent:'space-between', zIndex:'8'});
