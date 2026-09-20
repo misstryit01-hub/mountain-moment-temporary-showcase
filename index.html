@@ -1265,6 +1265,9 @@ function createYilanScene(env) {
   const grade=x=>(ground(x+.5)-ground(x-.5));
   const groundMesh=Array.from({length:610},(_,i)=>[-1800+i*6,forestGround(-1800+i*6)]);
   function project(x,y,depth=1){const vh=mix(1080,camera.h,depth),cy=mix(400,camera.y,depth);return{x:W/2+(x-camera.x*depth)*H/vh,y:H/2+(y-cy)*H/vh,k:H/vh};}
+  // 宜蘭道路是彎曲的 2.5D 路面，人物必須跟道路使用同一套投影。
+  // 原本手機畫面仍使用山谷的直角投影，寬螢幕不明顯，但窄螢幕會讓腳落到路外。
+  function actorProject(x,y){return sceneId==='yilan'&&yilan?.project?yilan.project(x,y):project(x,y);}
   function poly(context,pts,fill,close=true){context.beginPath();pts.forEach((p,i)=>i?context.lineTo(p[0],p[1]):context.moveTo(p[0],p[1]));if(close)context.closePath();context.fillStyle=fill;context.fill();}
   function glow(context,x,y,r,stops,sx=1,sy=1){context.save();context.translate(x,y);context.scale(sx,sy);const g=context.createRadialGradient(0,0,0,0,0,r);stops.forEach(([p,c])=>g.addColorStop(p,c));context.fillStyle=g;context.fillRect(-r,-r,r*2,r*2);context.restore();}
   const ridges=[
@@ -1358,7 +1361,7 @@ function createYilanScene(env) {
     for(const t of [{x:-490,h:230},{x:-386,h:149},{x:-260,h:166},{x:-180,h:97},{x:540,h:156},{x:637,h:228},{x:753,h:196},{x:935,h:244}]){let p=project(t.x,ground(t.x));fir(ctx,p.x,p.y,t.h*p.k,pal(palettes.ridges[5]),(t.x%5)/5);}
     wildlife.drawClose(ctx,'same');
     // Contact shadow makes the character belong to the ledge at every camera scale.
-    const foot=project(player.x,player.y);ctx.fillStyle=rgba(color('#152b26','#102231'),.38);ctx.beginPath();ctx.ellipse(foot.x+5*foot.k,foot.y+1.5*foot.k,22*foot.k,2.8*foot.k,Math.atan(grade(player.x)),0,Math.PI*2);ctx.fill();
+    const foot=actorProject(player.x,player.y);ctx.fillStyle=rgba(color('#152b26','#102231'),.38);ctx.beginPath();ctx.ellipse(foot.x+5*foot.k,foot.y+1.5*foot.k,22*foot.k,2.8*foot.k,Math.atan(grade(player.x)),0,Math.PI*2);ctx.fill();
     for(let i=0;i<22;i++){const x=-390+i*37,p=project(x,ground(x)),h=(3+Math.sin(i*9)**2*5)*p.k;ctx.strokeStyle=rgba(pal(palettes.edge),.31);ctx.lineWidth=Math.max(.6,p.k*.55);ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.quadraticCurveTo(p.x+h*.1,p.y-h*.7,p.x-h*.4+Math.sin(clock*.7+i)*h*.1,p.y-h);ctx.moveTo(p.x,p.y);ctx.quadraticCurveTo(p.x+h*.4,p.y-h*.3,p.x+h*.6,p.y-h*.75);ctx.stroke();}
   }
   function atmosphere(){
@@ -1412,7 +1415,7 @@ function createYilanScene(env) {
       fogLayer(ctx,'back');drawRidge(ridges[3],3);wildlife.drawDistant(ctx);fogLayer(ctx,'middle');
       drawRidge(ridges[4],4);cableway();fogLayer(ctx,'front');birds();nearLand();atmosphere();
     }
-    const p=project(player.x-50,player.y-130);
+    const p=actorProject(player.x-50,player.y-130);
     placement.style.transform='translate('+p.x.toFixed(3)+'px,'+p.y.toFixed(3)+'px) scale('+(p.k/4).toFixed(5)+')';
     if(paintSamples.length<900)paintSamples.push(performance.now()-start);
     frameCount++;
@@ -1510,7 +1513,7 @@ function createYilanScene(env) {
     out.width=Math.max(1,Math.round(W*factor));out.height=Math.max(1,Math.round(H*factor));
     const c=out.getContext('2d');c.scale(factor,factor);c.drawImage(canvas,0,0,W,H);
     const overlay=document.createElement('canvas');overlay.width=fx.width;overlay.height=fx.height;overlay.getContext('2d').drawImage(fx,0,0);
-    const p=project(player.x-50,player.y-130),pose=api.portraitSVG();
+    const p=actorProject(player.x-50,player.y-130),pose=api.portraitSVG();
     const metadata={scene:scenes[sceneId].name,light:lightState.label,fog:activeFog().snapshot().label,
       equipment:api.snapshot().equipment,distance,stage:1};
     const url=URL.createObjectURL(new Blob([pose],{type:'image/svg+xml;charset=utf-8'}));
@@ -1620,7 +1623,7 @@ function createYilanScene(env) {
   const percentile=(a,p)=>[...a].sort((x,y)=>x-y)[Math.floor((a.length-1)*p)]||0;
   window.mountainDemo={setDistance,setMoveSpeed,setLight,setFog,setScene,setTimeMode,drink:()=>api?.action('drink'),snapshot:()=>({
     ready,walking,playing,worldPaused,reduced,expanded,visible,quality,clock,distance,night,targetNight,lightMode,light:{...lightState},scene:sceneId,yilan:yilan.snapshot(),fog:activeFog().amount(),fogSettings:activeFog().snapshot(),
-    viewport:{width:W,height:H,dpr},player:{...player,slope:-grade(player.x)},camera:{...camera},moveSpeed,actor:project(player.x,player.y),
+    viewport:{width:W,height:H,dpr},player:{...player,slope:-grade(player.x)},camera:{...camera},moveSpeed,actor:actorProject(player.x,player.y),
     wildlife:sceneId==='forest'?wildlife.snapshot():{encounter:null,herd:[]},deer:sceneId==='forest'?wildlife.snapshot().herd:[],
     frames:frameCount,medianFrameMs:percentile(frameTimes,.5),p95DrawMs:percentile(paintSamples,.95),p95ActorMs:percentile(actorSamples,.95),
     character:api?.snapshot(),sound:coastalSound.snapshot(),postcards:postcards?.snapshot()
