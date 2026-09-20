@@ -1466,8 +1466,9 @@ function createYilanScene(env) {
     const weather=activeFog().snapshot();
     if($('fog-level').value!==weather.level)$('fog-level').value=weather.level;
     if($('fog-description').textContent!==weather.description)$('fog-description').textContent=weather.description;
-    $('world-pause').textContent=worldPaused?'▷':'Ⅱ';
-    $('world-pause').setAttribute('aria-label',worldPaused?'繼續所有動畫':'暫停所有動畫');
+    $('world-pause').textContent=worldPaused?'走':'停';
+    $('world-pause').setAttribute('aria-label',worldPaused?'走路':'停在原地');
+    $('world-pause').title=worldPaused?'走路':'停在原地';
   }
   function renderGear(){
     if(!api)return;const data=api.catalog();
