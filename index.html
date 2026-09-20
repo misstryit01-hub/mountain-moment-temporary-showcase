@@ -825,6 +825,158 @@ function createSceneryPostcards(env){
   return {capture,show,snapshot:()=>({count:cards.length,busy,storageError,limit,localOnly:true,cards:cards.map(({image,...meta})=>meta)})};
 }
 
+/* Mountain-side camera: ocean > rail > walker > carriageway > inland slope.
+   A shared 2.5D ribbon projection, not a displaced backdrop. No extra RAF. */
+function createCoastalRoadway(env) {
+  const {mix,clamp,color,rgba,ground}=env;
+  const C=(a,b)=>color(a,b,env.night());
+  const ease=t=>{t=clamp(t);return t*t*(3-2*t);};
+  // The distant road turns along the foot of the cape. Increasing route station
+  // always moves toward the horizon; avoids self-intersections at every zoom.
+  const knots=[[-1.4,-.65,1.10,1.8],[-.55,-.08,.86,1.3],[0,.38,.705,1],[.5,.65,.638,.69],[1,.79,.547,.39],[1.5,.84,.481,.18],[2,.94,.439,.060],[2.65,1.12,.422,.009]];
+  let cache=null,cacheKey='',time=0;
+  const verticalFit=()=>{const {W,H}=env.size();return env.expanded()&&W/H<.78?.52:1;};
+  const wideY=y=>.335+(y-.335)*verticalFit();
+  function spline(u) {
+    let i=1;while(i<knots.length-1&&u>knots[i][0])i++;
+    const a=knots[i-1],b=knots[i],t=clamp((u-a[0])/(b[0]-a[0]));
+    return [1,2,3].map(j=>{
+      const prev=knots[Math.max(0,i-2)],next=knots[Math.min(knots.length-1,i+1)];
+      const m0=(b[j]-prev[j])/(b[0]-prev[0]),m1=(next[j]-a[j])/(next[0]-a[0]),h=b[0]-a[0];
+      return (2*t**3-3*t*t+1)*a[j]+(t**3-2*t*t+t)*h*m0+(-2*t**3+3*t*t)*b[j]+(t**3-t*t)*h*m1;
+    });
+  }
+  function project(x,y) {
+    const {W,H}=env.size(),cam=env.camera(),q=ease(env.distance());
+    const u=(x-env.player().x*.60)/1100,wide=spline(u),k0=H/cam.h;
+    const k1=H/(env.expanded()?1040:820)*Math.max(.005,wide[2])*mix(.76,1,(verticalFit()-.52)/.48);
+    const k=mix(k0,k1,q);
+    // Screen height changes with the same scale as objects on the route.
+    const closeY=H/2+(ground(x)-cam.y)*k0;
+    const farY=wideY(wide[1])*H;
+    return {x:mix(W/2+(x-cam.x)*k0,wide[0]*W,q),y:mix(closeY,farY,q)+(y-ground(x))*k,k};
+  }
+  function surface(x,z=0) {
+    const p=project(x,ground(x)),b=project(x+2,ground(x+2));
+    const dx=b.x-p.x,dy=b.y-p.y,len=Math.hypot(dx,dy)||1;
+    // Transverse foreshortening leaves room for the visible vertical car body.
+    return {x:p.x-dy/len*z*p.k*.38,y:p.y+dx/len*z*p.k*.38,k:p.k,angle:Math.atan2(dy,dx)};
+  }
+  function extent(){const {W,H}=env.size(),cam=env.camera(),q=ease(env.distance()),s=W*cam.h/H;return {left:mix(cam.x-s*.7-550,env.player().x*.6-1450,q),right:mix(cam.x+s*.7+550,env.player().x*.6+2910,q)};}
+  function geometry(){
+    const {W,H}=env.size(),cam=env.camera(),key=[W,H,cam.x,cam.y,cam.h,env.distance(),env.player().x].join('|');
+    if(key===cacheKey)return cache;
+    cacheKey=key;const {left,right}=extent(),stations=Array.from({length:181},(_,i)=>mix(left,right,i/180));
+    // Share the expensive spline/tangent calculation across every road ribbon.
+    const frames=stations.map(x=>{const p=surface(x);return {...p,nx:-Math.sin(p.angle)*p.k*.38,ny:Math.cos(p.angle)*p.k*.38};});
+    const point=(p,z)=>({x:p.x+p.nx*z,y:p.y+p.ny*z});
+    const ribbon=(a,b)=>{const p=new Path2D();frames.forEach((f,i)=>{const v=point(f,a);i?p.lineTo(v.x,v.y):p.moveTo(v.x,v.y);});[...frames].reverse().forEach(f=>{const v=point(f,b);p.lineTo(v.x,v.y);});p.closePath();return p;};
+    const line=z=>{const p=new Path2D();frames.forEach((f,i)=>{const v=point(f,z);i?p.lineTo(v.x,v.y):p.moveTo(v.x,v.y);});return p;};
+    const railTube=h=>{const p=new Path2D();frames.forEach((f,i)=>{const v=point(f,-17),y=v.y-(h+.75)*f.k;i?p.lineTo(v.x,y):p.moveTo(v.x,y);});[...frames].reverse().forEach(f=>{const v=point(f,-17);p.lineTo(v.x,v.y-(h-.75)*f.k);});p.closePath();return p;};
+    const base=line(-80);base.lineTo(W+H*2,H*3);base.lineTo(-H*2,H*3);base.closePath();
+    cache={stations,base,rock:ribbon(-80,-27),wall:ribbon(-27,-17),path:ribbon(-17,20),curb:ribbon(20,26),road:ribbon(26,153),verge:ribbon(153,181),edge:line(-27),rail:line(-17),seaEdge:line(-80),roadEdge:line(30),centerA:line(88),centerB:line(91),nearEdge:line(149),curbTop:line(20),rails:[railTube(24),railTube(48)],stripes:{30:ribbon(28.9,31.1),149:ribbon(147.75,150.25),88:ribbon(87.2,88.8),92:ribbon(91.2,92.8)}};
+    return cache;
+  }
+  function polygon(c,p,fill){c.beginPath();p.forEach(([x,y],i)=>i?c.lineTo(x,y):c.moveTo(x,y));c.closePath();c.fillStyle=fill;c.fill();}
+  function landscape(c) {
+    const {W,H}=env.size(),q=ease(env.distance()),g=geometry();
+    // Geology belongs to the inland side, not a mountain pasted over open sea.
+    // The cape connects directly to the vanishing end of the road.
+    c.save();c.globalAlpha=q;
+    const layers=[
+      {p:[[.80,.441],[.84,.37],[.89,.30],[.96,.32],[1.04,.235],[1.16,.38],[1.2,.75]],a:'#8caaa0',b:'#3d5c69'},
+      {p:[[.84,.484],[.86,.366],[.90,.287],[.965,.256],[1.02,.19],[1.15,.27],[1.2,.85]],a:'#658d7c',b:'#294a59'},
+      {p:[[.86,.58],[.872,.46],[.9,.35],[.95,.27],[.987,.20],[1.045,.155],[1.16,.30],[1.2,1.1]],a:'#3c6758',b:'#1d3947'}
+    ];
+    for(const l of layers){
+      c.save();polygon(c,l.p.map(([x,y])=>[x*W,wideY(y)*H]),C(l.a,l.b));c.clip();
+      const shade=c.createLinearGradient(W*.9,H*.2,W*1.1,H*.7);shade.addColorStop(0,rgba(C('#c7c4a1','#68808a'),.27));shade.addColorStop(.6,rgba(C('#234c40','#172f3c'),.1));shade.addColorStop(1,rgba(C('#233f33','#142c38'),.56));c.fillStyle=shade;c.fillRect(W*.78,0,W*.5,H);
+      // Broken ridges and forest pockets, not repetitive triangular trees.
+      for(let i=0;i<19;i++){
+        const x=W*(.85+i*.018),y=H*(.34+Math.sin(i*2.7)*.095);
+        polygon(c,[[x,y],[x+W*.032,y+H*.14],[x+W*.052,y+H*.42],[x-W*.012,y+H*.21]],rgba(C('#b7b399','#779395'),.05+(i%3)*.017));
+      }
+      c.restore();
+    }
+    c.restore();
+    const land=c.createLinearGradient(0,H*.57,W*.7,H);land.addColorStop(0,C('#748a6d','#3c5960'));land.addColorStop(.45,C('#4e6e52','#2b4950'));land.addColorStop(1,C('#294c3f','#1b3541'));c.fillStyle=land;c.fill(g.base);
+    c.save();c.clip(g.base);
+    polygon(c,[[W*.67,H*.69],[W*.86,H*.78],[W*.91,H],[W*.45,H]],rgba(C('#b8ad83','#738878'),.08));
+    polygon(c,[[W*.81,H*.55],[W*.90,H*.69],[W*1.05,H*.61],[W*1.15,H]],rgba(C('#233f35','#132e3a'),.20));
+    c.restore();
+    c.fillStyle=C('#899386','#4e6268');c.fill(g.rock);
+    // Basalt-like fractured shore below the wall. Deterministic geometry.
+    const {left,right}=extent();
+    for(let x=Math.floor(left/37)*37;x<right;x+=37){
+      const drift=Math.sin(x*.1375),p=surface(x+drift*12,-54+drift*8),s=p.k;if(s<.06)continue;
+      const r=5+Math.sin(x*.2783)**2*12;
+      polygon(c,[[p.x-r*s,p.y],[p.x-r*.62*s,p.y-r*.51*s],[p.x+r*.35*s,p.y-r*.64*s],[p.x+r*s,p.y-r*.07*s],[p.x+r*.46*s,p.y+r*.18*s]],C('#627a73','#364f59'));
+      c.strokeStyle=rgba(C('#dfdac1','#80969b'),.22);c.lineWidth=Math.max(.4,s*.6);c.beginPath();c.moveTo(p.x-r*.6*s,p.y-r*.5*s);c.lineTo(p.x+r*.3*s,p.y-r*.62*s);c.stroke();
+    }
+    c.strokeStyle=rgba(C('#ede9cf','#a0b7bb'),.4);c.lineWidth=Math.max(.7,H*.0015);c.stroke(g.seaEdge);
+  }
+  function road(c){
+    const g=geometry(),{left,right}=extent(),{W,H}=env.size();
+    c.fillStyle=C('#a2a797','#687e7d');c.fill(g.wall);
+    c.fillStyle=C('#cfcaad','#7b8f8b');c.fill(g.path);
+    c.fillStyle=C('#ebe0be','#9baaa1');c.fill(g.curb);
+    c.fillStyle=C('#657271','#33454e');c.fill(g.road);
+    c.fillStyle=C('#81917a','#3b5551');c.fill(g.verge);
+    // Geometry-accurate solid edge and paired yellow centre lines, tapering in depth.
+    function stripe(z,w,ink){c.fillStyle=ink;c.fill(g.stripes[z]);}
+    stripe(30,1.1,C('#e2ddc1','#819591'));stripe(149,1.25,C('#e5dcc0','#869b95'));
+    stripe(88,.8,C('#cfb97a','#8a886a'));stripe(92,.8,C('#cfb97a','#8a886a'));
+    // Pavement joints, drainage slots and coastal guardrail.
+    for(let x=Math.floor(left/36)*36;x<right;x+=36){
+      const a=surface(x,-15),b=surface(x,19),p=surface(x,-17),k=p.k;
+      if(a.x<-80||a.x>W+80||k<.045)continue;
+      c.strokeStyle=rgba(C('#858e7c','#556f6d'),.30);c.lineWidth=Math.max(.35,k*.4);c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();
+      c.fillStyle=C('#738780','#47646a');c.fillRect(p.x-1.6*k,p.y-49*k,3.2*k,49*k);
+      c.fillStyle=C('#c9cdb6','#889fa1');c.fillRect(p.x-2.1*k,p.y-50*k,3.4*k,2*k);
+      const drain=surface(x+12,27);c.strokeStyle=rgba(C('#304f4b','#203945'),.44);c.lineWidth=Math.max(.5,k*.8);c.beginPath();c.moveTo(drain.x-3*k,drain.y);c.lineTo(drain.x+3*k,drain.y);c.stroke();
+    }
+    c.fillStyle=C('#c0c8b7','#899fa0');g.rails.forEach(p=>c.fill(p));
+    // Small roadside milestone: local material detail, deliberately no fantasy house.
+    const marker=surface(-145,18),k=marker.k;
+    if(marker.x>-30&&marker.x<W+30){c.save();c.translate(marker.x,marker.y);c.scale(k,k);c.fillStyle=C('#ddd4b7','#839892');c.beginPath();c.roundRect(-5,-20,10,20,2);c.fill();c.fillStyle=C('#5a7b65','#486767');c.fillRect(-5,-20,10,8);c.font='5px sans-serif';c.textAlign='center';c.fillStyle=C('#51685d','#d0d4ba');c.fillText('濱海',0,-4);c.restore();}
+  }
+  function foreground(c){
+    const {W,H}=env.size(),q=ease(env.distance());
+    // The mountain-side verge closes the bottom/right of the composition. Open
+    // sea stays visible through the centre; this is not a screen-wide curtain.
+    c.save();
+    const y=mix(H*1.10,H*.94,q);
+    c.beginPath();c.moveTo(-20,H+10);c.lineTo(-20,y);c.bezierCurveTo(W*.08,y-H*.025,W*.16,y+H*.08,W*.31,H+12);c.closePath();c.fillStyle=C('#2e5144','#1b3540');c.fill();
+    c.save();c.globalAlpha=q;
+    const hill=new Path2D();hill.moveTo(W*.67,H*1.03);hill.bezierCurveTo(W*.72,H*.94,W*.79,H*.93,W*.83,H*.88);hill.bezierCurveTo(W*.91,H*.79,W*.94,H*.70,W*1.03,H*.54);hill.lineTo(W*1.12,H*1.1);hill.closePath();
+    const hg=c.createLinearGradient(W*.88,H*.7,W,H);hg.addColorStop(0,C('#365c47','#25434a'));hg.addColorStop(1,C('#1e3e33','#142d37'));c.fillStyle=hg;c.fill(hill);
+    c.clip(hill);
+    for(let i=0;i<90;i++){
+      const x=W*(.7+(Math.sin(i*24.43)*.5+.5)*.45),y=H*(.60+(Math.sin(i*7.73)*.5+.5)*.52),r=H*(.003+(i%5)*.0014);
+      c.fillStyle=rgba(C(i%2?'#8b9c70':'#193b30',i%2?'#607c6b':'#142c35'),.18);c.beginPath();c.moveTo(x,y);c.quadraticCurveTo(x-r*.8,y-r*1.8,x+r*1.7,y-r*.7);c.quadraticCurveTo(x+r*1.2,y+r*.4,x,y);c.fill();
+    }
+    c.restore();
+    const {left,right}=extent();
+    for(let x=Math.floor(left/79)*79;x<right;x+=79){
+      const b=surface(x,193),k=b.k;
+      if(b.x<-40||b.x>W+40||b.y<H*.82||k<.09)continue;
+      c.strokeStyle=C('#768a67','#426155');c.lineWidth=Math.max(.6,k*.65);
+      for(let i=0;i<5;i++){const sway=Math.sin(time*.9+x+i)*1.4; c.beginPath();c.moveTo(b.x+i*k,b.y);c.quadraticCurveTo(b.x+(i*3+5+sway)*k,b.y-12*k,b.x+(i*4+8+sway)*k,b.y-(19+i*3)*k);c.stroke();}
+    }
+    c.restore();
+  }
+  function vehicleFrame(v){
+    const p=surface(v.x,v.lane),q=ease(env.distance());
+    const depth=v.lane>90?1.12:1;
+    const width=(v.type==='car'?305:151)*depth;
+    // Keep side-view coachwork almost level; yaw would require a separate 3D rig.
+    return {...p,width:width*p.k,worldWidth:width,height:width*(v.type==='car'?137/420:177/210)*p.k,angle:p.angle*mix(.55,.15,q)};
+  }
+  return {project,surface,extent,landscape,road,foreground,vehicleFrame,tick:dt=>time+=dt,
+    rail:x=>{const p=surface(x,-17);return {...p,y:p.y-49*p.k};},
+    snapshot:()=>({projection:'coastal-ribbon-2.5d',order:['ocean','rail','footpath','traffic','inland-verge'],actor:surface(env.player().x),roadFar:surface(env.player().x,30),roadNear:surface(env.player().x,149),rail:surface(env.player().x,-17),occlusion:'foreground-canvas-over-paperdoll'})};
+}
+
 /* Original Yilan coast study. No game assets, external textures, or own RAF. */
 function createYilanScene(env) {
   'use strict';
@@ -836,7 +988,8 @@ function createYilanScene(env) {
   const ground = x => 637 - x * .017 + Math.sin(x / 180) * 2.6;
   const slope = x => -.017 + Math.cos(x / 180) * 2.6 / 180;
   const dims = () => env.size();
-  const coast = () => { const {W,H} = dims(); return {W,H, horizon:H * mix(.405,.345,env.distance())}; };
+  const coast = () => { const {W,H} = dims(); return {W,H, horizon:H * mix(.36,.335,env.distance())}; };
+  const roadway=createCoastalRoadway({...env,ground});
   const C = (day, dark) => color(day, dark, env.night());
   const path = (c, points, fill) => {
     c.beginPath(); points.forEach((p,i) => i ? c.lineTo(p[0],p[1]) : c.moveTo(p[0],p[1]));
@@ -870,11 +1023,11 @@ function createYilanScene(env) {
     project:(x,y,d)=>{const {W,H,horizon}=coast();return {x:W*.5,y:horizon+H*((y-395)/900+.05),k:H/950};}
   });
   fog.setLevel('light',true);
-  const moments=createCoastalMoments({...env,ground,boats:vessels});
+  const moments=createCoastalMoments({...env,ground,perch:roadway.rail,boats:vessels});
   function islandFrame() {
     const {W,H,horizon}=coast(),q=env.distance();
     const width=Math.min(W*.34,H*.82)*mix(1,.84,q);
-    return {x:W*.70-env.camera().x*.008,y:horizon+H*.026,w:width,h:width*.245};
+    return {x:W*mix(.70,.43,q)-env.camera().x*.008,y:horizon+H*.026,w:width,h:width*.245};
   }
   function island(c) {
     const p=islandFrame(); c.save(); c.translate(p.x-p.w*.5,p.y); c.scale(p.w,p.h);
@@ -902,7 +1055,7 @@ function createYilanScene(env) {
     g.addColorStop(0,color(skyTopHex(skyTop),'#172d43',n));
     g.addColorStop(.56,color(skyTopHex(skyBottom),'#627b8a',n));
     g.addColorStop(1,C('#c1d7cf','#496572'));c.fillStyle=g;c.fillRect(0,0,W,H);
-    const sunX=W*.73,sunY=H*mix(.13,.27,warm);
+    const sunX=W*mix(.73,.47,env.distance()),sunY=H*mix(.13,.23,warm);
     if(n<.98){
       halo(c,sunX,sunY,H*.45,color('#f4efcf','#ffdaa7',warm),(1-n)*(.24+warm*.47),1.28,1);
       halo(c,sunX,sunY,H*.32,color('#fffce3','#fff9d6',warm),(1-n)*warm*.63,1.12,1.16);
@@ -936,7 +1089,7 @@ function createYilanScene(env) {
       const y=horizon+Math.pow(m.y,1.7)*H*.46;
       const x=(m.x+Math.sin(time*.17+m.phase)*.003)*W;
       const width=(1+m.w*11)*(H/280)*(.3+m.y);
-      const beam=Math.max(0,1-Math.abs(x/W-.73)/(.055+m.y*.14));
+      const beam=Math.max(0,1-Math.abs(x/W-mix(.73,.47,env.distance()))/(.055+m.y*.14));
       c.strokeStyle=rgba(C('#f8e9c4','#b1c7cf'),(.04+beam*(.26+light.warm*.16))*(.7+.3*Math.sin(time*.5+m.phase)**2));
       c.lineWidth=Math.max(.5,H*.0012);c.beginPath();c.moveTo(x,y);c.lineTo(x+width,y);c.stroke();
     }
@@ -951,7 +1104,7 @@ function createYilanScene(env) {
   function vessels() {
     const {W,H,horizon}=coast(),cam=env.camera(),n=env.night(),q=env.distance();
     // The near waterline follows the visible coast, never the actor's footpath.
-    const shore=Math.max(horizon+H*.055,Math.min(H*.73,project(cam.x,ground(cam.x)-63).y));
+    const shore=Math.max(horizon+H*.055,Math.min(H*.67,roadway.surface(env.player().x,-85).y));
     return vesselSpecs.map((v,i)=>{
       const raw=v.start+time*v.speed+.28,lap=Math.abs(Math.floor(raw/1.56));
       const preview=fleetPreview?.layer===v.layer;
@@ -1004,16 +1157,6 @@ function createYilanScene(env) {
     c.restore();
     moments.drawCrew(c,v);
   }
-  function headlands(c) {
-    const {W,H,horizon}=coast(),drift=env.camera().x*.02;
-    c.save();c.translate(-drift,0);
-    c.beginPath();c.moveTo(-100,H*.23);c.bezierCurveTo(W*.005,H*.27,W*.05,H*.30,W*.075,H*.36);c.bezierCurveTo(W*.11,H*.43,W*.105,H*.49,W*.16,H*.515);c.bezierCurveTo(W*.23,H*.55,W*.24,H*.605,W*.32,H*.645);c.lineTo(W*.36,H*.71);c.lineTo(-100,H*.84);c.closePath();c.fillStyle=C('#779a90','#365564');c.fill();
-    path(c,[[W*.072,H*.35],[W*.09,H*.51],[W*.23,H*.61],[W*.17,H*.55],[W*.105,H*.465]],rgba(C('#c1c4a1','#719096'),.15));
-    c.beginPath();c.moveTo(-100,H*.35);c.bezierCurveTo(W*.01,H*.37,W*.015,H*.40,W*.04,H*.44);c.bezierCurveTo(W*.07,H*.51,W*.065,H*.55,W*.12,H*.58);c.bezierCurveTo(W*.16,H*.61,W*.18,H*.655,W*.255,H*.705);c.lineTo(-100,H*.88);c.closePath();c.fillStyle=C('#536f63','#284451');c.fill();c.restore();
-    // A calm broken shoreline in the sheltered cove.
-    c.strokeStyle=rgba(C('#eee6c8','#9aacb0'),.43);c.lineWidth=Math.max(1,H*.003);
-    c.beginPath();c.moveTo(W*.14-drift,H*.64);c.bezierCurveTo(W*.26-drift,H*.70,W*.28-drift,H*.76,W*.49,H*.84);c.stroke();
-  }
   function gulls(c) {
     if(env.night()>.75)return;
     const {W,H,horizon}=coast();
@@ -1023,93 +1166,46 @@ function createYilanScene(env) {
       c.strokeStyle=rgba(C('#456472','#718e9c'),.74);c.lineWidth=Math.max(.6,s*.32);c.beginPath();c.moveTo(x-s*2,y-s*flap);c.quadraticCurveTo(x-s,y-s*.7,x,y);c.quadraticCurveTo(x+s,y-s*.7,x+s*2,y-s*flap);c.stroke();
     }
   }
-  function strip(c,offset1,offset2,fill) {
-    const {W,H}=dims(),cam=env.camera(),span=W*cam.h/H;
-    const left=cam.x-span*.6-80,right=cam.x+span*.6+80,pts=[];
-    for(let x=left;x<=right+14;x+=14){const p=project(x,ground(x)+offset1);pts.push([p.x,p.y]);}
-    for(let x=right+14;x>=left;x-=14){const p=project(x,ground(x)+offset2);pts.push([p.x,p.y]);}
-    path(c,pts,fill);
-  }
-  function groundLine(c,offset,ink,width,dashed=false) {
-    const {W,H}=dims(),cam=env.camera(),span=W*cam.h/H,k=H/cam.h;
-    c.save();c.strokeStyle=ink;c.lineWidth=Math.max(.5,width*k);if(dashed)c.setLineDash([18*k,25*k]);
-    c.beginPath();for(let x=cam.x-span*.7;x<cam.x+span*.7;x+=8){const p=project(x,ground(x)+offset);x===cam.x-span*.7?c.moveTo(p.x,p.y):c.lineTo(p.x,p.y);}c.stroke();c.restore();
-  }
-  function roadside(c) {
-    const {W,H}=dims(),cam=env.camera(),span=W*cam.h/H;
-    strip(c,-54,700,C('#405f51','#263e44'));
-    strip(c,-43,-14,C('#767d76','#34464d'));
-    groundLine(c,-41,C('#d0cbb1','#7a8a88'),.9);
-    groundLine(c,-28,C('#cfc5a1','#6b7b7d'),.7,true);
-    groundLine(c,-15,C('#d1c8ad','#81908c'),1);
-    strip(c,-12,-5,C('#566e59','#334a47'));
-    for(let x=Math.floor((cam.x-span*.65)/53)*53;x<cam.x+span*.65;x+=53){
-      const p=project(x,ground(x)-46),k=p.k;c.fillStyle=C('#b2b6a7','#788d91');c.fillRect(p.x-k,p.y-14*k,2*k,16*k);
-    }
-    groundLine(c,-58,C('#c8c9b5','#93a4a1'),2.2);
-    // Footpath is a separate physical strip on the near side of the highway.
-    strip(c,-3,19,C('#c4bda1','#71827e'));
-    groundLine(c,-2,C('#e2d5b7','#96a6a0'),1.1);
-    strip(c,19,31,C('#879580','#425b57'));
-    groundLine(c,19,C('#a7b29a','#5d7470'),1);
-    for(let x=Math.floor((cam.x-span*.6)/45)*45;x<cam.x+span*.6;x+=45){const a=project(x,ground(x)+3),b=project(x+3,ground(x+3)+18);c.strokeStyle=rgba(C('#8e967f','#4c6662'),.27);c.lineWidth=.55;c.beginPath();c.moveTo(a.x,a.y);c.lineTo(b.x,b.y);c.stroke();}
-    for(let i=-40;i<80;i++){
-      const x=i*41+Math.sin(i*17)*12,p=project(x,ground(x)+42);if(p.x<-30||p.x>W+30)continue;
-      c.save();c.translate(p.x,p.y);c.scale(p.k,p.k);c.strokeStyle=C('#819078','#4d6960');c.lineWidth=.8;
-      for(let j=0;j<4;j++){const sway=Math.sin(time*.8+i+j)*2;c.beginPath();c.moveTo(j*2,0);c.quadraticCurveTo(j*3-4+sway,-8,j*3-7+sway,-16-(j%3)*4);c.stroke();}c.restore();
-    }
-  }
-  function house(c) {
-    const p=project(-180,ground(-180)-2),k=p.k*1.9;
-    if(p.x<-120*k||p.x>dims().W+120*k)return;
-    c.save();c.translate(p.x,p.y);c.scale(k,k);
-    path(c,[[-36,0],[-36,-55],[26,-55],[26,0]],C('#dbd6bd','#87938c'));
-    path(c,[[26,0],[26,-55],[42,-45],[42,-1]],C('#aaa997','#657b76'));
-    path(c,[[-43,-53],[-20,-71],[31,-63],[46,-45],[25,-50]],C('#626c61','#334c51'));
-    c.fillStyle=C('#727c6b','#344c51');c.fillRect(-20,-34,16,34);
-    c.fillStyle=env.night()>.35?'#e6c585':'#9fbdba';c.fillRect(6,-38,15,17);
-    c.strokeStyle=C('#a9ad97','#758780');c.lineWidth=1.5;c.strokeRect(5,-39,17,19);c.beginPath();c.moveTo(13,-38);c.lineTo(13,-20);c.stroke();
-    c.fillStyle=C('#a68e71','#627b76');c.fillRect(-40,-4,6,6);c.fillStyle=C('#667c5d','#3c5a50');c.beginPath();c.ellipse(-37,-9,7,8,-.3,0,TAU);c.fill();
-    c.fillStyle=C('#7b7f69','#526c65');c.fillRect(48,-23,2,24);path(c,[[43,-24],[72,-24],[76,-18],[43,-18]],C('#d9cc9f','#9da789'));
-    c.fillStyle=C('#60766b','#37574f');c.font='6px sans-serif';c.fillText('海岸步道',45,-19);c.restore();
-  }
   function vehicleFrame(v){
-    const p=project(v.x,ground(v.x)+v.lane),width=(v.type==='car'?86:46)*(v.lane===-32?.93:1);
-    return {...p,width:width*p.k,worldWidth:width};
+    return roadway.vehicleFrame(v);
   }
   function drawVehicle(c,v) {
     const p=vehicleFrame(v);if(p.x+p.width*.8<0||p.x-p.width*.8>dims().W)return;
-    c.save();c.translate(p.x,p.y);c.rotate(Math.atan(slope(v.x)));c.scale(p.k,p.k);
+    c.save();c.translate(p.x,p.y);c.rotate(p.angle);c.scale(p.k,p.k);
     vehicleArt.draw(c,{type:v.type,width:p.worldWidth,night:env.night(),direction:v.dir,advance:v.x,variant:v.variant,detail:p.width>=24?1:0});
     c.restore();
   }
   function spawn(type,preview=false) {
     if(!['car','scooter'].includes(type)||vehicles.length>=2)return false;
     const {W,H}=dims(),cam=env.camera(),span=W*cam.h/H,dir=rand()>.32?1:-1;
-    const start=cam.x-dir*(span*.65+110),travel=Math.max(1000,span*1.8+220);
+    const wide=env.distance()>.5;
+    const start=wide?(dir===1?env.player().x*.6-1300:env.player().x*.6+2850):cam.x-dir*(span*.65+240);
+    const travel=wide?4400:Math.max(1400,span*1.8+480);
     // Taiwan's right-hand traffic: rightbound traffic uses the nearer lane.
     // Scene units are not kilometres/hour. Keep passage quick without more spawns.
-    vehicles.push({id:++serial,type,dir,lane:dir===1?-19:-32,variant:serial%3,x:start,end:start+dir*travel,speed:type==='car'?200:180,preview});return true;
+    vehicles.push({id:++serial,type,dir,lane:dir===1?121:59,variant:serial%3,x:start,end:start+dir*travel,speed:Math.max(type==='car'?620:670,span/2.7),preview});return true;
   }
   function tick(dt) {
-    time+=dt;
+    time+=dt;roadway.tick(dt);
     moments.tick(dt);
     if(time>=nextTraffic){spawn(rand()>.45?'car':'scooter');nextTraffic=time+38+rand()*37;}
     for(let i=vehicles.length-1;i>=0;i--){const v=vehicles[i];v.x+=v.dir*v.speed*dt;if((v.x-v.end)*v.dir>0)vehicles.splice(i,1);}
   }
   function world(c) {
     water(c);const boats=vessels();boats.filter(v=>v.layer==='far').forEach(v=>ship(c,v));island(c);
-    boats.filter(v=>v.layer!=='far').forEach(v=>ship(c,v));moments.drawMist(c);fog.draw(c,'back');headlands(c);fog.draw(c,'middle');gulls(c);
-    roadside(c);moments.drawGull(c);[...vehicles].sort((a,b)=>a.lane-b.lane).forEach(v=>drawVehicle(c,v));house(c);
+    boats.filter(v=>v.layer!=='far').forEach(v=>ship(c,v));moments.drawMist(c);fog.draw(c,'back');roadway.landscape(c);fog.draw(c,'middle');gulls(c);
+    roadway.road(c);moments.drawGull(c);
     const p=project(env.player().x,env.player().y);
     c.save();c.translate(p.x+3*p.k,p.y+1.5*p.k);c.scale(p.k,p.k);c.fillStyle=rgba(C('#465c51','#203947'),.22);c.beginPath();c.ellipse(0,0,18,2.4,Math.atan(slope(env.player().x)),0,TAU);c.fill();c.restore();
   }
   function foreground(c) {
     const {W,H}=dims();c.clearRect(0,0,W,H);
+    [...vehicles].sort((a,b)=>vehicleFrame(a).y-vehicleFrame(b).y).forEach(v=>drawVehicle(c,v));
+    roadway.foreground(c);
     const shade=c.createLinearGradient(0,H*.82,0,H);shade.addColorStop(0,'rgba(24,49,44,0)');shade.addColorStop(1,'rgba(24,49,44,.22)');c.fillStyle=shade;c.fillRect(0,H*.82,W,H*.18);
   }
-  return {ground,slope,fog,moments,background,world,foreground,tick,spawn,previewVessel,boatTypes:boatCatalog,end:850,
-    snapshot:()=>({phase:1,name:'宜蘭・望龜山',time,ground:'separate-coastal-footpath',island:islandFrame(),vehicles:vehicles.map(v=>({...v,y:ground(v.x)+v.lane,screen:vehicleFrame(v)})),vehicleArt:vehicleArt.snapshot(),nextTraffic,boats:vessels(),boatArt:boatArt.snapshot(),fleet:{selection:fleetPreview?.type||'auto',types:Object.keys(boatCatalog),maxShips:3},moments:moments.snapshot(),shipPositions:Object.fromEntries(vessels().map(v=>[v.id,v.x])),wildlife:'sea-birds-only',stagesBuilt:[1]})};
+  return {ground,slope,fog,moments,background,world,foreground,tick,spawn,project:roadway.project,previewVessel,boatTypes:boatCatalog,end:850,
+    snapshot:()=>({phase:1,name:'宜蘭・山海之間',time,ground:'seaward-footpath-foreground-road',layout:roadway.snapshot(),island:islandFrame(),vehicles:vehicles.map(v=>({...v,y:ground(v.x)+v.lane,screen:vehicleFrame(v)})),vehicleArt:vehicleArt.snapshot(),nextTraffic,boats:vessels(),boatArt:boatArt.snapshot(),fleet:{selection:fleetPreview?.type||'auto',types:Object.keys(boatCatalog),maxShips:3},moments:moments.snapshot(),shipPositions:Object.fromEntries(vessels().map(v=>[v.id,v.x])),wildlife:'sea-birds-only',stagesBuilt:[1]})};
 }
 
 (() => {
@@ -1638,6 +1734,15 @@ function createYilanScene(env) {
     button.addEventListener('click',()=>{const scene=window.mountainDemo?.snapshot().scene; window.mountainDemo?.setScene(scene==='yilan'?'forest':'yilan'); setTimeout(sync,100);});
     top.appendChild(button); sync();
   };
+  const addGearButton = () => {
+    const top = document.querySelector('.scene-top>div');
+    if (!top || document.getElementById('quick-gear')) return;
+    const button=document.createElement('button');
+    button.id='quick-gear'; button.type='button'; button.className='quick-gear'; button.textContent='衣';
+    button.title='換裝'; button.setAttribute('aria-label','換裝');
+    button.addEventListener('click',()=>document.getElementById('gear-toggle')?.click());
+    top.appendChild(button);
+  };
   const addForestMusic = () => {
     if (document.getElementById('forest-background-music')) return;
     const audio = document.createElement('audio');
@@ -1734,13 +1839,14 @@ function createYilanScene(env) {
   };
   const style = document.createElement('style');
   style.textContent = '.camera-control{display:flex;align-items:center;gap:8px;padding:3px 0 1px;color:var(--muted);font-size:10px}.camera-control label{color:var(--green);white-space:nowrap}.camera-control input{flex:1;min-width:0;accent-color:var(--green)}.camera-control span{white-space:nowrap;font-size:9px}.scene-top>div{position:relative}.scene-top button{width:32px!important;height:32px;min-height:32px!important;padding:0!important;margin-left:3px;font-size:15px!important;border-radius:9px}.scene-top #scene-zoom-toggle{font-size:11px!important;font-weight:600}.scene-top .quick-water,.scene-top .quick-music{position:absolute;right:0;background:transparent!important;color:#fff8e9;border:1px solid #fff6;font-size:11px!important;box-shadow:none;text-shadow:0 1px 4px #293c30}.scene-top .quick-water{top:35px}.scene-top .quick-music{top:70px}.primary-controls button,.secondary-controls button{min-height:32px!important;font-size:10px!important;padding:0 6px!important}.director-toggle{width:100%;min-height:42px!important;padding:0 14px!important;display:flex;align-items:center;justify-content:space-between;text-align:left;font-size:13px!important;letter-spacing:.08em;color:var(--green)!important;background:#f7f3e9b8!important;border:1px solid #42635b80!important;border-radius:14px!important;box-shadow:0 4px 14px #29423918,0 0 0 1px #fff8 inset;backdrop-filter:blur(8px);transition:background .22s ease,box-shadow .22s ease,transform .22s ease}.director-toggle:hover{background:#eef1e9e8!important;box-shadow:0 7px 18px #29423924,0 0 0 1px #fff9 inset;transform:translateY(-1px)}.director-content{display:block;max-height:1200px;opacity:1;overflow:hidden;transition:max-height .38s cubic-bezier(.18,.8,.22,1),opacity .22s ease}body.expanded .director:not(.is-collapsed){position:fixed;left:auto;right:18px;bottom:18px;transform:none;width:min(320px,calc(100% - 36px));max-height:54svh;overflow:auto;padding:8px 10px;background:#fffcf6e8;border:1px solid #fff8;border-radius:16px;box-shadow:0 12px 34px #172b2538;backdrop-filter:blur(10px)}body.expanded .director:not(.is-collapsed) #gear-toggle{background:var(--green);color:#fff9e9;opacity:1;font-weight:600}.director.is-collapsed{position:fixed;right:14px;bottom:14px;left:auto!important;top:auto!important;z-index:55;width:46px!important;height:46px!important;max-height:none!important;overflow:visible!important;padding:0!important;background:transparent!important;border-radius:50%;transform:none!important;transform-origin:bottom right;animation:director-dock-in .5s cubic-bezier(.18,.8,.22,1)}body.expanded .director.is-collapsed{position:fixed!important;right:14px!important;bottom:14px!important;left:auto!important;top:auto!important;width:46px!important;height:46px!important;max-height:none!important;overflow:visible!important;padding:0!important;background:transparent!important}.director.is-collapsed .director-toggle{width:46px;height:46px;min-height:46px;margin:0;padding:0;border:1px solid #fff8;background:#263e34aa;color:#fff8e9;border-radius:50%;box-shadow:0 5px 18px #1e302c40;font:300 28px/1 sans-serif}.director.is-collapsed .director-toggle:hover{background:#263e34dd}.director.is-collapsed .director-content{max-height:0;opacity:0;padding:0;margin:0}@keyframes director-dock-in{0%{opacity:.2;transform:translate(110px,70px) scale(1.4)}65%{opacity:1;transform:translate(-8px,-5px) scale(.94)}100%{opacity:1;transform:translate(0)}}@keyframes director-attention{0%,70%,100%{box-shadow:0 8px 24px #13272166,0 0 0 1px #ffffff26 inset}78%{box-shadow:0 8px 24px #13272166,0 0 0 6px #fff3,0 0 0 10px #fff1,0 0 0 1px #ffffff26 inset}}.scene-presets{position:absolute;right:0;top:105px;width:112px;display:grid;gap:4px}.preset-group{display:flex;gap:4px;justify-content:flex-end}.scene-presets .quick-preset{width:32px!important;height:27px!important;min-height:27px!important;margin:0!important;border:1px solid #fff6!important;background:#20372f88!important;color:#fff8e9!important;border-radius:8px!important;font-size:10px!important;backdrop-filter:blur(5px);text-shadow:0 1px 4px #293c30}.scene-presets .quick-preset:hover{background:#47675bcc!important}.scene-top>div>.scene-presets{pointer-events:auto}.scene-top>div>.scene-presets~*{z-index:1}@media (max-width:600px){body.expanded .director-content{display:contents}.camera-control{z-index:54}.camera-control{position:fixed;right:7px;width:82px;height:94px;display:flex;flex-direction:column;justify-content:center;gap:2px;padding:7px 5px;background:#20372f88;border:1px solid #fff6;border-radius:14px;color:#fff8e9;backdrop-filter:blur(8px);box-shadow:0 5px 18px #13272144}.camera-control label{font-size:9px;color:#fff8e9;text-align:center}.camera-control span{font-size:8px;color:#fff8e9}.camera-control input{width:64px;flex:none;transform:rotate(-90deg);margin:12px auto}.camera-control:first-of-type{top:calc(50% - 104px)}.camera-control.speed-control{top:calc(50% + 10px)}body:not(.expanded) .camera-control{display:none}.scene-rails{position:absolute;z-index:4;right:12px;top:52%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;pointer-events:auto}.scene-rails label{width:28px;height:96px;padding:0;display:flex;flex-direction:column;align-items:center;justify-content:space-between;color:#fff8e9;background:transparent;border:0;border-radius:0;backdrop-filter:none;box-shadow:none;font-size:8px;text-shadow:0 1px 4px #293c30}.scene-rails input{width:78px;height:14px;transform:rotate(-90deg);accent-color:#fff8e9;flex:none;margin:31px -25px}.scene-rails span{white-space:nowrap;font-size:8px;opacity:.9}}';
-  style.textContent += '.director-content .camera-control{display:none!important}.director.is-collapsed,body.expanded .director.is-collapsed{bottom:64px!important}.scene-top .quick-water{top:35px!important;right:0!important}.scene-top .quick-music{top:35px!important;right:35px!important}.scene-top .quick-scene{position:absolute;top:70px!important;right:0!important;background:transparent!important;color:#fff8e9!important;border:1px solid #fff6!important;font-size:10px!important;box-shadow:none;text-shadow:0 1px 4px #293c30}.music-volume-control{position:absolute;right:67px;top:35px;width:0;height:32px;display:flex;align-items:center;overflow:hidden;opacity:0;pointer-events:none;transition:width .28s cubic-bezier(.18,.8,.22,1),opacity .2s ease}.music-volume-control.is-open{width:104px;opacity:1;pointer-events:auto}.music-volume-control input{width:96px;height:14px;min-height:14px;accent-color:#fff8e9;filter:drop-shadow(0 1px 3px #293c30);cursor:pointer}.scene-rails{position:fixed!important;right:18px!important;top:50%!important;transform:translateY(-50%)!important;z-index:100!important;display:flex!important;flex-direction:column!important;gap:18px!important}.scene-rails label{width:26px!important;height:108px!important;padding:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;color:#fff8e9!important;background:transparent!important;border:0!important;border-radius:0!important;backdrop-filter:none!important;box-shadow:none!important;font-size:8px!important;text-shadow:0 1px 4px #293c30!important}.scene-rails input{width:82px!important;height:14px!important;transform:rotate(-90deg)!important;accent-color:#fff8e9!important;flex:none!important;margin:36px -28px!important}.scene-rails span{white-space:nowrap!important;font-size:8px!important;opacity:.9!important}';
+  style.textContent += '.director-content .camera-control{display:none!important}.director-toggle,.director.is-collapsed{display:none!important}.scene-top .quick-water{top:35px!important;right:0!important}.scene-top .quick-music{top:35px!important;right:35px!important}.scene-top .quick-scene{position:absolute;top:70px!important;right:0!important;background:transparent!important;color:#fff8e9!important;border:1px solid #fff6!important;font-size:10px!important;box-shadow:none;text-shadow:0 1px 4px #293c30}.scene-top .quick-gear{position:absolute;top:70px!important;right:35px!important;background:transparent!important;color:#fff8e9!important;border:1px solid #fff6!important;font-size:10px!important;box-shadow:none;text-shadow:0 1px 4px #293c30}.music-volume-control{position:absolute;right:67px;top:35px;width:0;height:32px;display:flex;align-items:center;overflow:hidden;opacity:0;pointer-events:none;transition:width .28s cubic-bezier(.18,.8,.22,1),opacity .2s ease}.music-volume-control.is-open{width:104px;opacity:1;pointer-events:auto}.music-volume-control input{width:96px;height:14px;min-height:14px;accent-color:#fff8e9;filter:drop-shadow(0 1px 3px #293c30);cursor:pointer}.scene-rails{position:fixed!important;right:18px!important;top:50%!important;transform:translateY(-50%)!important;z-index:100!important;display:flex!important;flex-direction:column!important;gap:18px!important}.scene-rails label{width:26px!important;height:108px!important;padding:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:space-between!important;color:#fff8e9!important;background:transparent!important;border:0!important;border-radius:0!important;backdrop-filter:none!important;box-shadow:none!important;font-size:8px!important;text-shadow:0 1px 4px #293c30!important}.scene-rails input{width:82px!important;height:14px!important;transform:rotate(-90deg)!important;accent-color:#fff8e9!important;flex:none!important;margin:36px -28px!important}.scene-rails span{white-space:nowrap!important;font-size:8px!important;opacity:.9!important}';
   document.head.appendChild(style);
   moveCameraControl();
   addDirectorToggle();
   addCameraToggle();
   addWaterButton();
   addSceneToggle();
+  addGearButton();
   addForestMusic();
   addScenePresets();
   addSceneRails();
@@ -1749,6 +1855,7 @@ function createYilanScene(env) {
   setTimeout(addCameraToggle, 0);
   setTimeout(addWaterButton, 0);
   setTimeout(addSceneToggle, 0);
+  setTimeout(addGearButton, 0);
   setTimeout(addForestMusic, 0);
   setTimeout(addScenePresets, 0);
   setTimeout(addSceneRails, 0);
