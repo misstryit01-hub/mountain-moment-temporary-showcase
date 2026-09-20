@@ -1735,7 +1735,7 @@ function createYilanScene(env) {
     const button = document.createElement('button');
     button.id='scene-switch-toggle'; button.type='button'; button.className='quick-scene';
     const sync=()=>{const scene=window.mountainDemo?.snapshot().scene; button.textContent=scene==='yilan'?'霧杉':'宜蘭'; button.title=scene==='yilan'?'切換到霧杉山谷':'切換到宜蘭';};
-    button.addEventListener('click',()=>{const scene=window.mountainDemo?.snapshot().scene; window.mountainDemo?.setScene(scene==='yilan'?'forest':'yilan'); setTimeout(()=>{sync(); document.getElementById('forest-background-music')?.dispatchEvent(new Event('scenechange'));},100);});
+    button.addEventListener('click',()=>{const scene=window.mountainDemo?.snapshot().scene; const next=scene==='yilan'?'forest':'yilan'; window.mountainDemo?.setScene(next); setTimeout(()=>{sync(); window.__switchSceneMusic?.(next);},100);});
     top.appendChild(button); sync();
   };
   const addGearButton = () => {
@@ -1792,14 +1792,13 @@ function createYilanScene(env) {
       if (!enabled) return;
       audio.play().then(() => { fading = false; fade(audio.volume, volumeTarget, 2000); }).catch(() => {});
     };
-    audio.addEventListener('scenechange', () => {
-      const scene = window.mountainDemo?.snapshot().scene;
+    window.__switchSceneMusic = scene => {
       const next = scene === 'yilan' ? audio.dataset.yilanSrc : audio.dataset.forestSrc;
       if (!next || audio.src.endsWith(next)) return;
       const wasPlaying = !audio.paused;
       audio.pause(); audio.currentTime = 0; audio.src = next; audio.load();
       if (wasPlaying || enabled) start();
-    });
+    };
     const tryStart = () => { if (audio.paused) start(); };
     ['pointerdown','keydown','touchstart'].forEach(type => window.addEventListener(type, tryStart, {once:true, passive:true}));
     volumeWrap.querySelector('input').addEventListener('input', e => {
