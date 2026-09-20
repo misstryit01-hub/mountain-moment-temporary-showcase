@@ -1744,7 +1744,10 @@ function createYilanScene(env) {
     const button=document.getElementById('quick-gear') || document.createElement('button');
     button.id='quick-gear'; button.type='button'; button.className='quick-gear'; button.textContent='衣';
     button.title='換裝'; button.setAttribute('aria-label','換裝');
-    button.addEventListener('click',()=>document.getElementById('gear-toggle')?.click());
+    if (button.dataset.gearWired !== 'true') {
+      button.dataset.gearWired = 'true';
+      button.addEventListener('click',()=>document.getElementById('gear-toggle')?.click());
+    }
     if (!button.parentElement) top.appendChild(button);
   };
   const addForestMusic = () => {
