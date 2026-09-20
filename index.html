@@ -1513,6 +1513,7 @@ function createYilanScene(env) {
     if(e.source!==actor.contentWindow||e.data?.channel!=='mountain-demo'||e.data.type!=='ready')return;
     api=actor.contentWindow.mountainActor;ready=!!api;$('play').disabled=!ready;$('walk').disabled=!ready;
     $('loading').classList.add('done');$('loading').setAttribute('aria-hidden','true');render(0);updateUI();
+    setTimeout(()=>{if(!expanded)$('fullscreen').click();},250);
     if(reduced)notify('低動態模式：山景保持靜止，可手動開始走路。');
   });
   actor.srcdoc=JSON.parse($('actor-document').textContent);
