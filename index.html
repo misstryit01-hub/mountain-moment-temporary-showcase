@@ -1055,7 +1055,7 @@ function createYilanScene(env) {
     g.addColorStop(0,color(skyTopHex(skyTop),'#172d43',n));
     g.addColorStop(.56,color(skyTopHex(skyBottom),'#627b8a',n));
     g.addColorStop(1,C('#c1d7cf','#496572'));c.fillStyle=g;c.fillRect(0,0,W,H);
-    const sunX=W*mix(.73,.47,env.distance()),sunY=H*mix(.13,.23,warm);
+    const hour=light.hour,dayT=clamp((hour-6)/12),sunArc=Math.sin(dayT*Math.PI),sunX=W*(.30+.61*dayT),sunY=H*(.43-sunArc*.30);
     if(n<.98){
       halo(c,sunX,sunY,H*.45,color('#f4efcf','#ffdaa7',warm),(1-n)*(.24+warm*.47),1.28,1);
       halo(c,sunX,sunY,H*.32,color('#fffce3','#fff9d6',warm),(1-n)*warm*.63,1.12,1.16);
@@ -1064,7 +1064,7 @@ function createYilanScene(env) {
     if(n>.2){
       c.save();c.globalAlpha=(n-.2)/.8;
       for(const s of stars){c.fillStyle='rgba(226,234,227,.65)';c.beginPath();c.arc(s.x*W,s.y*H,s.r,0,TAU);c.fill();}
-      const mx=W*.79,my=H*.16,r=H*.017;
+      const moonH=hour<12?hour+24:hour,moonT=clamp((moonH-18)/12),moonArc=Math.sin(moonT*Math.PI),mx=W*(.16+.68*moonT),my=H*(.43-moonArc*.31),r=H*.017;
       halo(c,mx,my,r*6,color('#cddbd8','#cddbd8',0),.14);
       c.beginPath();c.arc(mx,my,r,Math.PI*.55,Math.PI*1.55);c.bezierCurveTo(mx-r*.1,my-r*.4,mx-r*.2,my+r*.6,mx+Math.cos(Math.PI*.55)*r,my+Math.sin(Math.PI*.55)*r);c.fillStyle='#e8e5cf';c.fill();c.restore();
     }
@@ -1289,13 +1289,13 @@ function createYilanScene(env) {
   }
   function sky(){
     const g=ctx.createLinearGradient(0,0,0,H);[0,.22,.43,.64,1].forEach((p,i)=>g.addColorStop(p,pal(palettes.sky[i])));ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
-    const sx=W*(.70-.025*distance),sy=H*(.24+.035*distance),rad=H*.49;
+    const hour=lightState.hour,dayT=clamp((hour-6)/12),sunArc=Math.sin(dayT*Math.PI),sx=W*(.30+.61*dayT),sy=H*(.48-sunArc*.32),rad=H*.49;
     glow(ctx,sx,sy,rad,[[0,`rgba(255,247,194,${.96*(1-night)})`],[.17,`rgba(255,239,175,${.78*(1-night)})`],[.48,`rgba(255,211,152,${.42*(1-night)})`],[1,'rgba(255,180,137,0)']],1.2,1.05);
     glow(ctx,sx,sy,H*.25,[[0,`rgba(214,225,239,${night*.38})`],[1,'rgba(185,209,225,0)']]);
     for(const s of stars){const a=night*clamp(1-s.y/.68)*(.4+s.a*.6)*(.85+.15*Math.sin(clock*.5+s.p));if(a<.025)continue;ctx.fillStyle=`rgba(247,237,211,${a})`;ctx.beginPath();ctx.arc(s.x*W,s.y*H,s.r*dpr**.1,0,Math.PI*2);ctx.fill();}
     ctx.save();ctx.globalAlpha=1-night;
     glow(ctx,sx,sy,H*.068,[[0,'rgba(255,252,223,1)'],[.82,'rgba(255,249,210,.98)'],[1,'rgba(255,244,198,0)']]);ctx.restore();
-    if(night>.005){ctx.save();ctx.globalAlpha=night;ctx.translate(sx,sy);ctx.rotate(-.35);const r=H*.024;ctx.beginPath();ctx.arc(0,0,r,Math.PI*.58,Math.PI*1.58);ctx.bezierCurveTo(-r*.18,-r*.60,-r*.3,r*.64,Math.cos(Math.PI*.58)*r,Math.sin(Math.PI*.58)*r);ctx.fillStyle='#f5ead3';ctx.fill();ctx.restore();}
+    if(night>.005){const moonH=hour<12?hour+24:hour,moonT=clamp((moonH-18)/12),moonArc=Math.sin(moonT*Math.PI),mx=W*(.16+.68*moonT),my=H*(.47-moonArc*.34);ctx.save();ctx.globalAlpha=night;ctx.translate(mx,my);ctx.rotate(-.35);const r=H*.024;ctx.beginPath();ctx.arc(0,0,r,Math.PI*.58,Math.PI*1.58);ctx.bezierCurveTo(-r*.18,-r*.60,-r*.3,r*.64,Math.cos(Math.PI*.58)*r,Math.sin(Math.PI*.58)*r);ctx.fillStyle='#f5ead3';ctx.fill();ctx.restore();}
     // Long, translucent cloud strokes, not a row of circular cloud icons.
     for(let i=0;i<7;i++){const x=((i*.237+clock*.0011)%1.8-.4)*W,y=H*(.13+(i%3)*.09);const len=W*(.16+(i%3)*.06);ctx.fillStyle=rgba(color('#e5b2a7','#9491a7'),.18);ctx.beginPath();ctx.moveTo(x,y);ctx.bezierCurveTo(x+len*.13,y-H*.014,x+len*.19,y-H*.009,x+len*.31,y-H*.011);ctx.lineTo(x+len*.47,y-H*.028);ctx.lineTo(x+len*.63,y-H*.024);ctx.lineTo(x+len*.72,y-H*.006);ctx.bezierCurveTo(x+len*.83,y-H*.012,x+len*.96,y,x+len,y+H*.008);ctx.bezierCurveTo(x+len*.65,y+H*.013,x+len*.25,y+H*.009,x,y);ctx.fill();}
   }
