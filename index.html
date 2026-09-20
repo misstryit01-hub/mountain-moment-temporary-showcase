@@ -1556,6 +1556,9 @@ function createYilanScene(env) {
       window.mountainDemo?.setDistance(1);
       const fullscreen = document.getElementById('fullscreen');
       if (fullscreen && !document.body.classList.contains('expanded')) fullscreen.click();
+      [250, 800, 1600].forEach(delay => setTimeout(() => {
+        if (fullscreen && !document.body.classList.contains('expanded')) fullscreen.click();
+      }, delay));
       if (fullscreen) fullscreen.setAttribute('aria-label', '放大山景');
       const walk = document.getElementById('walk');
       if (walk && !walk.disabled && walk.textContent.includes('開始走路')) walk.click();
