@@ -1,0 +1,402 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#1f252a">
+<title>四國行程手帖 v8</title>
+<style>
+:root{--bg:#f5f1ea;--card:#fffdfa;--line:#ddd6cc;--ink:#20262b;--muted:#6b7379;--teal:#197a88;--teal2:#24b996;--tealSoft:#dceef1;--orange:#ef8a46;--warm:#c87949;--warmSoft:#f6e4d7;--dark:#112029;--shadow:0 12px 32px rgba(24,31,35,.08);--r:24px}
+*{box-sizing:border-box;min-width:0}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans TC",sans-serif;line-height:1.6;-webkit-text-size-adjust:100%}
+button,input{font:inherit} img{display:block;max-width:100%} a{color:inherit}
+.wrap{max-width:1080px;margin:auto;padding:0 14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);overflow:hidden}
+.hero{position:relative;color:white;background:#263941;overflow:hidden}
+.hero>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.58) saturate(.9)}
+.hero:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.06),rgba(0,0,0,.62))}
+.hero-in{position:relative;z-index:1;max-width:1080px;margin:auto;padding:30px 14px 22px}
+.kicker{font-size:11px;letter-spacing:.15em;text-transform:uppercase;font-weight:800;opacity:.8}
+.hero h1{font-family:Georgia,"Noto Serif TC",serif;font-size:clamp(36px,9vw,64px);line-height:1.02;margin:8px 0}
+.hero p{margin:0;color:rgba(255,255,255,.86)}
+.summary{display:grid;gap:12px;margin-top:18px}
+.sum{padding:16px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.18);border-radius:22px;backdrop-filter:blur(8px)}
+.sum .lab{font-size:11px;letter-spacing:.12em;text-transform:uppercase;font-weight:800;opacity:.76}
+.sum .big{font:700 44px/1.05 Georgia,"Noto Serif TC",serif;margin-top:6px}
+.sum .route{font-size:15px;margin-top:6px}
+.flight{padding:9px 0;border-top:1px solid rgba(255,255,255,.14)} .flight:first-of-type{margin-top:6px}
+.sticky{position:sticky;top:0;z-index:50;background:rgba(245,241,234,.95);backdrop-filter:blur(12px);border-bottom:1px solid rgba(180,170,160,.45)}
+.tabs{display:flex;gap:8px;overflow:auto;padding:12px 0;scrollbar-width:none} .tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;border:1px solid var(--line);background:#fffaf5;color:var(--muted);padding:10px 15px;border-radius:999px;font-weight:800;cursor:pointer}
+.tab.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+main{padding:18px 0 70px} .panel{display:none} .panel.active{display:block}
+.head{margin-bottom:14px} .head h2{font:700 38px/1.15 Georgia,"Noto Serif TC",serif;margin:0 0 6px} .head p{margin:0;color:var(--muted)}
+.grid{display:grid;gap:14px} .pad{padding:16px}
+.route-stop{padding:14px;border-radius:18px;background:#fbf7f1;border:1px solid #ece2d5;margin-bottom:10px}
+.route-stop strong{display:block;font:700 26px/1.1 Georgia,"Noto Serif TC",serif} .route-stop span{display:block;color:var(--muted);font-size:13px;margin-top:4px}
+.callout{margin-top:12px;padding:13px 14px;border-left:4px solid var(--warm);background:var(--warmSoft);border-radius:0 15px 15px 0;font-size:13px}
+.focus{display:grid;gap:10px} .focus-item{display:grid;grid-template-columns:72px 1fr;gap:12px;align-items:center;padding-bottom:10px;border-bottom:1px solid #ece4da}
+.focus-item:last-child{border-bottom:0;padding-bottom:0} .focus-item img{width:72px;height:72px;object-fit:cover;border-radius:16px} .focus-item b{display:block} .focus-item span{display:block;color:var(--muted);font-size:13px}
+.stays{display:grid;gap:12px} .stay{padding:15px;background:#fbf7f1;border:1px solid #ece2d5;border-radius:20px} .stay h3{font:700 28px/1.1 Georgia,"Noto Serif TC",serif;margin:0} .stay p{margin:8px 0 0;color:var(--muted)}
+.split{margin-top:14px;padding:16px} .split h3{font:700 32px/1.1 Georgia,"Noto Serif TC",serif;margin:0 0 8px} .branches{display:grid;gap:12px;margin-top:12px}
+.branch{padding:15px;border-radius:18px;background:#fbf7f1;border:1px solid #ece2d5} .branch h4{font:700 29px/1.12 Georgia,"Noto Serif TC",serif;margin:5px 0 8px} .branch .tiny{font-size:11px;letter-spacing:.1em;text-transform:uppercase;font-weight:800;color:#7e7064} .branch ul{padding-left:18px;color:#596269}
+.budget{margin-top:12px;padding:14px;background:#f8f3eb;border:1px solid #ece1d2;border-radius:18px} .budget input[type=number]{width:100%;padding:11px;border:1px solid var(--line);border-radius:13px;background:#fff} .budget input[type=range]{width:100%}
+.budget-grid{display:grid;gap:8px;margin-top:10px} .budget-item{padding:11px;background:#fff;border:1px solid #ece2d5;border-radius:15px} .budget-item b,.budget-item span{display:block} .budget-item span{color:var(--muted);font-size:13px}
+.days{display:flex;gap:8px;overflow:auto;scrollbar-width:none;margin-bottom:14px} .days::-webkit-scrollbar{display:none} .daybtn{flex:0 0 auto;border:1px solid var(--line);background:#fffaf5;border-radius:17px;padding:9px 12px;cursor:pointer;min-width:85px;text-align:left} .daybtn b{display:block;font:700 18px Georgia,"Noto Serif TC",serif} .daybtn span{font-size:12px;color:var(--muted)} .daybtn.active{background:var(--tealSoft);border-color:#a9cdd4}
+.day{display:none} .day.active{display:block} .daycard{padding:16px} .daytitle{display:flex;justify-content:space-between;gap:10px;align-items:center;flex-wrap:wrap} .daytitle h3{font:700 32px/1.15 Georgia,"Noto Serif TC",serif;margin:0} .state{padding:5px 9px;border-radius:999px;background:#eee8df;color:#69635d;font-size:11px;font-weight:800} .state.fixed{background:var(--tealSoft);color:#15525c}
+.photos{display:grid;grid-auto-flow:column;grid-auto-columns:80%;gap:10px;overflow:auto;scroll-snap-type:x mandatory;padding:10px 0 2px} .photo{position:relative;aspect-ratio:4/3;border-radius:20px;overflow:hidden;scroll-snap-align:start;background:#ddd5ca} .photo img{width:100%;height:100%;object-fit:cover} .photo .cap{position:absolute;left:0;right:0;bottom:0;padding:10px 12px;background:linear-gradient(transparent,rgba(0,0,0,.62));color:#fff;font-size:13px}
+.timeline{display:grid;gap:9px;margin-top:10px} .trow{display:grid;grid-template-columns:72px 1fr;gap:10px;padding:10px 0;border-bottom:1px solid #ece4da} .trow:last-child{border-bottom:0} .trow b{font-size:12px;color:var(--muted)}
+.note{margin-top:11px;padding:12px 13px;border-radius:15px;background:#f8f3eb;border:1px solid #ece2d5;color:#596269;font-size:13px}
+.eval-grid{display:grid;gap:9px;margin:12px 0} .eval{display:grid;grid-template-columns:1fr auto;gap:8px;padding:11px 12px;border:1px solid #ece2d5;background:#fbf7f1;border-radius:16px;align-items:center} .eval b{display:block} .eval span{display:block;color:var(--muted);font-size:12px} .eval em{font-style:normal;font-size:11px;font-weight:800;padding:5px 8px;border-radius:999px;background:var(--tealSoft);color:#15525c;white-space:nowrap} .eval.dim em{background:#eee8df;color:#776d64}
+.optbar{display:flex;gap:8px;overflow:auto;scrollbar-width:none;padding-bottom:2px} .optbar::-webkit-scrollbar{display:none} .opt{flex:0 0 auto;border:1px solid var(--line);background:#fff;padding:10px 12px;border-radius:999px;font-weight:800;cursor:pointer} .opt.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+.island{margin-top:12px;border:1px solid #ece2d5;border-radius:22px;overflow:hidden;background:#fff} .island>img{width:100%;height:220px;object-fit:cover} .island-body{padding:15px} .island h4{font:700 30px/1.1 Georgia,"Noto Serif TC",serif;margin:0 0 5px} .tagrow{display:flex;gap:7px;flex-wrap:wrap;margin:9px 0} .itag{padding:5px 8px;border-radius:999px;background:#f0ebe3;font-size:11px;font-weight:800;color:#68615a}
+.kv{display:grid;gap:8px;margin-top:10px} .kvdiv{padding:10px 11px;background:#fbf7f1;border:1px solid #ece2d5;border-radius:15px} .kvdiv b,.kvdiv span{display:block} .kvdiv span{color:#596269;font-size:13px;margin-top:2px}
+.train-shell{margin-top:14px;background:var(--dark);color:#eef4f7;border-radius:28px;padding:15px;border:1px solid #24333b} .train-head h4{font:700 30px/1.1 Georgia,"Noto Serif TC",serif;margin:0} .train-head p{margin:5px 0 0;color:rgba(255,255,255,.72);font-size:13px}
+.route-select{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px} .routebtn{border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;border-radius:18px;padding:13px 11px;text-align:left;cursor:pointer} .routebtn b{display:block;font-size:18px} .routebtn span{display:block;font-size:12px;color:rgba(255,255,255,.68);margin-top:3px} .routebtn.active{background:#fff;color:#142028;border-color:#fff;box-shadow:0 0 0 3px rgba(34,196,150,.35)} .routebtn.active span{color:#536068}
+.mapbox{position:relative;margin-top:12px;border-radius:22px;background:linear-gradient(180deg,#0e1720,#142630);border:1px solid rgba(255,255,255,.08);padding:8px;overflow:hidden} .mapbox svg{display:block;width:100%;height:auto}
+.marker{position:absolute;width:32px;height:32px;border-radius:50%;border:2px solid #fff;background:#21313a;color:white;display:grid;place-items:center;font-size:14px;cursor:pointer;box-shadow:0 6px 18px rgba(0,0,0,.28);transform:translate(-50%,-50%)} .marker.active{background:#fff;color:#132029;box-shadow:0 0 0 4px rgba(34,196,150,.45)}
+.mapbubble{position:absolute;left:12px;top:12px;width:min(220px,62%);background:#fff;color:#1f252a;border-radius:16px;padding:8px;box-shadow:0 12px 30px rgba(0,0,0,.3);z-index:3} .mapbubble:after{content:"";position:absolute;left:28px;bottom:-9px;border:10px solid transparent;border-top-color:#fff;border-bottom:0} .mapbubble img{width:100%;height:94px;object-fit:cover;border-radius:11px;background:#d8d2c8} .mapbubble b{display:block;margin-top:6px} .mapbubble span{display:block;font-size:11.5px;color:#667076;margin-top:2px}
+.route-facts{display:grid;gap:8px;margin-top:10px} .rfact{padding:10px 11px;border-radius:15px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09)} .rfact b{display:block;color:#fff} .rfact span{display:block;color:rgba(255,255,255,.72);font-size:12.5px;margin-top:2px}
+.train-photo{margin-top:11px;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.1)} .train-photo img{width:100%;height:190px;object-fit:cover} .train-photo div{padding:9px 11px;background:rgba(255,255,255,.04);font-size:13px}
+.todo{display:grid;gap:14px} .todo-card,.status{padding:16px} .todo-list{list-style:none;margin:0;padding:0} .todo-item{border-bottom:1px solid #ece4da} .todo-item:last-child{border-bottom:0} .todo-label{display:grid;grid-template-columns:26px 1fr;gap:12px;padding:14px 0;align-items:start;cursor:pointer} .check{appearance:none;width:22px;height:22px;border-radius:50%;border:1.5px solid #a4a9ad;background:#fff;position:relative;margin-top:1px} .check:checked{background:var(--ink);border-color:var(--ink)} .check:checked:after{content:"✓";position:absolute;inset:0;display:grid;place-items:center;color:white;font-size:13px} .tt b{display:block} .tt span{display:block;color:var(--muted);font-size:13px;margin-top:2px} .check:checked+.tt{opacity:.45;text-decoration:line-through} .stats{display:grid;gap:6px;margin-top:9px} .stats div{display:flex;justify-content:space-between;gap:10px;padding:9px 0;border-bottom:1px solid #ece4da} .reset{width:100%;margin-top:12px;padding:11px;border-radius:999px;border:1px solid var(--line);background:#fff;font-weight:800;cursor:pointer}
+@media(min-width:760px){.summary{grid-template-columns:1.1fr .9fr} .twocol{display:grid;grid-template-columns:1fr 1fr;gap:14px} .stays{grid-template-columns:repeat(3,1fr)} .branches{grid-template-columns:1fr 1fr} .budget-grid{grid-template-columns:repeat(3,1fr)} .photos{grid-auto-columns:38%} .todo{grid-template-columns:1fr 300px}}
+
+.festival-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.festival-shot{position:relative;border-radius:18px;overflow:hidden;aspect-ratio:1/1;background:#ddd5ca}
+.festival-shot img{width:100%;height:100%;object-fit:cover}
+.festival-shot span{position:absolute;left:0;right:0;bottom:0;padding:9px 10px;color:#fff;font-size:12px;background:linear-gradient(transparent,rgba(0,0,0,.66))}
+.route-select{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
+.routebtn{position:relative;border:2px solid rgba(255,255,255,.18);background:rgba(255,255,255,.06);color:#fff;border-radius:20px;padding:14px 12px;text-align:left;cursor:pointer;transition:.18s ease}
+.routebtn::after{content:"點我";position:absolute;right:10px;top:10px;font-size:10px;font-weight:900;letter-spacing:.08em;padding:4px 7px;border-radius:999px;background:rgba(255,255,255,.12)}
+.routebtn b{display:block;font-size:18px}.routebtn span{display:block;font-size:12px;color:rgba(255,255,255,.72);margin-top:4px}
+.routebtn.active{background:#fff;color:#142028;border-color:#fff;box-shadow:0 0 0 4px rgba(34,196,150,.34)}
+.routebtn.active::after{content:"目前選擇";background:#dceef1;color:#15525c}.routebtn.active span{color:#526068}
+.mapbox{margin-top:12px;border-radius:22px;background:#b7dfe9;border:1px solid rgba(255,255,255,.08);padding:0;overflow:hidden}
+.mapbox svg{display:block;width:100%;height:auto}
+.station-buttons{display:flex;gap:8px;overflow:auto;scrollbar-width:none;padding:11px 0 2px}.station-buttons::-webkit-scrollbar{display:none}
+.station-btn{flex:0 0 auto;display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:999px;border:1px solid rgba(255,255,255,.14);background:rgba(255,255,255,.06);color:#fff;cursor:pointer;font-weight:800}
+.station-btn::after{content:"›";opacity:.7;font-size:18px}.station-btn.active{background:#fff;color:#142028}
+.station-btn img{width:34px;height:34px;border-radius:50%;object-fit:cover}
+.station-preview{display:grid;grid-template-columns:150px 1fr;gap:12px;margin-top:10px;padding:12px;border-radius:18px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09)}
+.station-preview img{width:100%;height:116px;object-fit:cover;border-radius:14px;background:#0f171c}
+.station-preview b{display:block;font-size:22px}.station-preview span{display:block;color:rgba(255,255,255,.76);font-size:13px;margin-top:4px}
+.route-facts{display:grid;gap:8px;margin-top:10px}.rfact{padding:10px 11px;border-radius:15px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.09)}
+.rfact b{display:block;color:#fff}.rfact span{display:block;color:rgba(255,255,255,.72);font-size:12.5px;margin-top:2px}
+@media(max-width:520px){.station-preview{grid-template-columns:1fr}.station-preview img{height:170px}}
+
+
+.routebtn{position:relative!important;padding:15px 13px!important;border:2px solid rgba(255,255,255,.24)!important;box-shadow:0 5px 0 rgba(0,0,0,.16);transform:translateY(0);transition:.16s ease}
+.routebtn::after{content:none!important}
+.routebtn b::before{content:"○ ";font-size:16px}
+.routebtn.active{background:#fff!important;color:#142028!important;border-color:#fff!important;box-shadow:0 0 0 4px rgba(34,196,150,.38),0 5px 0 rgba(0,0,0,.14)!important}
+.routebtn.active b::before{content:"✓ ";color:#14866b}
+.routebtn:active{transform:translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,.14)!important}
+.festival-photos{grid-auto-columns:82%!important}
+@media(min-width:760px){.festival-photos{grid-auto-columns:38%!important}}
+
+.photos.festival-photos{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,84%);overflow-x:auto;gap:14px;scroll-snap-type:x proximity}
+.photos.festival-photos .photo{scroll-snap-align:start}
+.branch-compare{margin-top:12px;padding:12px;border-radius:20px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08)}
+.branch-compare svg{display:block;width:100%;height:auto}
+.splitcards{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+.routebtn.split{border-width:2px}
+.routebtn.split.active{box-shadow:0 0 0 4px rgba(34,196,150,.24)}
+.routebtn::after{display:none}
+.modebar{display:flex;gap:10px;margin-top:12px}
+.modebtn{flex:1;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.05);color:#fff;padding:10px 14px;font-weight:800;cursor:pointer}
+.modebtn.active{background:#fff;color:#142028}
+.route-map{margin-top:12px}
+.route-map svg{display:block;width:100%;height:auto}
+.station-preview{scroll-margin-top:88px}
+.map-hit{fill:rgba(255,255,255,0);cursor:pointer}
+@media(max-width:520px){
+  .splitcards{grid-template-columns:1fr 1fr}
+}
+
+
+.split-note{color:var(--muted);margin:6px 0 0}
+.stay-fork{margin-top:14px}
+.fork-top{width:max-content;margin:0 auto 8px;padding:8px 14px;border-radius:999px;background:#fbf7f1;border:1px solid #e7ddcf;font-weight:800}
+.stay-fork svg{display:block;width:100%;height:auto;margin:2px 0 8px}
+.branches.side{grid-template-columns:1fr 1fr;align-items:stretch}
+.branch{height:100%}
+@media(max-width:520px){.branches.side{grid-template-columns:1fr 1fr}.branch h4{font-size:23px}.branch ul{padding-left:16px;font-size:14px}}
+
+.train-cover{margin-top:12px;border-radius:20px;overflow:hidden;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04)}
+.train-cover img{width:100%;height:180px;object-fit:cover;display:block}
+.train-cover div{padding:9px 11px;color:rgba(255,255,255,.84);font-size:13px}
+.branch-compare.clean{margin-top:12px}
+.route-trio{display:grid;grid-template-columns:1fr 1fr .8fr;gap:10px;margin-top:12px;align-items:stretch}
+.routebtn.trio,.returnbtn{min-height:88px;border-radius:22px;padding:15px 13px;border:2px solid rgba(255,255,255,.20);background:rgba(255,255,255,.06);color:#fff;text-align:left;cursor:pointer;box-shadow:0 5px 0 rgba(0,0,0,.16);transition:.16s ease}
+.returnbtn b{display:block;font-size:24px;line-height:1.05}.returnbtn span{display:block;margin-top:4px;font-size:12px;color:rgba(255,255,255,.68)}
+.returnbtn.active{background:#fff;color:#142028;border-color:#fff;box-shadow:0 0 0 4px rgba(34,196,150,.32),0 5px 0 rgba(0,0,0,.12)}
+.returnbtn.active span{color:#5b656b}
+.routebtn.trio b{font-size:18px}
+.routebtn.trio span{font-size:12px}
+.route-map svg{display:block;width:100%;height:auto}
+#mapPoints circle{cursor:pointer}
+.station-buttons.full{display:flex;gap:10px;overflow:auto;padding-bottom:2px}
+.station-btn{min-height:52px}
+.station-btn span{white-space:nowrap}
+@media(max-width:560px){.route-trio{grid-template-columns:1fr 1fr 110px}.returnbtn b{font-size:20px}}
+
+</style>
+</head>
+<body>
+<header class="hero"><img id="heroImg" alt="瀨戶內海島景"><div class="hero-in"><div class="kicker">Shikoku Trip Planner</div><h1>四國行程手帖</h1><p>瀨戶內海・琴平祭典・松山｜8 天 7 夜</p><div class="summary"><div class="sum"><div class="lab">Trip Summary</div><div class="big">8 天 7 夜</div><div class="route">高松 3 晚 → 琴平 1 晚 → 松山 3 晚</div></div><div class="sum"><div class="lab">Flights</div><div class="flight"><b>去程｜CI 178</b><div>10/07 台北 14:30 → 高松 18:05</div></div><div class="flight"><b>回程｜CI 179</b><div>10/14 高松 19:05 → 台北 20:55</div></div></div></div></div></header>
+
+<div class="sticky"><div class="wrap"><div class="tabs"><button class="tab active" data-panel="overview">總覽</button><button class="tab" data-panel="stay">住宿</button><button class="tab" data-panel="plan">每日行程</button><button class="tab" data-panel="todo">待辦</button></div></div></div>
+
+<main class="wrap">
+<section class="panel active" id="panel-overview"><div class="head"><h2>大方向</h2><p>高松看公園、離島與海景；琴平看祭典；松山看觀光列車與道後溫泉。</p></div><div class="twocol"><article class="card pad"><div class="route-stop"><strong>高松</strong><span>10/07–10/10 · 栗林公園／男木島／父母ヶ浜</span></div><div class="route-stop"><strong>琴平</strong><span>10/10–10/11 · 金刀比羅宮例大祭</span></div><div class="route-stop"><strong>松山</strong><span>10/11–10/14 · 伊予灘ものがたり／道後溫泉</span></div><div class="callout"><strong>10/08（四）先排離島、10/09（五）上午高松市區＋下午父母ヶ浜夕景。</strong>若週四海況不好，再把這兩天互換。</div></article><article class="card pad"><div class="focus"><div class="focus-item"><img data-asset="ritsurin"><div><b>高松</b><span>栗林公園、男木島、父母ヶ浜。</span></div></div><div class="focus-item"><img data-asset="festival"><div><b>琴平</b><span>住一晚就是為了把例大祭看到完整。</span></div></div><div class="focus-item"><img data-asset="dogo"><div><b>松山</b><span>觀光列車、道後溫泉、松山城。</span></div></div></div></article></div></section>
+
+<section class="panel" id="panel-stay"><div class="head"><h2>住宿安排</h2><p>高松與琴平固定；只有松山這 3 晚再往下分成 2 個住法。</p></div><div class="stays"><div class="stay"><h3>高松 · 3 晚</h3><p>10/07–10/10。住站區方便港口與市區移動。</p></div><div class="stay"><h3>琴平 · 1 晚</h3><p>10/10–10/11。目的就是祭典，不用深夜趕車。</p></div><div class="stay"><h3>松山 · 3 晚</h3><p>10/11–10/14。這一段才分叉：維持同住，或只拆 10/11 一晚。</p></div></div><article class="card split"><h3>松山住宿選項</h3><p class="split-note">下面不是整趟旅程分兩案，而是只有 <b>松山 3 晚</b> 往下分成兩種住法。</p><div class="stay-fork"><div class="fork-top">松山 3 晚</div><svg viewBox="0 0 760 140" aria-label="松山住宿分叉"><defs><marker id="arrowhead" markerWidth="10" markerHeight="10" refX="8" refY="5" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#cabaa7"/></marker></defs><path d="M380 20 L380 44" fill="none" stroke="#cabaa7" stroke-width="2.6" stroke-linecap="round"/><path d="M380 44 C310 44 260 54 210 92" fill="none" stroke="#cabaa7" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/><path d="M380 44 C450 44 500 54 550 92" fill="none" stroke="#cabaa7" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrowhead)"/></svg><div class="branches side"><div class="branch"><div class="tiny">選項 1</div><h4>三晚同住</h4><ul><li><strong>10/11、10/12、10/13</strong> 都住同一家。</li><li>優點：不用搬行李，流程最順。</li><li>適合：三晚價差不大，想省麻煩。</li></ul></div><div class="branch"><div class="tiny">選項 2</div><h4>只拆 10/11</h4><ul><li><strong>10/11：</strong>先住商務飯店 1 晚。</li><li><strong>10/12、10/13：</strong>再住道後溫泉旅館 2 晚。</li><li>意思：把最貴那晚壓低，把預算集中給後兩晚。</li></ul></div></div></div><div class="budget"><b>松山 3 晚預算分配</b><input id="budget" type="number" min="15000" step="1000" value="60000"><div style="font-size:13px;color:var(--muted);margin-top:8px">10/11 商務飯店比例：<b><span id="pct">25</span>%</b></div><input id="range" type="range" min="15" max="50" value="25"><div class="budget-grid"><div class="budget-item"><b>10/11 商務飯店</b><span id="biz">¥15,000</span></div><div class="budget-item"><b>道後 2 晚合計</b><span id="dogo2">¥45,000</span></div><div class="budget-item"><b>道後每晚</b><span id="dogo1">¥22,500 / 晚</span></div></div></div></article></section>
+
+<section class="panel" id="panel-plan"><div class="head"><h2>每日行程</h2><p>10/8 離島方案增加女木島與豊島評估；10/12 列車可切去程／回程；預設從第一天開始看。</p></div><div class="days"><button class="daybtn active" data-day="d1"><b>10/07</b><span>抵達</span></button><button class="daybtn" data-day="d2"><b>10/08</b><span>離島</span></button><button class="daybtn" data-day="d3"><b>10/09</b><span>高松＋父母浜</span></button><button class="daybtn" data-day="d4"><b>10/10</b><span>祭典</span></button><button class="daybtn" data-day="d5"><b>10/11</b><span>松山</span></button><button class="daybtn" data-day="d6"><b>10/12</b><span>列車</span></button><button class="daybtn" data-day="d7"><b>10/13</b><span>松山周邊</span></button><button class="daybtn" data-day="d8"><b>10/14</b><span>回程</span></button></div>
+
+
+<div class="day active" id="d1"><article class="card daycard"><div class="daytitle"><h3>出發 → 抵達高松</h3><span class="state fixed">已定案</span></div><div class="photos"><div class="photo"><img src="https://www.art-takamatsu.com/archives/003/202202/92fb71455a976a9139ea4e0ad2fb25c4.jpg"><div class="cap">桃園機場出發</div></div><div class="photo"><img src="https://www.art-takamatsu.com/archives/003/202202/92fb71455a976a9139ea4e0ad2fb25c4.jpg"><div class="cap">高松機場抵達</div></div></div><div class="timeline"><div class="trow"><b>14:30</b><div>CI 178 自桃園起飛</div></div><div class="trow"><b>18:05</b><div>抵達高松機場</div></div><div class="trow"><b>~19:00</b><div>機場巴士到高松站</div></div><div class="trow"><b>晚上</b><div>高松站周邊晚餐、休息</div></div></div></article></div>
+<div class="day" id="d2"><article class="card daycard"><div class="daytitle"><h3>離島日</h3><span class="state">8 個方案</span></div><div class="eval-grid" id="evalGrid"></div><div class="optbar" id="islandBtns"></div><div class="island"><img id="islandImg"><div class="island-body"><h4 id="islandTitle"></h4><div class="tagrow" id="islandTags"></div><p id="islandDesc"></p><div class="kv"><div class="kvdiv"><b>船班範例</b><span id="islandSchedule"></span></div><div class="kvdiv"><b>船資</b><span id="islandFare"></span></div><div class="kvdiv"><b>可玩時間／難度</b><span id="islandPlay"></span></div></div><div class="note" id="islandNote"></div></div></div></article></div>
+
+<div class="day" id="d3"><article class="card daycard"><div class="daytitle"><h3>高松市區日</h3><span class="state fixed">建議固定</span></div><div class="photos"><div class="photo"><img data-asset="ritsurin"><div class="cap">栗林公園</div></div><div class="photo"><img data-asset="chichibu"><div class="cap">父母ヶ浜可做海景延伸</div></div><div class="photo"><img data-asset="ogijima"><div class="cap">港區散步</div></div></div><div class="timeline"><div class="trow"><b>上午</b><div>栗林公園</div></div><div class="trow"><b>中午</b><div>讚岐烏龍麵／商店街</div></div><div class="trow"><b>下午</b><div>玉藻公園／高松城</div></div><div class="trow"><b>傍晚</b><div>北浜 alley／Sunport</div></div></div></article></div>
+
+
+
+<div class="day" id="d4">
+  <article class="card daycard">
+    <div class="daytitle"><h3>琴平祭典日</h3><span class="state fixed">已定案</span></div>
+    <div class="photos festival-photos">
+      <div class="photo"><img src="https://www.konpira.or.jp/articles_2023/20231130_KOTOHIRA-Gu_Official-Guide_in_English/materials/11_1010.jpg" alt="金刀比羅宮例大祭夜間御神輿"><div class="cap">夜間御神輿渡御</div></div>
+      <div class="photo"><img src="https://www.konpira.or.jp/articles_2025/20251211_prize/materials/images/001_20251011_F3Q9842.jpg" alt="金刀比羅宮例大祭神輿細節"><div class="cap">神輿與擔ぎ手</div></div>
+      <div class="photo"><img src="https://www.art-takamatsu.com/archives/003/202202/92fb71455a976a9139ea4e0ad2fb25c4.jpg" alt="金刀比羅宮例大祭燈與神輿"><div class="cap">祭典燈火氛圍</div></div>
+      <div class="photo"><img data-asset="festival" alt="琴平夜間燈籠"><div class="cap">琴平夜間燈籠</div></div>
+    </div>
+    <div class="timeline">
+      <div class="trow"><b>下午</b><div>金刀比羅宮、參道</div></div>
+      <div class="trow"><b>21:00</b><div>金刀比羅宮例大祭・神轎渡御</div></div>
+      <div class="trow"><b>住宿</b><div>住琴平，不用為末班車提早離場</div></div>
+    </div>
+  </article>
+</div>
+
+<div class="day" id="d5"><article class="card daycard"><div class="daytitle"><h3>琴平 → 松山</h3><span class="state">移動日</span></div><div class="photos"><div class="photo"><img data-asset="castle"><div class="cap">松山城</div></div><div class="photo"><img data-asset="dogo"><div class="cap">道後溫泉</div></div></div><div class="timeline"><div class="trow"><b>上午</b><div>琴平 → 多度津轉特急西行</div></div><div class="trow"><b>傍晚</b><div>抵松山、入住</div></div></div></article></div>
+
+
+
+<div class="day" id="d6">
+  <article class="card daycard">
+    <div class="daytitle"><h3>伊予灘列車 × 道後溫泉</h3><span class="state fixed">主角日</span></div>
+    <div class="train-shell">
+      <div class="train-head"><h4>伊予灘ものがたり</h4><p>先看分岔，再決定 A 或 B；需要時再點回程。地圖與下方站點都可直接點，照片會切換成對應地點。</p></div>
+
+      <div class="train-cover"><img data-asset="train" alt="伊予灘ものがたり列車代表景"><div>代表景：伊予灘ものがたり列車</div></div>
+
+      <div class="branch-compare clean">
+        <svg viewBox="0 0 680 170" aria-label="A B 路線分岔比較">
+          <path d="M40 84 H220 L350 84" fill="none" stroke="#1bb990" stroke-width="9" stroke-linecap="round"/>
+          <path d="M350 84 H480" fill="none" stroke="#1bb990" stroke-width="9" stroke-linecap="round"/>
+          <path d="M350 84 C395 94 432 114 480 140" fill="none" stroke="#f08a43" stroke-width="9" stroke-dasharray="18 12" stroke-linecap="round"/>
+          <circle cx="40" cy="84" r="7" fill="#1f2b31"/><circle cx="220" cy="84" r="7" fill="#1f2b31"/><circle cx="350" cy="84" r="9" fill="#1f2b31"/><circle cx="480" cy="84" r="8" fill="#1f2b31"/><circle cx="480" cy="140" r="8" fill="#1f2b31"/>
+          <text x="18" y="61" font-size="14" fill="#a5b8bd">松山</text><text x="196" y="61" font-size="14" fill="#a5b8bd">下灘</text><text x="316" y="61" font-size="14" fill="#a5b8bd">伊予大洲</text><text x="454" y="61" font-size="14" fill="#63d4ba">A</text><text x="456" y="160" font-size="14" fill="#f0a46b">B</text>
+        </svg>
+      </div>
+
+      <div class="route-trio">
+        <button class="routebtn trio active" data-route="A"><b>A｜大洲編</b><span>08:28 → 10:28 · ¥8,280</span></button>
+        <button class="routebtn trio" data-route="B"><b>B｜八幡浜編</b><span>13:38 → 15:56 · ¥11,130</span></button>
+        <button class="returnbtn" id="returnToggle"><b>回程</b><span>預設收起</span></button>
+      </div>
+
+      <div class="mapbox route-map">
+        <svg id="routeMap" viewBox="0 0 640 720" aria-label="伊予灘沿岸與觀光列車路線示意地圖">
+          <defs>
+            <linearGradient id="seaGrad" x1="0" x2="1"><stop offset="0" stop-color="#97d8e7"/><stop offset="1" stop-color="#c6ebf0"/></linearGradient>
+            <linearGradient id="landGrad" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#efe8cf"/><stop offset="1" stop-color="#d3ddb0"/></linearGradient>
+          </defs>
+          <rect width="640" height="720" fill="url(#seaGrad)"/>
+          <path d="M405 0 C420 70 388 116 402 164 C419 214 388 266 372 314 C356 362 360 416 332 463 C307 505 273 544 258 590 C246 628 224 675 214 720 L640 720 L640 0Z" fill="url(#landGrad)"/>
+          <path d="M405 0 C420 70 388 116 402 164 C419 214 388 266 372 314 C356 362 360 416 332 463 C307 505 273 544 258 590 C246 628 224 675 214 720" fill="none" stroke="#7c927b" stroke-width="5"/>
+          <g opacity=".42" fill="#90aa7d"><path d="M500 205l30-48 30 48z"/><path d="M544 247l26-40 26 40z"/><path d="M468 402l30-44 30 44z"/><path d="M524 454l28-42 28 42z"/></g>
+          <text x="32" y="88" fill="#316b7b" font-size="31" font-weight="700">伊予灘</text><text x="32" y="118" fill="#4e8491" font-size="16">瀨戶內海側</text>
+          <text x="505" y="70" fill="#65745e" font-size="16">松山平野</text><text x="484" y="364" fill="#65745e" font-size="16">內陸山地</text><text x="55" y="648" fill="#4e8491" font-size="16">宇和海方向</text>
+
+          <path id="outA" d="M548 108 L495 194 L452 286 L411 396 L450 524" fill="none" stroke="#1bb990" stroke-width="11" stroke-linecap="round" stroke-linejoin="round"/>
+          <path id="outB" d="M450 524 L302 622" fill="none" stroke="#f08a43" stroke-width="11" stroke-dasharray="22 14" stroke-linecap="round"/>
+          <path id="backA" d="M450 524 C518 484 552 422 554 344 C556 250 560 182 548 108" fill="none" stroke="#5f7488" stroke-width="8" stroke-dasharray="8 12"/>
+          <path id="backB" d="M302 622 C361 575 410 540 450 524 C518 484 552 422 554 344 C556 250 560 182 548 108" fill="none" stroke="#5f7488" stroke-width="8" stroke-dasharray="8 12"/>
+
+          <g id="mapPoints" fill="#fff" stroke="#59656a" stroke-width="4">
+            <circle cx="548" cy="108" r="13" data-spot="matsuyama"/>
+            <circle cx="495" cy="194" r="9" data-spot="iyoshi"/>
+            <circle cx="452" cy="286" r="10" data-spot="shimonada"/>
+            <circle cx="411" cy="396" r="9" data-spot="iyonagahama"/>
+            <circle cx="450" cy="524" r="14" data-spot="ozu"/>
+            <circle cx="302" cy="622" r="14" data-spot="yawatahama"/>
+            <circle cx="548" cy="344" r="10" data-spot="uchiko"/>
+          </g>
+          <g fill="#2b4048" font-family="sans-serif">
+            <text x="569" y="115" font-size="23" font-weight="700">松山</text>
+            <text x="507" y="198" font-size="17">伊予市</text>
+            <text x="428" y="282" font-size="22" font-weight="700">下灘</text>
+            <text x="365" y="392" font-size="18">伊予長浜</text>
+            <text x="462" y="524" font-size="23" font-weight="700">伊予大洲</text>
+            <text x="212" y="625" font-size="23" font-weight="700">八幡浜</text>
+            <text x="560" y="349" font-size="18">內子</text>
+          </g>
+          <g id="routeLabels"></g>
+        </svg>
+      </div>
+
+      <div class="station-buttons full">
+        <button class="station-btn" data-spot="matsuyama"><img id="sb-matsuyama"><span>松山</span></button>
+        <button class="station-btn" data-spot="iyoshi"><img id="sb-iyoshi"><span>伊予市</span></button>
+        <button class="station-btn active" data-spot="shimonada"><img id="sb-shimonada"><span>下灘</span></button>
+        <button class="station-btn" data-spot="iyonagahama"><img id="sb-iyonagahama"><span>伊予長浜</span></button>
+        <button class="station-btn" data-spot="ozu"><img id="sb-ozu"><span>伊予大洲</span></button>
+        <button class="station-btn" data-spot="yawatahama"><img id="sb-yawatahama"><span>八幡浜</span></button>
+        <button class="station-btn" data-spot="uchiko"><img id="sb-uchiko"><span>內子</span></button>
+      </div>
+
+      <div class="station-preview" id="spotPreview">
+        <img id="spotImg" alt="沿線景點">
+        <div><b id="spotName">下灘</b><span id="spotDesc">海景代表停靠點，A／B 都會經過。</span></div>
+      </div>
+
+      <div class="route-facts">
+        <div class="rfact"><b id="goFact"></b><span id="goSub"></span></div>
+        <div class="rfact"><b id="returnFact"></b><span id="returnSub"></span></div>
+        <div class="rfact"><b id="totalFact"></b><span id="totalSub"></span></div>
+      </div>
+    </div>
+    <div class="timeline"><div class="trow"><b>晚上</b><div>回松山後接道後溫泉本館</div></div></div>
+  </article>
+</div>
+
+<div class="day" id="d7">
+<article class="card daycard"><div class="daytitle"><h3>松山周邊</h3><span class="state">保留彈性</span></div><div class="photos"><div class="photo"><img data-asset="dogo"><div class="cap">道後溫泉</div></div><div class="photo"><img data-asset="castle"><div class="cap">松山城</div></div></div><div class="timeline"><div class="trow"><b>白天</b><div>內子老街／下灘站／島波海道擇一</div></div><div class="trow"><b>晚上</b><div>回道後散步</div></div></div></article></div>
+
+
+<div class="day" id="d8"><article class="card daycard"><div class="daytitle"><h3>回程日</h3><span class="state fixed">已定案</span></div><div class="photos"><div class="photo"><img src="https://www.art-takamatsu.com/archives/003/202202/92fb71455a976a9139ea4e0ad2fb25c4.jpg"><div class="cap">高松機場出發</div></div><div class="photo"><img src="https://www.art-takamatsu.com/archives/003/202202/92fb71455a976a9139ea4e0ad2fb25c4.jpg"><div class="cap">桃園機場返抵</div></div></div><div class="timeline"><div class="trow"><b>11:23</b><div>松山發特急 → 高松（備案 12:21）</div></div><div class="trow"><b>~16:00</b><div>高松站搭機場巴士</div></div><div class="trow"><b>19:05</b><div>CI 179 高松起飛</div></div><div class="trow"><b>20:55</b><div>抵達桃園</div></div></div></article></div>
+
+</section>
+
+<section class="panel" id="panel-todo"><div class="head"><h2>待辦</h2><p>手機版固定單欄。</p></div><div class="todo"><article class="card todo-card"><ul class="todo-list"><li class="todo-item"><label class="todo-label"><input class="check" type="checkbox" id="t1"><span class="tt"><b>訂松山住宿 3 晚</b><span>10/11 入住，最優先</span></span></label></li><li class="todo-item"><label class="todo-label"><input class="check" type="checkbox" id="t2"><span class="tt"><b>決定松山三晚是否拆住</b><span>比較 10/11 與 10/13 房價</span></span></label></li><li class="todo-item"><label class="todo-label"><input class="check" type="checkbox" id="t3"><span class="tt"><b>決定 10/8 離島方案</b><span>女木＋男木／男木／女木／直島／小豆島／豊島／直島住一晚</span></span></label></li><li class="todo-item"><label class="todo-label"><input class="check" type="checkbox" id="t4"><span class="tt"><b>決定伊予灘 A 或 B</b><span>A 座位較少</span></span></label></li><li class="todo-item"><label class="todo-label"><input class="check" type="checkbox" id="t5"><span class="tt"><b>訂伊予灘車票與餐點</b><span>去程觀光列車＋回程宇和海</span></span></label></li><li class="todo-item"><label class="todo-label"><input class="check" type="checkbox" id="t6"><span class="tt"><b>訂 10/14 松山→高松特急</b><span>11:23 優先</span></span></label></li></ul></article><article class="card status"><h3 style="margin:0;font:700 32px Georgia,serif">目前狀態</h3><div class="stats"><div><span>總待辦</span><b id="total">6</b></div><div><span>已完成</span><b id="done">0</b></div><div><span>未完成</span><b id="left">6</b></div></div><button class="reset" id="reset">清除全部勾選</button></article></div></section>
+</main>
+
+<script>
+const ASSETS = {"ritsurin":"https://www.art-takamatsu.com/archives/003/201711/69daec3b9770ad394e973401c0589cf8.jpg","ritsurin2":"https://upload.wikimedia.org/wikipedia/commons/thumb/9/98/Ritsurin_Garden_-_Takamatsu.jpg/1280px-Ritsurin_Garden_-_Takamatsu.jpg","ogijima":"https://www.art-takamatsu.com/archives/003/202202/92fb71455a976a9139ea4e0ad2fb25c4.jpg","naoshima":"https://benesse-artsite.jp/special/pumpkin20221004.png","chichibu":"https://commons.wikimedia.org/wiki/Special:Redirect/file/Titibugahama%2001.jpg?width=1200","dogo":"https://upload.wikimedia.org/wikipedia/commons/thumb/4/44/Dogo-onsen_Honkan.jpg/1280px-Dogo-onsen_Honkan.jpg","train":"https://upload.wikimedia.org/wikipedia/commons/thumb/6/68/Iyonada_Monogatari_20170611.jpg/1280px-Iyonada_Monogatari_20170611.jpg","castle":"https://upload.wikimedia.org/wikipedia/commons/thumb/1/1d/Matsuyama_Castle_%28Iyo%29.jpg/1280px-Matsuyama_Castle_%28Iyo%29.jpg","festival":"https://www.konpira.or.jp/articles_2023/20231130_KOTOHIRA-Gu_Official-Guide_in_English/materials/11_1010.jpg"};
+const MINI = {"matsuyama": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20fill%3D%22%23dceef1%22/%3E%3Cpath%20d%3D%22M0%20155%20Q80%20125%20160%20150%20T320%20140%20V200H0Z%22%20fill%3D%22%237ea27d%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22118%22%20y%3D%2282%22%20width%3D%2284%22%20height%3D%2255%22%20rx%3D%223%22%20fill%3D%22%23f7f2e8%22%20stroke%3D%22%2342535b%22%20stroke-width%3D%224%22/%3E%0A%20%20%20%20%3Cpath%20d%3D%22M106%2082h108l-18-18h-72zM126%2062h68l-13-15h-42z%22%20fill%3D%22%2336454d%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22153%22%20y%3D%2295%22%20width%3D%2218%22%20height%3D%2242%22%20fill%3D%22%23bb6b45%22/%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22248%22%20cy%3D%2248%22%20r%3D%2222%22%20fill%3D%22%23f3c768%22/%3E%3Ctext%20x%3D%2218%22%20y%3D%2228%22%20font-size%3D%2221%22%20font-family%3D%22sans-serif%22%20fill%3D%22%2323404b%22%20font-weight%3D%22700%22%3E%E6%9D%BE%E5%B1%B1%3C/text%3E%3C/svg%3E", "shimonada": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22110%22%20fill%3D%22%239dd9ed%22/%3E%3Crect%20y%3D%22110%22%20width%3D%22320%22%20height%3D%2290%22%20fill%3D%22%234faabd%22/%3E%0A%20%20%20%20%3Crect%20y%3D%22145%22%20width%3D%22320%22%20height%3D%2255%22%20fill%3D%22%23d9c7a5%22/%3E%3Crect%20x%3D%2258%22%20y%3D%22105%22%20width%3D%22204%22%20height%3D%228%22%20fill%3D%22%2364635d%22/%3E%0A%20%20%20%20%3Crect%20x%3D%2288%22%20y%3D%2292%22%20width%3D%228%22%20height%3D%2255%22%20fill%3D%22%23685846%22/%3E%3Crect%20x%3D%22220%22%20y%3D%2292%22%20width%3D%228%22%20height%3D%2255%22%20fill%3D%22%23685846%22/%3E%0A%20%20%20%20%3Cpath%20d%3D%22M70%2092h174l-20-22H90z%22%20fill%3D%22%236d7475%22/%3E%3Crect%20x%3D%22115%22%20y%3D%22132%22%20width%3D%2292%22%20height%3D%228%22%20rx%3D%224%22%20fill%3D%22%23305f85%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22125%22%20y%3D%22140%22%20width%3D%226%22%20height%3D%2220%22%20fill%3D%22%23305f85%22/%3E%3Crect%20x%3D%22191%22%20y%3D%22140%22%20width%3D%226%22%20height%3D%2220%22%20fill%3D%22%23305f85%22/%3E%0A%20%20%20%20%3Ccircle%20cx%3D%22270%22%20cy%3D%2245%22%20r%3D%2219%22%20fill%3D%22%23f7ca62%22/%3E%3Ctext%20x%3D%2218%22%20y%3D%2228%22%20font-size%3D%2221%22%20font-family%3D%22sans-serif%22%20fill%3D%22%23244752%22%20font-weight%3D%22700%22%3E%E4%B8%8B%E7%81%98%3C/text%3E%3C/svg%3E", "ozu": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20fill%3D%22%23e5f1ee%22/%3E%3Cpath%20d%3D%22M0%20166%20Q80%20126%20150%20154%20T320%20145%20V200H0Z%22%20fill%3D%22%237ea67b%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22112%22%20y%3D%2283%22%20width%3D%2296%22%20height%3D%2260%22%20fill%3D%22%23fbf7ef%22%20stroke%3D%22%2349555c%22%20stroke-width%3D%224%22/%3E%0A%20%20%20%20%3Cpath%20d%3D%22M96%2083h128l-22-20h-84zM122%2062h76l-15-18h-46zM140%2044h40l-9-13h-21z%22%20fill%3D%22%233a474c%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22152%22%20y%3D%22107%22%20width%3D%2218%22%20height%3D%2236%22%20fill%3D%22%23a95d40%22/%3E%3Cpath%20d%3D%22M0%20177H320%22%20stroke%3D%22%235b98ad%22%20stroke-width%3D%2214%22/%3E%0A%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%2228%22%20font-size%3D%2221%22%20font-family%3D%22sans-serif%22%20fill%3D%22%23244752%22%20font-weight%3D%22700%22%3E%E4%BC%8A%E4%BA%88%E5%A4%A7%E6%B4%B2%3C/text%3E%3C/svg%3E", "yawatahama": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22104%22%20fill%3D%22%239dd9ed%22/%3E%3Crect%20y%3D%22104%22%20width%3D%22320%22%20height%3D%2296%22%20fill%3D%22%234b9fb4%22/%3E%0A%20%20%20%20%3Cpath%20d%3D%22M0%20110%20Q55%2080%20105%20103%20T205%2092%20T320%2095V112H0Z%22%20fill%3D%22%23668c68%22/%3E%0A%20%20%20%20%3Cpath%20d%3D%22M65%20135h172l-18%2032H82z%22%20fill%3D%22%23f7f7f1%22/%3E%3Crect%20x%3D%22101%22%20y%3D%22112%22%20width%3D%2292%22%20height%3D%2228%22%20rx%3D%224%22%20fill%3D%22%23f7f7f1%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22112%22%20y%3D%22120%22%20width%3D%2217%22%20height%3D%2212%22%20fill%3D%22%234c7c94%22/%3E%3Crect%20x%3D%22137%22%20y%3D%22120%22%20width%3D%2217%22%20height%3D%2212%22%20fill%3D%22%234c7c94%22/%3E%0A%20%20%20%20%3Crect%20x%3D%22162%22%20y%3D%22120%22%20width%3D%2217%22%20height%3D%2212%22%20fill%3D%22%234c7c94%22/%3E%3Crect%20x%3D%22130%22%20y%3D%2299%22%20width%3D%2225%22%20height%3D%2213%22%20fill%3D%22%23d96748%22/%3E%0A%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%2228%22%20font-size%3D%2221%22%20font-family%3D%22sans-serif%22%20fill%3D%22%23244752%22%20font-weight%3D%22700%22%3E%E5%85%AB%E5%B9%A1%E6%B5%9C%3C/text%3E%3C/svg%3E", "uchiko": "data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20320%20200%22%3E%0A%20%20%20%20%3Crect%20width%3D%22320%22%20height%3D%22200%22%20fill%3D%22%23f3eadc%22/%3E%3Crect%20y%3D%22148%22%20width%3D%22320%22%20height%3D%2252%22%20fill%3D%22%23cdb99d%22/%3E%0A%20%20%20%20%3Cg%3E%3Crect%20x%3D%2230%22%20y%3D%2272%22%20width%3D%2292%22%20height%3D%2277%22%20fill%3D%22%23f7f0e4%22/%3E%3Cpath%20d%3D%22M22%2072h108l-18-18H40z%22%20fill%3D%22%23554b43%22/%3E%3Crect%20x%3D%2265%22%20y%3D%22103%22%20width%3D%2225%22%20height%3D%2246%22%20fill%3D%22%238f654a%22/%3E%3C/g%3E%0A%20%20%20%20%3Cg%3E%3Crect%20x%3D%22196%22%20y%3D%2282%22%20width%3D%2288%22%20height%3D%2267%22%20fill%3D%22%23fbf5e9%22/%3E%3Cpath%20d%3D%22M187%2082h106l-18-18h-70z%22%20fill%3D%22%23574e46%22/%3E%3Crect%20x%3D%22226%22%20y%3D%22108%22%20width%3D%2224%22%20height%3D%2241%22%20fill%3D%22%238f654a%22/%3E%3C/g%3E%0A%20%20%20%20%3Ctext%20x%3D%2218%22%20y%3D%2228%22%20font-size%3D%2221%22%20font-family%3D%22sans-serif%22%20fill%3D%22%23554c45%22%20font-weight%3D%22700%22%3E%E5%85%A7%E5%AD%90%3C/text%3E%3C/svg%3E"};
+const ISLANDS = {"megi-ogi": {"label": "女木＋男木", "badge": "最均衡", "rank": "很適合", "img": "https://www.art-takamatsu.com/archives/003/202202/f606daf693ff395d71304f9864977846.jpg", "desc": "一天串兩島；女木島先看海岸與鬼ヶ島主題，男木島留較多時間走聚落、小巷與港邊。", "schedule": "08:00 高松 → 08:20 女木｜10:20 女木 → 10:40 男木｜17:00 男木 → 17:40 高松", "fare": "¥1,120", "play": "女木約 2 小時＋男木約 6 小時", "effort": "低～中", "tags": ["男木一定有", "一天兩島", "交通順"], "note": "想把男木島排進這趟、又不想只玩一座島，這個最平衡。"}, "ogi": {"label": "男木島", "badge": "最悠閒", "rank": "很適合", "img": "https://www.art-takamatsu.com/archives/003/202202/92fb71455a976a9139ea4e0ad2fb25c4.jpg", "desc": "整天專心玩男木島，適合慢慢走斜坡聚落、石階、小巷、燈塔與港邊。", "schedule": "08:00 高松 → 08:40 男木｜17:00 男木 → 17:40 高松", "fare": "¥1,020", "play": "約 8 小時 20 分", "effort": "低", "tags": ["聚落感", "最不趕", "拍照舒服"], "note": "如果你偏好慢慢逛、不想一直追船班，這個很適合。"}, "megi": {"label": "女木島", "badge": "最簡單", "rank": "可排", "img": "https://www.art-takamatsu.com/archives/003/202202/c29a6e3d0b2c4b8fbc0617dd77f60f4d.jpg", "desc": "單玩女木島，主題是鬼ヶ島洞窟、海岸與小島散步；島較小、船程最短。", "schedule": "08:00 高松 → 08:20 女木｜15:20 女木 → 15:40 高松", "fare": "¥740", "play": "約 7 小時", "effort": "低", "tags": ["最便宜", "船程最短", "島較小"], "note": "如果只玩一座，我會把男木排在女木前面；女木更適合跟男木一起串。"}, "naoshima": {"label": "直島", "badge": "最有名", "rank": "很適合", "img": "https://benesse-artsite.jp/special/pumpkin20221004.png", "desc": "藝術、建築與海景辨識度最高，最有「瀨戶內代表作」的感覺。", "schedule": "08:12 高松 → 09:02 宮浦｜17:00 宮浦 → 18:00 高松", "fare": "¥1,360", "play": "約 8 小時", "effort": "中", "tags": ["藝術", "封面感", "知名度高"], "note": "第一次玩瀨戶內、想要代表性最強的島，直島很穩。"}, "shodoshima": {"label": "小豆島", "badge": "景點最多", "rank": "可排", "img": "https://assets.my-kagawa.jp/storage/tourism_attractions/10086/responsive_images/Mke9Km7UdgMunLuJGegxMItVKqMBd0japnBh8iFS__1626_1084.jpeg", "desc": "Angel Road、橄欖公園等景點很多；但島很大，還要接島內巴士或租車。", "schedule": "08:02 高松 → 09:02 土庄｜17:30 土庄 → 18:30 高松", "fare": "¥1,330", "play": "約 8 小時 30 分", "effort": "中～高", "tags": ["景點多", "島很大", "移動較多"], "note": "只有一天時比較像趕景點；如果你本來就很想去小豆島再優先。"}, "teshima": {"label": "豊島", "badge": "進階藝術島", "rank": "條件式", "img": "https://benesse-artsite.jp/art/teshima-artmuseum_kv_thumb_01_pc.jpg", "desc": "從高松先到直島再轉船，藝術感很強，但轉乘與海象風險都高於直島。", "schedule": "07:20 高松 → 07:50 直島｜09:20 → 09:42 豊島｜16:17 → 16:39 直島｜17:00 → 18:00 高松", "fare": "約 ¥3,910", "play": "豊島約 6 小時 35 分", "effort": "高", "tags": ["要轉船", "藝術感強", "天候敏感"], "note": "如果豊島美術館本身就是你的重點，才值得把交通複雜度拉高。"}, "naoshima-stay": {"label": "直島住 1 晚", "badge": "住離島 ①", "rank": "很適合", "img": "https://benesse-artsite.jp/special/pumpkin20221004.png", "desc": "10/8 住直島，10/9 再回高松；島上黃昏與早晨都能留下來。", "schedule": "10/08：08:12 高松 → 09:02 宮浦｜10/09：14:20 或 17:00 回高松", "fare": "¥1,360＋住宿", "play": "兩天分段玩", "effort": "中", "tags": ["住離島", "時間最完整", "藝術感"], "note": "住宿結構改成：高松 2 晚 → 直島 1 晚 → 琴平 1 晚 → 松山 3 晚。"}, "ogijima-stay": {"label": "男木島住 1 晚", "badge": "住離島 ②", "rank": "很適合", "img": "https://www.art-takamatsu.com/archives/003/202202/a83365c6a9cc97fbcc9140bdde4edd02.jpg", "desc": "10/8 住男木島，留下遊客散去後的港口、聚落夜色與清晨；隔天早班船回高松。", "schedule": "10/08：08:00 高松 → 08:40 男木｜10/09：09:00 男木 → 09:40 高松", "fare": "¥1,020＋住宿", "play": "接近完整 24 小時島上時間", "effort": "低～中", "tags": ["住離島", "最安靜", "男木深度玩"], "note": "男木島有民宿圓、民宿さくら、まりも荘等住宿。10/9 09:40 回高松，仍可接高松市區日。"}};
+document.querySelectorAll('[data-asset]').forEach(el=>el.src=ASSETS[el.dataset.asset]);
+document.getElementById('heroImg').src=ASSETS.chichibu;
+
+(function(){
+  const panelKey='v8-panel', dayKey='v8-day', todoKey='v8-todo';
+  const tabs=[...document.querySelectorAll('.tab')], panels={overview:document.getElementById('panel-overview'),stay:document.getElementById('panel-stay'),plan:document.getElementById('panel-plan'),todo:document.getElementById('panel-todo')};
+  function setPanel(n){tabs.forEach(b=>b.classList.toggle('active',b.dataset.panel===n));Object.entries(panels).forEach(([k,v])=>v.classList.toggle('active',k===n));localStorage.setItem(panelKey,n)}
+  tabs.forEach(b=>b.onclick=()=>{setPanel(b.dataset.panel); if(b.dataset.panel==='plan') setDay('d1');});
+  const db=[...document.querySelectorAll('.daybtn')], dv=[...document.querySelectorAll('.day')];
+  function setDay(id){db.forEach(b=>b.classList.toggle('active',b.dataset.day===id));dv.forEach(v=>v.classList.toggle('active',v.id===id));localStorage.setItem(dayKey,id);document.querySelector(`.daybtn[data-day="${id}"]`)?.scrollIntoView({inline:'center',block:'nearest',behavior:'smooth'})}
+  db.forEach(b=>b.onclick=()=>setDay(b.dataset.day));
+
+  // Budget
+  const bud=document.getElementById('budget'), rng=document.getElementById('range');
+  function yen(n){return '¥'+Math.round(n).toLocaleString('en-US')}
+  function calc(){const t=Number(bud.value||0),p=Number(rng.value||25),biz=t*p/100,dogo=t-biz;document.getElementById('pct').textContent=p;document.getElementById('biz').textContent=yen(biz);document.getElementById('dogo2').textContent=yen(dogo);document.getElementById('dogo1').textContent=yen(dogo/2)+' / 晚'}
+  bud.oninput=calc; rng.oninput=calc; calc();
+
+  // Island evaluation + selector
+  const evalGrid=document.getElementById('evalGrid'), btns=document.getElementById('islandBtns');
+  Object.entries(ISLANDS).forEach(([k,d],i)=>{
+    const e=document.createElement('div');e.className='eval';e.innerHTML=`<div><b>${d.label}</b><span>${d.fare} · ${d.effort} · ${d.badge}</span></div><em>${d.rank}</em>`;evalGrid.appendChild(e);
+    const b=document.createElement('button');b.className='opt'+(i===0?' active':'');b.dataset.key=k;b.textContent=d.label;b.onclick=()=>setIsland(k);btns.appendChild(b);
+  });
+  function setIsland(k){const d=ISLANDS[k];[...btns.children].forEach(b=>b.classList.toggle('active',b.dataset.key===k));{
+      const im=document.getElementById('islandImg');
+      im.referrerPolicy='no-referrer';
+      im.onerror=null;
+      im.src=d.img.startsWith('__ASSET__:')?ASSETS[d.img.split(':')[1]]:d.img;
+      im.onerror=()=>{im.onerror=null;im.src=(d.label.includes('男木')?ASSETS.ogijima:d.label.includes('直島')||d.label.includes('豊島')?ASSETS.naoshima:d.label.includes('小豆')?ASSETS.ritsurin:ASSETS.ogijima);};
+    }document.getElementById('islandTitle').textContent=d.label;document.getElementById('islandDesc').textContent=d.desc;document.getElementById('islandSchedule').textContent=d.schedule;document.getElementById('islandFare').textContent=d.fare;document.getElementById('islandPlay').textContent=d.play+'｜難度：'+d.effort;document.getElementById('islandTags').innerHTML=d.tags.map(x=>`<span class="itag">${x}</span>`).join('');document.getElementById('islandNote').textContent=d.note}
+  setIsland('megi-ogi');
+
+
+  
+  // Train route: A/B choose + return toggle + clickable map points
+  const trainData={
+    A:{go:'去程｜08:28 松山 → 10:28 伊予大洲',goSub:'伊予灘ものがたり 大洲編 · ¥8,280',ret:'回程｜16:34 伊予大洲 → 17:17 松山',retSub:'特急 宇和海 22 號 · 自由席約 ¥1,840',total:'去回程交通：約 ¥10,120',totalSub:'大洲停留約 6 小時；可依玩法改搭前後一班'},
+    B:{go:'去程｜13:38 松山 → 15:56 八幡浜',goSub:'伊予灘ものがたり 八幡浜編 · ¥11,130',ret:'回程｜17:20 八幡浜 → 18:18 松山',retSub:'特急 宇和海 24 號 · 自由席約 ¥2,860',total:'去回程交通：約 ¥13,990',totalSub:'八幡浜停留約 1 小時 24 分'}
+  };
+  let routeSel='A', showReturn=false;
+  const routeBtns=[...document.querySelectorAll('.routebtn')], returnBtn=document.getElementById('returnToggle');
+  const outA=document.getElementById('outA'), outB=document.getElementById('outB'), backA=document.getElementById('backA'), backB=document.getElementById('backB'), routeLabels=document.getElementById('routeLabels');
+  function renderRoute(){
+    routeBtns.forEach(b=>b.classList.toggle('active',b.dataset.route===routeSel));
+    returnBtn.classList.toggle('active',showReturn);
+    returnBtn.querySelector('span').textContent=showReturn?'目前高亮':'預設收起';
+
+    // outbound
+    outA.style.opacity=showReturn?'.18':'1';
+    outB.style.opacity=showReturn?'.18':(routeSel==='B'?'1':'0');
+    // return faint by default, bright when toggled
+    backA.style.opacity=routeSel==='A'?(showReturn?'1':'.22'):'0';
+    backB.style.opacity=routeSel==='B'?(showReturn?'1':'.22'):'0';
+
+    const d=trainData[routeSel];
+    document.getElementById('goFact').textContent=d.go;document.getElementById('goSub').textContent=d.goSub;
+    document.getElementById('returnFact').textContent=d.ret;document.getElementById('returnSub').textContent=d.retSub;
+    document.getElementById('totalFact').textContent=d.total;document.getElementById('totalSub').textContent=d.totalSub;
+
+    if(showReturn){
+      routeLabels.innerHTML = routeSel==='A'
+      ? `<g font-family="sans-serif"><rect x="430" y="342" width="165" height="56" rx="15" fill="#fff" opacity=".96"/><text x="444" y="365" fill="#496274" font-size="15" font-weight="700">A 回程 16:34→17:17</text><text x="444" y="386" fill="#687278" font-size="12">伊予大洲 → 內子 → 松山</text></g>`
+      : `<g font-family="sans-serif"><rect x="238" y="634" width="250" height="56" rx="15" fill="#fff" opacity=".96"/><text x="252" y="657" fill="#496274" font-size="15" font-weight="700">B 回程 17:20→18:18</text><text x="252" y="678" fill="#687278" font-size="12">八幡浜 → 大洲 → 內子 → 松山</text></g>`;
+    } else {
+      routeLabels.innerHTML = routeSel==='A'
+      ? `<g font-family="sans-serif"><rect x="432" y="540" width="170" height="56" rx="15" fill="#fff" opacity=".96"/><text x="446" y="563" fill="#14866b" font-size="15" font-weight="700">A 到站 10:28 · ¥8,280</text><text x="446" y="584" fill="#687278" font-size="12">松山 → 伊予大洲</text></g>`
+      : `<g font-family="sans-serif"><rect x="235" y="634" width="220" height="56" rx="15" fill="#fff" opacity=".96"/><text x="249" y="657" fill="#c46b34" font-size="15" font-weight="700">B 到站 15:56 · ¥11,130</text><text x="249" y="678" fill="#687278" font-size="12">松山 → 八幡浜</text></g>`;
+    }
+  }
+  routeBtns.forEach(b=>b.addEventListener('click',()=>{routeSel=b.dataset.route;renderRoute();}));
+  returnBtn.addEventListener('click',()=>{showReturn=!showReturn;renderRoute();});
+  renderRoute();
+
+  const spotData={
+    matsuyama:{title:'松山',text:'起點。列車從松山出發，先穿過松山平野，再慢慢靠向伊予灘海岸。',img:ASSETS.castle,fallback:ASSETS.castle},
+    iyoshi:{title:'伊予市',text:'從松山往南後開始貼近海岸，是進入伊予灘海景段前的過渡區。',img:ASSETS.train,fallback:ASSETS.train},
+    shimonada:{title:'下灘',text:'海景代表停靠點；A、B 兩班都會經過這段海岸線。',img:'https://ehime.travel/images/shimonada/shimonada_2.webp',fallback:ASSETS.train},
+    iyonagahama:{title:'伊予長浜',text:'長濱一帶是沿海線的重要節點，之後 A / B 才會往大洲與八幡浜方向分流。',img:ASSETS.train,fallback:ASSETS.train},
+    ozu:{title:'伊予大洲',text:'A 大洲編終點。可接大洲城、臥龍山莊與城下町。',img:ASSETS.castle,fallback:ASSETS.castle},
+    yawatahama:{title:'八幡浜',text:'B 八幡浜編終點。從伊予大洲再往西南延伸到宇和海側港町。',img:ASSETS.train,fallback:ASSETS.train},
+    uchiko:{title:'內子',text:'回程改走內陸，經內子回松山；這是去程沿海、回程穿山地的差別。',img:ASSETS.dogo,fallback:ASSETS.dogo}
+  };
+  const stationBtns=[...document.querySelectorAll('.station-btn')];
+  function setImg(el,d){el.onerror=null;el.referrerPolicy='no-referrer';el.src=d.img;el.onerror=()=>{el.onerror=null;el.src=d.fallback};}
+  Object.keys(spotData).forEach(k=>{const el=document.getElementById('sb-'+k);if(el)setImg(el,spotData[k])});
+  function setSpot(k,scroll=true){
+    stationBtns.forEach(b=>b.classList.toggle('active',b.dataset.spot===k));
+    const d=spotData[k]; const img=document.getElementById('spotImg'); setImg(img,d);
+    document.getElementById('spotName').textContent=d.title;
+    document.getElementById('spotDesc').textContent=d.text;
+    if(scroll) document.getElementById('spotPreview').scrollIntoView({block:'nearest',behavior:'smooth'});
+  }
+  stationBtns.forEach(b=>b.addEventListener('click',()=>setSpot(b.dataset.spot)));
+  setSpot('shimonada',false);
+
+  // clickable map spots: whole point acts like a button
+  document.querySelectorAll('#mapPoints circle').forEach(node=>{
+    node.style.cursor='pointer';
+    node.addEventListener('click',()=>setSpot(node.dataset.spot,true));
+  });
+
+  // festival section already uses embedded photos.
+
+  // Todo
+  const checks=[...document.querySelectorAll('.check')];
+  function todoRefresh(){const d=checks.filter(c=>c.checked).length;document.getElementById('total').textContent=checks.length;document.getElementById('done').textContent=d;document.getElementById('left').textContent=checks.length-d;localStorage.setItem(todoKey,JSON.stringify(Object.fromEntries(checks.map(c=>[c.id,c.checked]))))}
+  checks.forEach(c=>c.onchange=todoRefresh);document.getElementById('reset').onclick=()=>{checks.forEach(c=>c.checked=false);todoRefresh()};
+  try{const s=localStorage.getItem(todoKey);if(s){const v=JSON.parse(s);checks.forEach(c=>c.checked=!!v[c.id])}}catch(e){} todoRefresh();
+  try{localStorage.removeItem(panelKey);localStorage.removeItem(dayKey)}catch(e){} setPanel('overview'); setDay('d1');
+})();
+</script>
+</body></html>
