@@ -2305,7 +2305,15 @@ E.modal=html=>{modalMap14?.destroy();modalMap14=null;originalModal14(html)};
 E.closeModal=()=>{modalMap14?.destroy();modalMap14=null;originalClose14()};
 dayMapModal=function(i){E.modal(`<div class="modal-head"><div><div class="eyebrow">DAY ${String(i+1).padStart(2,'0')} / ${D.days[i].date}</div><h2>${E.esc(PLAN_DAYS[i].title)}</h2></div><button class="close" data-close aria-label="關閉">×</button></div><div id="source-modal14" class="journey-map map-modal-canvas"></div>${scheduleSummaryChips(i)}<div class="source-modal-actions">${SECTIONS14[i]?`<button class="btn primary" data-schedule-day="${i}">${icon('train')}選擇班次</button>`:''}<button class="btn" data-route-sheet="${i}">${icon('route')}分段路線</button></div><p class="micro">可拖曳、縮放；點地名開啟地點詳圖，再進入 Google Maps。</p>`);modalMap14=new SourceMap14(document.getElementById('source-modal14'),i)};
 // Correct legacy embedded directions: fit both endpoints rather than forcing zoom 14.
-routeEmbedURL=function(from,to,mode='walk'){const a=point(from),b=point(to);if(!a?.q||!b?.q)return '';const params=new URLSearchParams({saddr:a.q,daddr:b.q,dirflg:mode==='walk'?'w':mode==='cycle'?'b':'r',output:'embed',hl:'zh-TW'});return 'https://maps.google.com/maps?'+params.toString()};
+const LL14R={airport:[34.2142,134.0156],takJR:[34.3506,134.0466],takPortSt:[34.350728,134.049485],tamamo:[34.3504,134.0499],ritsurin:[34.3303,134.0455],marugame:[34.3418,134.0491],kitahamaArea:[34.3512,134.0562],busshozan:[34.2855,134.0503],yashima:[34.3587,134.1017],chichibu:[34.1869,133.6457],kotoSt:[34.191164,133.818958],kotoJR:[34.1907,133.8233],shrine:[34.1843,133.8094],approach:[34.1880,133.8150],tadotsu:[34.2745,133.7560],matsuJR:[33.8376,132.7526],matsuTram:[33.8378,132.7536],horie:[33.905834,132.753429],dogoSt:[33.850426,132.785082],honkan:[33.852028,132.786495],uchiko:[33.5395,132.6560],oboke:[33.8687,133.7648],kazura:[33.8773,133.8347],matsuCity:[33.8456,132.7656],megi:[34.3953,134.0445],ogi:[34.4247,134.0578],cave:[34.3930,134.0426],lighthouse:[34.4350,134.0620],pier:[34.35234,134.04969]};
+function llOf14(id){const p=point(id);if(p?.h)return [p.h.lat,p.h.lon];const m=p?.q?.match(/^(-?[\d.]+),(-?[\d.]+)$/);if(m)return [+m[1],+m[2]];return LL14R[id]||null}
+routeEmbedURL=function(from,to,mode='walk'){const a=point(from),b=point(to);if(!a?.q||!b?.q)return '';const params=new URLSearchParams({saddr:a.q,daddr:b.q,dirflg:mode==='walk'?'w':mode==='cycle'?'b':'r',output:'embed',hl:'zh-TW'});
+ const A=llOf14(from),B=llOf14(to);if(A&&B){const lat=(A[0]+B[0])/2,cos=Math.cos(lat*Math.PI/180),dx=Math.max(Math.abs(A[1]-B[1])*111320*cos,60),dy=Math.max(Math.abs(A[0]-B[0])*110574,60);
+  const W=Math.min(window.innerWidth-40,760),H=window.innerWidth<740?320:400;
+  const zx=Math.log2(156543*cos*W*.62/dx),zy=Math.log2(156543*cos*H*.42/dy);const z=Math.max(8,Math.min(17,Math.floor(Math.min(zx,zy))));
+  const mpp=156543*cos/Math.pow(2,z),shift=H*.14*mpp/110574;
+  params.set('ll',(lat+shift).toFixed(6)+','+((A[1]+B[1])/2).toFixed(6));params.set('z',String(z));}
+ return 'https://maps.google.com/maps?'+params.toString()};
 
 /* Lodging: one chosen property is the primary page. The original comparison is retained. */
 let compare14=false;
