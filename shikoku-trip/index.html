@@ -1,1 +1,42 @@
-<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>四國秋日紀行</title><style>html,body{margin:0;background:#0b171b;color:#dfe7e3;font:14px system-ui}#l{min-height:100vh;display:grid;place-items:center}small{opacity:.6}</style><div id="l"><div>正在載入行程…<br><small>Shikoku Trip v32</small></div></div><script>(async()=>{try{const u=["v32/part-00.txt","v32/part-01.txt","v32/part-02.txt","v32/part-03.txt","v32/part-04.txt","v32/part-05.txt","v32/part-06.txt","v32/part-07.txt"];const a=await Promise.all(u.map(x=>fetch(x,{cache:'no-store'}).then(r=>{if(!r.ok)throw Error(r.status);return r.text()})));document.open();document.write(a.join(''));document.close()}catch(e){document.getElementById('l').innerHTML='<div>行程載入失敗，請重新整理。<br><small>'+String(e)+'</small></div>'}})()</script>
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="color-scheme" content="dark">
+<title>四國行程手帖</title>
+<style>
+html,body{margin:0;min-height:100%;background:#102127;color:#e8eee8;font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif}
+#boot{min-height:100vh;display:grid;place-items:center;padding:24px;box-sizing:border-box}
+#boot>div{max-width:520px;width:100%}
+h1{font-size:22px;font-weight:650;margin:0 0 10px}
+p{color:#9bb5b1;margin:0;line-height:1.8}
+</style>
+</head>
+<body>
+<div id="boot"><div><h1>四國行程手帖</h1><p id="boot-msg">正在載入行程資料…</p></div></div>
+<script>
+(async()=>{
+  const msg=document.getElementById('boot-msg');
+  try{
+    const files=Array.from({length:8},(_,i)=>'v32/part-'+String(i).padStart(2,'0')+'.txt?v=32');
+    const parts=await Promise.all(files.map(async(path)=>{
+      const r=await fetch(path,{cache:'no-store'});
+      if(!r.ok)throw new Error(path+' HTTP '+r.status);
+      return r.text();
+    }));
+    let html=parts.join('');
+    if(!/<!doctype html/i.test(html)||!/<\/html>/i.test(html))throw new Error('行程檔案不完整');
+    const fix='<script src="./api-fix-v33.js?v=33"><\\/script>';
+    if(/<\/body\s*>/i.test(html))html=html.replace(/<\/body\s*>/i,fix+'</body>');
+    else html+=fix;
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(e){
+    msg.textContent='載入失敗：'+String(e?.message||e)+'。請重新整理頁面。';
+  }
+})();
+</script>
+</body>
+</html>
