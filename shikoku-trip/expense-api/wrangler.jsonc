@@ -1,0 +1,19 @@
+{
+  "name": "shikoku-travel-expense-api",
+  "main": "worker.mjs",
+  "compatibility_date": "2026-09-11",
+  "workers_dev": true,
+  "preview_urls": false,
+  "observability": { "enabled": true },
+  "vars": {
+    "ALLOWED_ORIGINS": "https://misstryit01-hub.github.io",
+    "GEMINI_MODEL": "gemini-3.8-flash"
+  },
+  "ratelimits": [
+    {
+      "name": "SHIKOKU_EXPENSE_LIMITER",
+      "namespace_id": "9472065183",
+      "simple": { "limit": 6, "period": 60 }
+    }
+  ]
+}
