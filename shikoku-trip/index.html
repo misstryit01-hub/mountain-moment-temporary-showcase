@@ -85,13 +85,36 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
           parent.insertBefore(frame,map);
           bar.append(title,btn); body.append(map); frame.append(bar,body);
         };
-        const cleanDailyModes=()=>document.querySelectorAll('.proposal-route-toolbar').forEach(toolbar=>{
+        const toolbarSelector='.proposal-route-toolbar';
+        const cleanDailyModes=(toolbar)=>{
           toolbar.querySelectorAll('.segmented').forEach(x=>x.remove());
           const small=toolbar.querySelector('small');
-          if(small)small.textContent='主路線、關鍵時間與必要導航';
-        });
-        const apply=()=>{cleanDailyModes();document.querySelectorAll(mapSelectors.join(',')).forEach(addFrame)};
-        const boot=()=>{apply();new MutationObserver(apply).observe(document.body,{childList:true,subtree:true})};
+          if(small&&small.textContent!=='主路線、關鍵時間與必要導航')small.textContent='主路線、關鍵時間與必要導航';
+        };
+        const prepare=(root)=>{
+          if(!root||root.nodeType!==1)return;
+          if(root.matches(mapSelectors.join(',')))addFrame(root);
+          root.querySelectorAll(mapSelectors.join(',')).forEach(addFrame);
+          if(root.matches(toolbarSelector))cleanDailyModes(root);
+          root.querySelectorAll(toolbarSelector).forEach(cleanDailyModes);
+        };
+        const boot=()=>{
+          prepare(document.body);
+          const pending=new Set();let timer=0;
+          const flush=()=>{
+            timer=0;const roots=[...pending];pending.clear();
+            const top=roots.filter(root=>!roots.some(other=>other!==root&&other.contains(root)));
+            top.forEach(prepare);
+          };
+          new MutationObserver(records=>{
+            for(const record of records){
+              const target=record.target.nodeType===1?record.target:record.target.parentElement;
+              const toolbar=target?.closest?.(toolbarSelector);if(toolbar)pending.add(toolbar);
+              for(const node of record.addedNodes)if(node.nodeType===1)pending.add(node);
+            }
+            if(pending.size&&!timer)timer=setTimeout(flush,60);
+          }).observe(document.body,{childList:true,subtree:true});
+        };
         if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
       })();
     <\/script>`;
