@@ -39,6 +39,9 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
       .shk-map-frame__toggle:hover{background:#244238;border-color:#8fb69e}
       .shk-map-frame__body{width:100%;min-width:0}
       .shk-map-frame.is-collapsed>.shk-map-frame__body{display:none!important}
+      .split20.shk-map-folded{grid-template-columns:minmax(0,1fr)!important;grid-template-rows:var(--shk-map-fold-row,80px) minmax(0,1fr)!important}
+      .split20.shk-map-folded .split20-map .proposal-route-toolbar,
+      .split20.shk-map-folded .split20-map .proposal-zone-title{display:none!important}
       .proposal-route-toolbar .segmented{display:none!important}
       .proposal-route-toolbar small{font-size:10px;color:var(--muted,#a5bdb2)}
       @media(max-width:640px){.shk-map-frame__bar{min-height:34px;padding-inline:10px}.proposal-route-toolbar{padding-top:12px}}
@@ -60,6 +63,15 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
           if(el.classList.contains('place-map-shell')) return '地點地圖';
           return '路線地圖';
         };
+        const syncSplitFold=(frame,closed)=>{
+          const split=frame.closest('.split20');
+          if(!split)return;
+          if(!closed){split.classList.remove('shk-map-folded');split.style.removeProperty('--shk-map-fold-row');return;}
+          const head=frame.closest('.proposal-day')?.querySelector('.proposal-day-head');
+          const bar=frame.querySelector('.shk-map-frame__bar');
+          const row=Math.ceil((head?.getBoundingClientRect().height||0)+(bar?.getBoundingClientRect().height||34));
+          split.classList.add('shk-map-folded');split.style.setProperty('--shk-map-fold-row',row+'px');
+        };
         const addFrame=(map)=>{
           if(!map||map.closest('.shk-map-frame'))return;
           const parent=map.parentNode;
@@ -78,6 +90,7 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
           body.className='shk-map-frame__body';
           btn.addEventListener('click',()=>{
             const closed=frame.classList.toggle('is-collapsed');
+            syncSplitFold(frame,closed);
             btn.textContent=closed?'+':'−';
             btn.setAttribute('aria-expanded',String(!closed));
             btn.setAttribute('aria-label',closed?'展開地圖':'收合地圖');
@@ -100,6 +113,9 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
         };
         const boot=()=>{
           prepare(document.body);
+          window.addEventListener('resize',()=>document.querySelectorAll('.split20.shk-map-folded').forEach(split=>{
+            const frame=split.querySelector('.shk-map-frame.is-collapsed');if(frame)syncSplitFold(frame,true);
+          }),{passive:true});
           const pending=new Set();let timer=0;
           const flush=()=>{
             timer=0;const roots=[...pending];pending.clear();
