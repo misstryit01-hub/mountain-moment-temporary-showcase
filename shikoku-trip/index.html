@@ -27,7 +27,7 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
     }));
     let html=parts.join('');
     if(!/<!doctype html/i.test(html)||!/<\/html>/i.test(html))throw new Error('行程檔案不完整');
-    const fix='<script src="./api-fix-v33.js?v=33"></'+'script>';
+    const fix='<script src="./api-fix-v34.js?v=34"></'+'script>';
     if(/<\/body\s*>/i.test(html))html=html.replace(/<\/body\s*>/i,fix+'</body>');
     else html+=fix;
     document.open();
