@@ -27,6 +27,70 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
     }));
     let html=parts.join('');
     if(!/<!doctype html/i.test(html)||!/<\/html>/i.test(html))throw new Error('行程檔案不完整');
+    const uiPatch=`<style id="shikoku-compact-v31">
+      /* v31 compact map controls: the map itself is the progressive disclosure. */
+      .atlas-controls [data-zoom="fit"],
+      .journey-controls [data-journey-zoom="fit"],
+      .map-controls [data-map-zoom="fit"]{display:none!important}
+      .shk-map-fold{margin:0;border-top:1px solid var(--line,#365047);border-bottom:1px solid var(--line,#365047);background:var(--panel,#112229);overflow:hidden}
+      .shk-map-fold__bar{min-height:38px;padding:0 12px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--ink,#e8eee8);font-size:11px;letter-spacing:.04em}
+      .shk-map-fold__title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted,#a5bdb2)}
+      .shk-map-fold__toggle{width:30px;height:30px;display:grid;place-items:center;flex:none;border:1px solid #557267;border-radius:50%;background:transparent;color:var(--ink,#e8eee8);font-size:19px;line-height:1;cursor:pointer}
+      .shk-map-fold__toggle:hover{background:#244238;border-color:#8fb69e}
+      .shk-map-fold.is-collapsed>.shk-map-fold__body{display:none}
+      .shk-map-fold.is-collapsed>.shk-map-fold__bar{min-height:32px}
+      .proposal-route-toolbar .segmented{display:none!important}
+      .proposal-route-toolbar small{font-size:10px;color:var(--muted,#a5bdb2)}
+      @media(max-width:640px){.shk-map-fold__bar{min-height:36px;padding-inline:11px}.proposal-route-toolbar{padding-top:12px}}
+    </style>`;
+    const uiBehavior=`<script>
+      (()=>{
+        const mapSelectors=[
+          '.proposal-day .proposal-map-shell',
+          '.journey-map',
+          '.source-route-map',
+          '.map-modal-canvas'
+        ];
+        const labelFor=(el)=>{
+          if(el.closest('.proposal-day')) return '當日路線地圖';
+          if(el.classList.contains('source-route-map')) return '路線地圖';
+          if(el.classList.contains('map-modal-canvas')) return '地圖詳圖';
+          return '行程總覽地圖';
+        };
+        const addFold=(el)=>{
+          if(!el||el.dataset.shkFold==='1'||el.closest('.shk-map-fold'))return;
+          el.dataset.shkFold='1';
+          const body=document.createElement('div');
+          body.className='shk-map-fold__body';
+          while(el.firstChild)body.appendChild(el.firstChild);
+          const bar=document.createElement('div');
+          bar.className='shk-map-fold__bar';
+          const title=document.createElement('span');
+          title.className='shk-map-fold__title';
+          title.textContent=labelFor(el);
+          const btn=document.createElement('button');
+          btn.type='button'; btn.className='shk-map-fold__toggle';
+          btn.setAttribute('aria-label','收合地圖'); btn.setAttribute('aria-expanded','true'); btn.textContent='−';
+          btn.addEventListener('click',()=>{
+            const closed=el.classList.toggle('is-collapsed');
+            btn.textContent=closed?'+':'−';
+            btn.setAttribute('aria-expanded',String(!closed));
+            btn.setAttribute('aria-label',closed?'展開地圖':'收合地圖');
+          });
+          bar.append(title,btn); el.className+=' shk-map-fold'; el.append(bar,body);
+        };
+        const cleanDailyModes=()=>document.querySelectorAll('.proposal-route-toolbar').forEach(toolbar=>{
+          toolbar.querySelectorAll('.segmented').forEach(x=>x.remove());
+          const small=toolbar.querySelector('small');
+          if(small)small.textContent='主路線、關鍵時間與必要導航';
+        });
+        const apply=()=>{cleanDailyModes();document.querySelectorAll(mapSelectors.join(',')).forEach(addFold)};
+        const boot=()=>{apply();new MutationObserver(apply).observe(document.body,{childList:true,subtree:true})};
+        if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+      })();
+    <\/script>`;
+    html=html.replace(/<\/head\s*>/i,uiPatch+'</head>');
+    html=html.replace(/<\/body\s*>/i,uiBehavior+'</body>');
     const fix='<script src="./api-cloudflare-v38.js?v=38"></'+'script>';
     if(/<\/body\s*>/i.test(html))html=html.replace(/<\/body\s*>/i,fix+'</body>');
     else html+=fix;
