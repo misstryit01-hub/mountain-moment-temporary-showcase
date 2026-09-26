@@ -28,64 +28,69 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
     let html=parts.join('');
     if(!/<!doctype html/i.test(html)||!/<\/html>/i.test(html))throw new Error('行程檔案不完整');
     const uiPatch=`<style id="shikoku-compact-v31">
-      /* v31 compact map controls: the map itself is the progressive disclosure. */
+      /* Independent disclosure frame. The map canvas inside keeps its original DOM and sizing. */
       .atlas-controls [data-zoom="fit"],
       .journey-controls [data-journey-zoom="fit"],
       .map-controls [data-map-zoom="fit"]{display:none!important}
-      .shk-map-fold{margin:0;border-top:1px solid var(--line,#365047);border-bottom:1px solid var(--line,#365047);background:var(--panel,#112229);overflow:hidden}
-      .shk-map-fold.is-collapsed{height:auto!important;min-height:0!important;aspect-ratio:auto!important}
-      .shk-map-fold__bar{min-height:38px;padding:0 12px 0 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;color:var(--ink,#e8eee8);font-size:11px;letter-spacing:.04em}
-      .shk-map-fold__title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--muted,#a5bdb2)}
-      .shk-map-fold__toggle{width:30px;height:30px;display:grid;place-items:center;flex:none;border:1px solid #557267;border-radius:50%;background:transparent;color:var(--ink,#e8eee8);font-size:19px;line-height:1;cursor:pointer}
-      .shk-map-fold__toggle:hover{background:#244238;border-color:#8fb69e}
-      .shk-map-fold.is-collapsed>.shk-map-fold__body{display:none}
-      .shk-map-fold.is-collapsed>.shk-map-fold__bar{min-height:32px}
+      .shk-map-frame{width:100%;min-width:0;overflow:hidden}
+      .shk-map-frame__bar{min-height:36px;padding:0 10px 0 13px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#102127;color:var(--muted,#a5bdb2);font-size:11px;letter-spacing:.04em}
+      .shk-map-frame__title{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+      .shk-map-frame__toggle{width:30px;height:30px;display:grid;place-items:center;flex:none;border:1px solid #557267;border-radius:50%;background:transparent;color:var(--ink,#e8eee8);font-size:19px;line-height:1;cursor:pointer}
+      .shk-map-frame__toggle:hover{background:#244238;border-color:#8fb69e}
+      .shk-map-frame__body{width:100%;min-width:0}
+      .shk-map-frame.is-collapsed>.shk-map-frame__body{display:none!important}
       .proposal-route-toolbar .segmented{display:none!important}
       .proposal-route-toolbar small{font-size:10px;color:var(--muted,#a5bdb2)}
-      @media(max-width:640px){.shk-map-fold__bar{min-height:36px;padding-inline:11px}.proposal-route-toolbar{padding-top:12px}}
+      @media(max-width:640px){.shk-map-frame__bar{min-height:34px;padding-inline:10px}.proposal-route-toolbar{padding-top:12px}}
     </style>`;
     const uiBehavior=`<script>
       (()=>{
         const mapSelectors=[
-          '.proposal-day .proposal-map-shell',
-          '.journey-map',
-          '.source-route-map',
-          '.map-modal-canvas'
+          '.journey-hero > #journey-map',
+          '.proposal-day .proposal-geography',
+          '.map-modal-canvas',
+          '.atlas.sv2-atlas',
+          '.place-map-shell.large'
         ];
         const labelFor=(el)=>{
           if(el.closest('.proposal-day')) return '當日路線地圖';
-          if(el.classList.contains('source-route-map')) return '路線地圖';
+          if(el.id==='journey-map') return '路線地圖';
           if(el.classList.contains('map-modal-canvas')) return '地圖詳圖';
-          return '行程總覽地圖';
+          if(el.classList.contains('atlas')) return '住宿位置地圖';
+          if(el.classList.contains('place-map-shell')) return '地點地圖';
+          return '路線地圖';
         };
-        const addFold=(el)=>{
-          if(!el||el.dataset.shkFold==='1'||el.closest('.shk-map-fold'))return;
-          el.dataset.shkFold='1';
-          const body=document.createElement('div');
-          body.className='shk-map-fold__body';
-          while(el.firstChild)body.appendChild(el.firstChild);
+        const addFrame=(map)=>{
+          if(!map||map.closest('.shk-map-frame'))return;
+          const parent=map.parentNode;
+          if(!parent)return;
+          const frame=document.createElement('section');
+          frame.className='shk-map-frame';
           const bar=document.createElement('div');
-          bar.className='shk-map-fold__bar';
+          bar.className='shk-map-frame__bar';
           const title=document.createElement('span');
-          title.className='shk-map-fold__title';
-          title.textContent=labelFor(el);
+          title.className='shk-map-frame__title';
+          title.textContent=labelFor(map);
           const btn=document.createElement('button');
-          btn.type='button'; btn.className='shk-map-fold__toggle';
+          btn.type='button'; btn.className='shk-map-frame__toggle';
           btn.setAttribute('aria-label','收合地圖'); btn.setAttribute('aria-expanded','true'); btn.textContent='−';
+          const body=document.createElement('div');
+          body.className='shk-map-frame__body';
           btn.addEventListener('click',()=>{
-            const closed=el.classList.toggle('is-collapsed');
+            const closed=frame.classList.toggle('is-collapsed');
             btn.textContent=closed?'+':'−';
             btn.setAttribute('aria-expanded',String(!closed));
             btn.setAttribute('aria-label',closed?'展開地圖':'收合地圖');
           });
-          bar.append(title,btn); el.className+=' shk-map-fold'; el.append(bar,body);
+          parent.insertBefore(frame,map);
+          bar.append(title,btn); body.append(map); frame.append(bar,body);
         };
         const cleanDailyModes=()=>document.querySelectorAll('.proposal-route-toolbar').forEach(toolbar=>{
           toolbar.querySelectorAll('.segmented').forEach(x=>x.remove());
           const small=toolbar.querySelector('small');
           if(small)small.textContent='主路線、關鍵時間與必要導航';
         });
-        const apply=()=>{cleanDailyModes();document.querySelectorAll(mapSelectors.join(',')).forEach(addFold)};
+        const apply=()=>{cleanDailyModes();document.querySelectorAll(mapSelectors.join(',')).forEach(addFrame)};
         const boot=()=>{apply();new MutationObserver(apply).observe(document.body,{childList:true,subtree:true})};
         if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
       })();
