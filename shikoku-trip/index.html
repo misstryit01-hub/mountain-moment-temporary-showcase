@@ -4825,7 +4825,9 @@ render();upgradeTickets30();enhanceMaps29(document);enhanceMaps30(document);
       .proposal-day .proposal-route-toolbar>div:first-child{display:block!important}
       .proposal-day .proposal-route-toolbar small{display:none!important}
       .proposal-day .proposal-map-shell{padding:8px 10px 0}
-      .proposal-day.shk-map-folded .proposal-map-shell{padding:0!important;margin:0!important;min-height:0!important}
+      .proposal-day.shk-map-folded .proposal-map-shell{padding:0!important;margin:0!important;min-height:32px!important;flex:0 0 32px!important;overflow:hidden!important}
+      .proposal-day.shk-map-folded .proposal-map-shell>.shk-map-frame{height:32px!important;min-height:32px!important;flex:0 0 32px!important}
+      .proposal-day.shk-map-folded .shk-map-frame__bar{height:32px!important;min-height:32px!important;flex:0 0 32px!important}
       .proposal-day .shk-map-frame{border:0;border-radius:8px}
       .proposal-day .shk-map-frame__bar{height:32px;min-height:32px;padding-inline:10px;background:#102127}
       .proposal-day .shk-map-frame__body>.proposal-geography{height:clamp(190px,23vw,270px)!important;min-height:190px!important;aspect-ratio:auto!important;margin:0!important;border:0!important;border-radius:0!important}
