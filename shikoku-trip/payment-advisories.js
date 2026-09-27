@@ -89,11 +89,6 @@
   const refresh = () => {
     queued = false;
     const existing = app.querySelector('.shk-payment-guidance');
-    if (document.documentElement.dataset.view !== 'plan') {
-      existing?.remove();
-      return;
-    }
-
     const selectedDay = app.querySelector('.date-rail [role="tab"][aria-selected="true"]');
     const day = Number(selectedDay?.dataset.day);
     const notes = PAYMENT_NOTES[day];
@@ -132,6 +127,17 @@
     queued = true;
     requestAnimationFrame(refresh);
   });
-  observer.observe(app, { childList: true, subtree: true });
+  observer.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ['data-view', 'aria-selected'],
+    childList: true,
+    subtree: true
+  });
+  app.addEventListener('click', event => {
+    if (!event.target.closest('.date-rail [data-day]')) return;
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(refresh);
+  }, true);
   refresh();
 })();
