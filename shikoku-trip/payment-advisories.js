@@ -8,18 +8,39 @@
         text: '高松空港利木津接受 ICOCA；現金也可，依乘車日票價與班次為準。'
       }
     ],
-    1: [
-      {
-        kind: 'separate',
-        label: '渡輪另購票',
-        text: '高松港—直島宮浦渡輪需另購船票；女木／男木備選也一樣。官網未明列付款方式，帶日圓現金備用並在售票處確認。'
-      },
-      {
-        kind: 'cash',
-        label: '町營巴士只收硬幣',
-        text: '直島町營巴士成人每程 ¥100；現金硬幣投幣、車上沒有找零機，不能刷 ICOCA。按上下車趟數備好 ¥100 硬幣。'
-      }
-    ],
+    1: {
+      A: [
+        {
+          kind: 'separate',
+          label: '直島渡輪另購票',
+          text: '高松—宮浦渡輪須另購船票；四國汽船不接受事前預約，請在售票處購票並依序候船。'
+        },
+        {
+          kind: 'cash',
+          label: '町營巴士備 ¥100 硬幣',
+          text: '直島町營巴士每程 ¥100，現金投幣、車上不找零且不能刷 ICOCA；按上下車趟數備好硬幣。'
+        }
+      ],
+      B: [
+        {
+          kind: 'separate',
+          label: '女木／男木渡輪購票',
+          text: 'めおん渡輪需按班次購票候船；付款方式以售票處公告為準，備日圓現金。島上交通以步行為主。'
+        }
+      ],
+      C: [
+        {
+          kind: 'ticket',
+          label: 'FIT 船券・免預約',
+          text: '符合香川 FIT 優惠資格可兌領高松—土庄往返電子船券，免另付渡輪船費；搭船仍須出示有效動態乘船憑證並依現場核銷。散客通常不接受預約、依序登船；未符合資格仍須現場購票，備日圓現金。'
+        },
+        {
+          kind: 'optional',
+          label: '橄欖巴士先查班次',
+          text: '土庄港—天使之路班距有限，出發前確認當日巴士時刻與付款方式；不要把 ICOCA 可用視為已確認，備日圓現金。'
+        }
+      ]
+    },
     2: [
       {
         kind: 'ticket',
@@ -91,18 +112,22 @@
     const existing = app.querySelector('.shk-payment-guidance');
     const selectedDay = app.querySelector('.date-rail [role="tab"][aria-selected="true"]');
     const day = Number(selectedDay?.dataset.day);
-    const notes = PAYMENT_NOTES[day];
+    const activeVariant = day === 1
+      ? (app.querySelector('.var15-seg button[aria-pressed="true"]')?.dataset.var15?.split(':')[1] || 'A')
+      : '';
+    const notes = day === 1 ? PAYMENT_NOTES[day]?.[activeVariant] : PAYMENT_NOTES[day];
     const tools = app.querySelector('.day-main .itinerary-tools');
     if (!notes?.length || !tools) {
       existing?.remove();
       return;
     }
-    if (existing?.dataset.day === String(day) && existing.previousElementSibling === tools) return;
+    if (existing?.dataset.day === String(day) && existing.dataset.plan === activeVariant && existing.previousElementSibling === tools) return;
     existing?.remove();
 
     const panel = document.createElement('aside');
     panel.className = 'shk-payment-guidance';
     panel.dataset.day = String(day);
+    panel.dataset.plan = activeVariant;
     panel.setAttribute('aria-label', '當日交通支付提醒');
     const heading = document.createElement('div');
     heading.className = 'shk-payment-guidance__head';

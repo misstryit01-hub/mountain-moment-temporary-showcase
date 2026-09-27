@@ -156,7 +156,7 @@ const HOME17={2:['08:30–18:00 高松單車自由行','借車後整天自由，
 function inject17(){
  const d0=PLAN_DAYS[0];d0.stops.push(PK('z_tak','約 20:15','晚餐（擇一）','入住後步行可到，營業到 21:30 以後。',[G('晚餐',['hamakaido','ikkaku','sugidamaT','tsurumaru'])]));
  const d1=PLAN_DAYS[1];
- if(planVar15[1]!=='A'){d1.stops.splice(1,0,PK('takPierN','07:15','午餐外帶','男木島平日幾乎沒有餐廳，出發前買好。',[G('外帶',['onigiri'])]));}
+  if(planVar15[1]==='B'){d1.stops.splice(1,0,PK('takPierN','07:15','午餐外帶','男木島平日幾乎沒有餐廳，出發前買好。',[G('外帶',['onigiri'])]));}
  if(planVar15[1]!=='A')d1.stops.splice(d1.stops.length-1,0,PK('z_tak','18:30','晚餐（擇一）','高松市區。',[G('晚餐',DINNER_TAK)]));
  if(planVar15[4]==='A'){const d4=PLAN_DAYS[4];const k=d4.stops.findIndex(s=>s.p==='okaido');if(k>=0)d4.stops[k]=PK('okaido','12:40','午餐（擇一）','大街道周邊；鯛めし或松山鍋燒烏龍。',[G('午餐',['asahi','kotori','gansuiM','akiyoshiM'])]);
   const a=d4.stops.findIndex(s=>s.p==='bansuiso'),b=d4.stops.findIndex(s=>s.p==='gintengai');if(a>=0&&b>=a)d4.stops.splice(a,b-a+1,PK('z_matsu','15:40–17:00','大街道・銀天街自由逛','下山後自由逛，17:00 回 JR 松山站取行李。',[G('逛・玩',['bansuisoP','ichiroku','botchanM','kururinP'],1),G('甜點・飲料',['tenfactory','kirinomori'],1)],'matsu'));
