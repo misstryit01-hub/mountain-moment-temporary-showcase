@@ -157,7 +157,7 @@ function inject17(){
  const d0=PLAN_DAYS[0];d0.stops.push(PK('z_tak','約 20:15','晚餐（擇一）','入住後步行可到，營業到 21:30 以後。',[G('晚餐',['hamakaido','ikkaku','sugidamaT','tsurumaru'])]));
  const d1=PLAN_DAYS[1];
   if(planVar15[1]==='B'){d1.stops.splice(1,0,PK('takPierN','07:15','午餐外帶','男木島平日幾乎沒有餐廳，出發前買好。',[G('外帶',['onigiri'])]));}
- if(planVar15[1]!=='A')d1.stops.splice(d1.stops.length-1,0,PK('z_tak','18:30','晚餐（擇一）','高松市區。',[G('晚餐',DINNER_TAK)]));
+ if(planVar15[1]!=='A')d1.stops.push(PK('z_tak','18:30','晚餐（擇一）','高松市區。',[G('晚餐',DINNER_TAK)]));
  if(planVar15[4]==='A'){const d4=PLAN_DAYS[4];const k=d4.stops.findIndex(s=>s.p==='okaido');if(k>=0)d4.stops[k]=PK('okaido','12:40','午餐（擇一）','大街道周邊；鯛めし或松山鍋燒烏龍。',[G('午餐',['asahi','kotori','gansuiM','akiyoshiM'])]);
   const a=d4.stops.findIndex(s=>s.p==='bansuiso'),b=d4.stops.findIndex(s=>s.p==='gintengai');if(a>=0&&b>=a)d4.stops.splice(a,b-a+1,PK('z_matsu','15:40–17:00','大街道・銀天街自由逛','下山後自由逛，17:00 回 JR 松山站取行李。',[G('逛・玩',['bansuisoP','ichiroku','botchanM','kururinP'],1),G('甜點・飲料',['tenfactory','kirinomori'],1)],'matsu'));
   d4.stops.push(PK('z_matsu','18:30','晚餐（擇一）','可在市區吃完再回堀江，或回堀江附近吃。',[G('松山市區',['goshiki','maruman','shii']),G('堀江站附近',['alporte','minatoS'])]));}
@@ -1375,7 +1375,7 @@ const NAO_TICKETS30=[
 ];
 function naoshimaTickets30(){
  const rows=NAO_TICKETS30.map(t=>`<div class="nao-ticket29 ${t.highlight?'featured':''} ${t.sub?'is-sub':''}"><div class="nao-ticket29-name"><b>${E.esc(t.name)}</b><span class="nao-ticket30-tag ${t.timed?'timed':''} ${t.free?'free':''}">${E.esc(t.tag)}</span></div><div><small>線上</small><b class="num">${E.esc(t.online)}</b></div><div><small>現場</small><b class="num">${E.esc(t.onsite)}</b></div><p>${E.esc(t.rule)}</p><div class="nao-ticket30-actions"><a href="${E.esc(t.url)}" target="_blank" rel="noopener noreferrer">訂票／官方 ↗</a></div></div>`).join('');
- return `<section class="nao-tickets29" data-nao-tickets29><header><div><div class="eyebrow">NAOSHIMA / COMPLETE TICKET REFERENCE</div><h2>直島全部美術館・展覽・作品票券參考</h2><p>把直島可購票的美術館、家計畫、展覽型設施與免預約體驗全部列入參考，家計畫 7 處逐一拆開，包含南寺與 Kinza。這只是選擇庫；10/8 主線仍只安排「直島新美術館」一座主要美術館，再挑 1–2 個小作品。</p></div><a class="btn" target="_blank" rel="noopener noreferrer" href="${NAO_TICKET_URL29}">官方全部票券 ↗</a></header><div class="nao-ticket29-head"><span>設施／作品</span><span>線上</span><span>現場</span><span>規則</span></div><div class="nao-ticket29-list">${rows}</div><p class="micro">需指定日期／時段者包含：地中美術館、杉本博司藝廊、南寺、Kinza、Ring of Fire 等；實際 10/8 開館與餘票以官方日曆與訂票頁為準。</p></section>`;
+ return `<section class="nao-tickets29" data-nao-tickets29><header><div><div class="eyebrow">NAOSHIMA / COMPLETE TICKET REFERENCE</div><h2>直島全部美術館・展覽・作品票券參考</h2><p>把直島可購票的美術館、家計畫、展覽型設施與免預約體驗全部列入參考，家計畫 7 處逐一拆開，包含南寺與 Kinza。A 方案的 10/8 主線只安排「直島新美術館」一座主要美術館，再挑 1–2 個小作品；B 為女木＋男木，C 為小豆島土庄散策。本區僅供直島票券查詢，不會覆蓋所選方案。</p></div><a class="btn" target="_blank" rel="noopener noreferrer" href="${NAO_TICKET_URL29}">官方全部票券 ↗</a></header><div class="nao-ticket29-head"><span>設施／作品</span><span>線上</span><span>現場</span><span>規則</span></div><div class="nao-ticket29-list">${rows}</div><p class="micro">需指定日期／時段者包含：地中美術館、杉本博司藝廊、南寺、Kinza、Ring of Fire 等；實際 10/8 開館與餘票以官方日曆與訂票頁為準。</p></section>`;
 }
 function upgradeTickets30(){if(day!==1||view!=='plan')return;const old=document.querySelector('[data-nao-tickets29]');if(old)old.outerHTML=naoshimaTickets30();else mountNaoshimaTickets29();}
 
