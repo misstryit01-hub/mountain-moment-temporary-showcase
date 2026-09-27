@@ -74,6 +74,9 @@ test('expense route enforces fixed broad categories and maps meal-style request 
   for (const category of ['交通', '住宿', '餐飲', '景點／活動', '購物', '通訊與行前', '保險／醫療', '其他']) {
     assert.ok(prompt.includes(category), `prompt must include fixed category ${category}`);
   }
+  for (const rule of ['高松空港利木津', 'JR 四國', '琴平—松山', '只收硬幣現金', '高松站前租車', '未表示已付款']) {
+    assert.ok(prompt.includes(rule), `prompt must include itinerary payment rule ${rule}`);
+  }
   assert.equal(JSON.stringify(captured.body).includes('飲料'), false);
 });
 
