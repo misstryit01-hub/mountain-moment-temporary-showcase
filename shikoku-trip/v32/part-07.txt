@@ -250,7 +250,7 @@ const sourceInfo17=sourceInfo;sourceInfo=function(){sourceInfo17();document.quer
 const OVW18=()=>{const n=smallNode14,A1=planVar15[1]==='A',A4=planVar15[4]==='A';return [
  n('airport','高松機場','','D1 / D8'),
  n('takJR','高松','','D1–3・10/07–09'),
- A1?n('naoPort','直島','','D2・10/08'):n('ogi','女木・男木','','D2・10/08'),
+ planVar15[1]==='C'?n('tonoshoPort','小豆島','','D2・10/08'):A1?n('naoPort','直島','','D2・10/08'):n('ogi','女木・男木','','D2・10/08'),
  n('kotoJR','琴平','','D4・10/10'),
  ...(A4?[]:[n('oboke','祖谷・大步危','','D5・10/11')]),
  n('matsuJR','松山','','D5・10/11'),
