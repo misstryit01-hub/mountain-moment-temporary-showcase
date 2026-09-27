@@ -241,7 +241,7 @@ Object.values(PH17).forEach(p=>p[0]=encodeURI(p[0]));
 Object.keys(PH17).forEach(k=>{if(typeof PHDATA17!=='undefined'&&PHDATA17[k]){PH17[k][0]=PHDATA17[k][0];PH17[k][3]=PHDATA17[k][1];}});
 const small17=u=>u.includes('/thumb/')?u.replace('/1600px-','/800px-'):u;
 const DAYPH17={0:['takSunset','sunport'],'1A':['benesse','miyanoura'],'1B':['ogiLH','ogiSpring'],2:['ritsurin','takCastle','lighthouse','yashima'],3:['kotohira','kotoStairs','kanamaru'],'4A':['matsuCastle','bansuiso','botchan'],'4B':['iya','oboke'],5:['shimonada','dogoNight'],6:['isaniwa','asuka'],7:['train','takStation']};
-function applyPhotos17(){for(let i=0;i<8;i++){const key=[1,4].includes(i)?i+planVar15[i]:i,list=DAYPH17[key];HD.photos[i]=list.map(k=>({src:PH17[k][0],label:PH17[k][1],credit:PH17[k][2]}));D.days[i].image=PH17[list[0]][3]||small17(PH17[list[0]][0]);}}
+function applyPhotos17(){for(let i=0;i<8;i++){if(i===1&&planVar15[1]==='C'){HD.photos[i]=[{src:SHO_IMG15,label:'小豆島・土庄散策示意',credit:'行程示意圖'}];D.days[i].image=SHO_IMG15;continue;}const key=[1,4].includes(i)?i+planVar15[i]:i,list=DAYPH17[key];HD.photos[i]=list.map(k=>({src:PH17[k][0],label:PH17[k][1],credit:PH17[k][2]}));D.days[i].image=PH17[list[0]][3]||small17(PH17[list[0]][0]);}}
 const evaluate17b=evaluate14;evaluate14=function(){const r=evaluate17b();applyPhotos17();return r};
 const sourceInfo17=sourceInfo;sourceInfo=function(){sourceInfo17();document.querySelector('.modal')?.insertAdjacentHTML('beforeend',`<div class="data-note"><b>照片出處（Wikimedia Commons）</b><br>${Object.values(PH17).map(p=>`${E.esc(p[1])}：${E.esc(p[2])}`).join('<br>')}</div>`)};
 
