@@ -342,7 +342,7 @@ const currencySign22=c=>c==='TWD'?'NT$':'¥';
 const round22=v=>Math.round((v+Number.EPSILON)*100)/100;
 const validAmount22=v=>typeof v==='number'&&Number.isFinite(v)&&v>0&&v<=10000000;
 function converted22(x){return x.currency==='JPY'?round22(x.amount*E.state.rate):round22(x.amount/E.state.rate)}
-function categories22(){return [...new Set(['餐飲','飲料','交通','購物','伴手禮','門票','體驗',...(E.state.expenses||[]).map(x=>cat22(x.category))])].slice(0,100)}
+function categories22(){return ['交通','住宿','餐飲','景點／活動','購物','通訊與行前','保險／醫療','其他']}
 function currencyToggle22(){const cur=defaultCurrency22();return `<div class="segmented" role="group" aria-label="未說明時的預設幣別">${['JPY','TWD'].map(c=>`<button type="button" data-default22="${c}" aria-pressed="${cur===c}" class="${cur===c?'active':''}">${currencyLabel22(c)} ${c}</button>`).join('')}</div>`}
 function sourceNote22(){const q=FX_REFERENCE22;return `${E.state.rateMode22==='reference'?'使用本版參考匯率':'使用已儲存／自訂匯率'} · <a href="${E.esc(q.url)}" target="_blank" rel="noopener noreferrer">${E.esc(q.source)}</a> 參考 ${q.rate} · 掛牌 ${E.esc(q.quotedAt)}（台灣時間）。參考值非即時更新或實際刷卡匯率。`}
 function settings22(){return `<section class="fx22" aria-label="幣別與匯率設定"><div><h1>我的旅程費用</h1><span class="fx22-label">沒有說明幣別時，預設使用</span>${currencyToggle22()}</div><div><label class="fx22-label" for="expense-rate22">換算匯率・可自行修改</label><div class="fx22-rate"><span>1 日圓 ＝</span><input id="expense-rate22" type="number" inputmode="decimal" min="0.000001" max="100" step="0.0001" value="${E.state.rate}" aria-label="一日圓等於多少台幣"><span>台幣</span><button class="btn" type="button" data-reference22>套用本版參考值</button></div><p class="fx22-note">${sourceNote22()}</p></div><div class="fx22-bottom"><span>明說幣別／照片標示優先；切換預設不更改舊紀錄。原幣保留，換算由網頁處理。</span><span class="fx22-status">本機儲存・不使用雲端 DB</span></div></section>`}
@@ -416,7 +416,7 @@ exportCosts=function(){const rate=E.state.rate;const rows=[['日期','名稱','�
 /* v23 — browser-owned prompt, local ledger, 45 s AI deadline. No model key or DB. */
 const AI_TIMEOUT23 = 45000;
 const FORMAT21 = `你是個人旅費記帳助手。根據本次文字、語音轉寫、照片及備註，整理消費。只輸出合法 JSON，不要 Markdown、評語或其他文字。
-每項只輸出 name、category、amount、currency 四個欄位。name 為簡短繁體中文品項名稱，不限食物；category 為簡短繁體中文類別。優先採用 existingCategories 語意相符的類別，沒有適合的可新增，並以使用者指定類別為優先。不輸出子分類或標籤。
+每項只輸出 name、category、amount、currency 四個欄位。name 為簡短繁體中文名稱，說明實際消費細項；category 只能從以下 8 個大類逐字選一個：交通、住宿、餐飲、景點／活動、購物、通訊與行前、保險／醫療、其他。不可新增、改名或輸出清單外類別；細項寫在 name，不要另建子分類或標籤。無法判斷時選「其他」。
 金額照使用者提供的自己的支出記錄，不依人數乘除、不分攤、不與歷史紀錄合併。日期由網站選定，不辨識或輸出日期、付款狀態、來源、訂單或營養資料。
 amount 是原幣 JSON 數字，不含貨幣符號、千分位或文字，保留小數。看不清或未提供金額時用 null，不填 0、不猜價格。有明確金額修正時以使用者修正為準。
 幣別：日幣、日圓、円、JPY、日圓標價的 ¥ → JPY；台幣、新台幣、NT$、TWD → TWD。使用者明確說明或照片清楚標示的幣別優先，沒有說明時用 defaultCurrency。明確是其他幣別或互相矛盾無法確定時用 null。不要換匯，不輸出另一幣別的金額。

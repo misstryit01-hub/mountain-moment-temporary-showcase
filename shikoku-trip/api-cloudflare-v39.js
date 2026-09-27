@@ -39,7 +39,7 @@
     const response=await fetch(API,{
       method:'POST',headers:{'Content-Type':'application/json','Accept':'application/json'},
       credentials:'omit',cache:'no-store',referrerPolicy:'no-referrer',
-      body:JSON.stringify(body),signal
+      body:JSON.stringify({text:body.text,defaultCurrency:body.defaultCurrency,images:body.images}),signal
     });
     apiCloud29.http=response.status;
     let data=null;try{data=await response.json()}catch(_){}

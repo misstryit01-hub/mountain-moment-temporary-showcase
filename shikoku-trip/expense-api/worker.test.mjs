@@ -40,13 +40,14 @@ test('expense route requires valid origin, input, and an independent key', async
   assert.equal(noContent.status, 400);
 });
 
-test('expense route sends its own key and maps meal-style request data to Gemini', async t => {
+test('expense route enforces fixed broad categories and maps meal-style request data to Gemini', async t => {
   const originalFetch = globalThis.fetch;
   let captured;
   globalThis.fetch = async (url, init) => {
     captured = { url: String(url), headers: new Headers(init.headers), body: JSON.parse(init.body) };
     return Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ items: [
-      { name: '咖啡', category: '飲料', amount: 100, currency: 'JPY' }
+      { name: '咖啡', category: '餐飲', amount: 100, currency: 'JPY' },
+      { name: 'eSIM', category: '通訊', amount: 800, currency: 'JPY' }
     ] }) }] } }] });
   };
   t.after(() => { globalThis.fetch = originalFetch; });
@@ -60,12 +61,20 @@ test('expense route sends its own key and maps meal-style request data to Gemini
     method: 'POST', headers: { Origin: origin, 'Content-Type': 'application/json', 'cf-connecting-ip': '203.0.113.7' }, body: JSON.stringify(body)
   }), env({ SHIKOKU_EXPENSE_GEMINI_KEY: 'expense-only-secret', SHIKOKU_EXPENSE_LIMITER: limiter }));
   assert.equal(response.status, 200);
-  assert.deepEqual(await response.json(), { items: [{ name: '咖啡', category: '飲料', amount: 100, currency: 'JPY' }] });
+  assert.deepEqual(await response.json(), { items: [
+    { name: '咖啡', category: '餐飲', amount: 100, currency: 'JPY' },
+    { name: 'eSIM', category: '其他', amount: 800, currency: 'JPY' }
+  ] });
   assert.equal(limitedKey, '203.0.113.7');
   assert.match(captured.url, /generativelanguage\.googleapis\.com\/v1beta\/models\/gemini-3\.8-flash:generateContent$/);
   assert.equal(captured.headers.get('x-goog-api-key'), 'expense-only-secret');
   assert.equal(captured.body.contents[0].parts[1].inline_data.mime_type, 'image/jpeg');
   assert.equal(JSON.stringify(captured.body).includes('ignored client prompt'), false);
+  const prompt = captured.body.system_instruction.parts[0].text;
+  for (const category of ['交通', '住宿', '餐飲', '景點／活動', '購物', '通訊與行前', '保險／醫療', '其他']) {
+    assert.ok(prompt.includes(category), `prompt must include fixed category ${category}`);
+  }
+  assert.equal(JSON.stringify(captured.body).includes('飲料'), false);
 });
 
 test('expense route rejects over-limit traffic and unsupported images', async () => {

@@ -157,7 +157,7 @@ p{color:#9bb5b1;margin:0;line-height:1.8}
     <\/script>`;
     html=html.replace(/<\/head\s*>/i,uiPatch+'</head>');
     html=html.replace(/<\/body\s*>/i,uiBehavior+'</body>');
-    const fix='<script src="./api-cloudflare-v39.js?v=39"></'+'script>';
+    const fix='<script src="./api-cloudflare-v39.js?v=40"></'+'script>';
     if(/<\/body\s*>/i.test(html))html=html.replace(/<\/body\s*>/i,fix+'</body>');
     else html+=fix;
     document.open();
