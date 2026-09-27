@@ -653,7 +653,7 @@ html,body{max-width:100%;overflow-x:clip}[hidden]{display:none!important}.contai
  .sv2-mapcol .atlas{flex:none!important;height:clamp(190px,calc(100vh - 490px),360px)!important;height:clamp(190px,calc(100svh - 490px),360px)!important}
 }
 </style><style id="plan-v3">.var15{border:1px solid #3c5e52;border-radius:12px;background:linear-gradient(120deg,#1b3530,#161b21 70%);padding:12px 14px;margin:0 0 14px}
-.var15-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+ .var15-head{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
 .var15-head>div:first-child b{display:block;font-size:15px;margin-top:2px}
 .var15-seg button{white-space:nowrap}
 .var15-seg em{font-style:normal;font-size:10px;color:#e6b050;border:1px solid #e6b050;border-radius:999px;padding:0 6px;margin-left:4px;vertical-align:1px}
@@ -664,7 +664,11 @@ html,body{max-width:100%;overflow-x:clip}[hidden]{display:none!important}.contai
 .var15-eval summary small{font-size:11px;color:var(--muted);display:flex;align-items:center;gap:3px}
 .var15-eval summary svg{width:14px;height:14px}
 .var15-eval[open] summary small svg{transform:rotate(90deg)}
-.var15-table{margin-top:10px;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+ .var15-table{margin-top:10px;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+ .var15-table.three-plan{overflow-x:auto;overscroll-behavior-x:contain}
+ .var15-table.three-plan .var15-row{min-width:700px;grid-template-columns:74px repeat(3,minmax(190px,1fr))}
+ .var15-benefit{margin:10px 0 0;padding:10px 12px;border:1px solid #567766;border-radius:9px;background:#142923;color:var(--ink2,#b4bdc7);font-size:12px;line-height:1.7}
+ .var15-benefit b{color:var(--mint,#a7d9bf)}
 .var15-row{display:grid;grid-template-columns:90px 1fr 1fr;gap:1px;background:var(--line)}
 .var15-row>*{background:var(--panel,#161b21);padding:8px 10px;font-size:12px;line-height:1.55;margin:0}
 .var15-row span{color:var(--muted);font-size:11px}
@@ -688,9 +692,11 @@ html,body{max-width:100%;overflow-x:clip}[hidden]{display:none!important}.contai
 @media(max-width:740px){
  .var15{padding:11px}
  .var15-head{flex-direction:column;align-items:stretch}
- .var15-seg{display:grid;grid-template-columns:1fr 1fr}
+  .var15-seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
  .var15-seg button{white-space:normal;font-size:12px;padding:8px 6px}
- .var15-row{grid-template-columns:62px 1fr 1fr}
+  .var15-row{grid-template-columns:62px 1fr 1fr}
+  .var15-table.three-plan .var15-row{min-width:670px;grid-template-columns:60px repeat(3,minmax(185px,1fr))}
+ .var15-benefit{font-size:11.5px}
  .var15-row>*{padding:7px;font-size:11.5px}
  .pass15-cmp{grid-template-columns:1fr}
 }
@@ -2820,7 +2826,7 @@ document.addEventListener('click',e=>{
  else if(b.dataset.routeModal){routeDialog(b.dataset.routeFrom,b.dataset.routeTo,b.dataset.routeMode||'walk',b.dataset.routeTitle||'',b.dataset.routeDuration||'')}
  else if(b.dataset.routeSheet!==undefined){routeSheet(Number(b.dataset.routeSheet))}
  else if(b.dataset.copyPlace){const p=point(b.dataset.copyPlace);if(p)copyText(`${p.name}\n${p.detail||p.q}\n${searchURL(b.dataset.copyPlace)}`)}
- else if(b.dataset.copyDay!==undefined){const i=Number(b.dataset.copyDay),d=PLAN_DAYS[i];if(!d)return;const text=`四國秋日紀行｜2026/${D.days[i].date}\n${d.title}\n\n`+d.stops.map(s=>`${s.time}　${s.title}\n${point(s.p)?.name||''}${s.via?'\n'+(['ferry','shuttle'].includes(s.via.mode)?OFFICIAL[s.via.mode==='ferry'?'ferry':'oboke'].url:directions(s.via.from,s.p,s.via.mode)||'住宿待選'):''}`).join('\n\n')+'\n\n交通時間為原行程規劃，請核對當日適用班表。';copyText(text)}
+  else if(b.dataset.copyDay!==undefined){const i=Number(b.dataset.copyDay),d=PLAN_DAYS[i];if(!d)return;const text=`四國秋日紀行｜2026/${D.days[i].date}\n${d.title}\n\n`+d.stops.map(s=>`${s.time}　${s.title}\n${point(s.p)?.name||''}${s.via?'\n'+(['ferry','shuttle'].includes(s.via.mode)?OFFICIAL[s.via.ref==='shodoFerry'?'shodoFerry':s.via.mode==='ferry'?'ferry':'oboke'].url:directions(s.via.from,s.p,s.via.mode)||'住宿待選'):''}`).join('\n\n')+'\n\n交通時間為原行程規劃，請核對當日適用班表。';copyText(text)}
  else if(b.dataset.planPane){planPane=b.dataset.planPane;const y=window.scrollY;render();window.scrollTo(0,y)}
  else if(b.dataset.costPane){costPane=b.dataset.costPane;const y=window.scrollY;render();window.scrollTo(0,Math.min(y,document.documentElement.scrollHeight-innerHeight))}
  else if(b.hasAttribute('data-add-expense'))expenseDialog();
@@ -3000,8 +3006,8 @@ function originalGeo14(i){
  return s;
 }
 class SourceMap14{
- constructor(el,contextDay=null){this.el=el;this.day=contextDay===null?homeDay:contextDay;this.isDaily=contextDay!==null;this.island=this.day===1&&planVar15[1]!=='A';this.dead=false;this.frame=0;this.nodes=this.island?[]:nodes14(this.day);this.size();el.classList.add('source-route-map');el.classList.toggle('is-island',this.island);el.dataset.source='uploaded-map';
- const routes=this.day<0?(planVar15[1]==='A'?[0,1,3,4,5,7]:[0,3,4,5,7]):[this.day];
+  constructor(el,contextDay=null){this.el=el;this.day=contextDay===null?homeDay:contextDay;this.isDaily=contextDay!==null;this.island=this.day===1&&planVar15[1]==='B';this.dead=false;this.frame=0;this.nodes=this.island?[]:nodes14(this.day);this.size();el.classList.add('source-route-map');el.classList.toggle('is-island',this.island);el.dataset.source='uploaded-map';
+  const routes=this.day<0?(planVar15[1]!=='B'?[0,1,3,4,5,7]:[0,3,4,5,7]):[this.day];
  const dots=this.nodes.map((n,j)=>`<circle data-nd14="${j}" cx="${n.coord[0]}" cy="${n.coord[1]}" r="4" class="source-node ${n.kind}"/>`).join('');
  const zone=zoneSvg17(this.day);
  el.innerHTML=(this.island?sourceIsland14():`<svg class="source-svg" aria-label="${this.day<0?'四國全程':D.days[this.day].date+' 當日'}地理總覽"><rect x="-2000" y="-2000" width="6000" height="6000" fill="#0e2330"/>${originalGeo14(this.day)}<g class="source-routes">${routes.map(i=>`<path class="source-route r${i}" d="${path14(i)}" vector-effect="non-scaling-stroke"/><path class="source-flow r${i}" d="${path14(i)}" vector-effect="non-scaling-stroke"/>`).join('')}${zone}</g><g>${dots}</g></svg><svg class="source-leaders"></svg><div class="source-labels">${this.nodes.map((n,j)=>`<button data-label14="${j}" data-map-place="${n.id}" class="source-label ${n.kind}"><b>${E.esc(n.title)}</b><small>${E.esc(n.sub)}</small>${n.time?`<span>${E.esc(n.time)}</span>`:''}</button>`).join('')}</div>`)+`<div class="source-controls"><button data-source-zoom="in" aria-label="放大">＋</button><button data-source-zoom="out" aria-label="縮小">−</button><button data-source-zoom="fit">${this.isDaily?'本日全圖':'全景'}</button></div><div class="source-credit">© OpenStreetMap contributors · ${this.island?'原檔航線圖':'原檔地理圖資・移動線為示意'}</div>`;
@@ -3125,15 +3131,21 @@ focusHotel=function(id,opt={}){if(view!=='stay'||!E.region(region).hotels.some(h
 window.importTT14=function(v){if(!v||typeof v!=='object')return;for(const k of ['entry','airportBuffer','transfer','megiStay','ogiStay','shimoStay','bagPickup','tramBudget'])if(Number.isFinite(v[k])&&v[k]>=0&&v[k]<=300)TT14[k]=v[k];if(tm14(v.landing)!==null)TT14.landing=v.landing;for(const k of Object.keys(TABLE14))if(TABLE14[k].some(x=>x.id===v.selected?.[k]))TT14.selected[k]=v.selected[k];evaluate14();};
 
 let wasMobile=mobile();window.addEventListener('resize',()=>{if(wasMobile!==mobile()){wasMobile=mobile();render()}});const NAO_IMG15='data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA4MDAgNjAwIj48ZGVmcz48bGluZWFyR3JhZGllbnQgaWQ9ImsiIHgxPSIwIiB5MT0iMCIgeDI9IjAiIHkyPSIxIj48c3RvcCBvZmZzZXQ9IjAiIHN0b3AtY29sb3I9IiNmNmQ3YTgiLz48c3RvcCBvZmZzZXQ9Ii41NSIgc3RvcC1jb2xvcj0iI2YyYjk4YSIvPjxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iI2M5ZDlkNiIvPjwvbGluZWFyR3JhZGllbnQ+PGxpbmVhckdyYWRpZW50IGlkPSJ3IiB4MT0iMCIgeTE9IjAiIHgyPSIwIiB5Mj0iMSI+PHN0b3Agb2Zmc2V0PSIwIiBzdG9wLWNvbG9yPSIjNmZhM2FkIi8+PHN0b3Agb2Zmc2V0PSIxIiBzdG9wLWNvbG9yPSIjMWY0ZjYzIi8+PC9saW5lYXJHcmFkaWVudD48L2RlZnM+PHJlY3Qgd2lkdGg9IjgwMCIgaGVpZ2h0PSI2MDAiIGZpbGw9InVybCgjaykiLz48Y2lyY2xlIGN4PSI2MDAiIGN5PSIyMDAiIHI9IjU0IiBmaWxsPSIjZmZmM2Q2IiBvcGFjaXR5PSIuOSIvPjxwYXRoIGQ9Ik0wIDMzMCBDOTAgMjgwIDE3MCAzMDAgMjQwIDMyMiBDMzAwIDI5MCAzNjAgMjYyIDQzMCAzMDAgQzUwMCAyNzAgNTYwIDI4NiA2NDAgMzE2IEM3MDAgMjk2IDc2MCAzMDAgODAwIDMxOCBWMzgwIEgwWiIgZmlsbD0iIzhmYThhNiIgb3BhY2l0eT0iLjU1Ii8+PHBhdGggZD0iTS0xMCAzNzAgQzgwIDMwMCAxODAgMjkyIDI2MCAzNTAgQzMyMCAzMTggMzgwIDMxMCA0NTAgMzU2IFY0MDAgSC0xMFoiIGZpbGw9IiM0ZjdhNmMiLz48cGF0aCBkPSJNNDIwIDM4MCBDNTAwIDMyMCA2MDAgMzA4IDcwMCAzNDQgQzc0MCAzMzIgNzgwIDMzNiA4MTAgMzUwIFY0MTAgSDQyMFoiIGZpbGw9IiMzZTZhNWQiLz48cmVjdCB5PSIzNzAiIHdpZHRoPSI4MDAiIGhlaWdodD0iMjMwIiBmaWxsPSJ1cmwoI3cpIi8+PGcgc3Ryb2tlPSIjZThmMWVmIiBzdHJva2Utb3BhY2l0eT0iLjM1IiBzdHJva2Utd2lkdGg9IjIiIGZpbGw9Im5vbmUiPjxwYXRoIGQ9Ik02MCA0MzBoOTBNMjIwIDQ3MGgxNDBNNDcwIDQ0MGgxMTBNNjAwIDUwNWgxMjBNMTIwIDU0MGg5ME0zODAgNTYwaDgwIi8+PC9nPjxnIHRyYW5zZm9ybT0idHJhbnNsYXRlKDMwMCA0NDApIj48cGF0aCBkPSJNMCAzMCBMMjUwIDMwIEwyMjUgNTggTDIwIDU4WiIgZmlsbD0iI2Y0ZjFlYSIvPjxyZWN0IHg9IjYwIiB5PSI0IiB3aWR0aD0iMTIwIiBoZWlnaHQ9IjI2IiByeD0iMyIgZmlsbD0iI2Y0ZjFlYSIvPjxyZWN0IHg9IjEwMCIgeT0iLTE2IiB3aWR0aD0iNDQiIGhlaWdodD0iMjAiIHJ4PSIyIiBmaWxsPSIjMmQ2YThhIi8+PGcgZmlsbD0iIzJkNmE4YSI+PHJlY3QgeD0iNzIiIHk9IjEyIiB3aWR0aD0iMTIiIGhlaWdodD0iOSIvPjxyZWN0IHg9IjkyIiB5PSIxMiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjkiLz48cmVjdCB4PSIxMTIiIHk9IjEyIiB3aWR0aD0iMTIiIGhlaWdodD0iOSIvPjxyZWN0IHg9IjEzMiIgeT0iMTIiIHdpZHRoPSIxMiIgaGVpZ2h0PSI5Ii8+PHJlY3QgeD0iMTUyIiB5PSIxMiIgd2lkdGg9IjEyIiBoZWlnaHQ9IjkiLz48L2c+PHBhdGggZD0iTTAgMzAgTDI1MCAzMCIgc3Ryb2tlPSIjMmQ2YThhIiBzdHJva2Utd2lkdGg9IjUiLz48cGF0aCBkPSJNLTQwIDY2IEM0MCA1OCAxNTAgNzAgMjkwIDYyIiBzdHJva2U9IiNlOGYxZWYiIHN0cm9rZS1vcGFjaXR5PSIuNSIgc3Ryb2tlLXdpZHRoPSIzIiBmaWxsPSJub25lIi8+PC9nPjwvc3ZnPgo=';
-/* ===== v15: day plan variants (A/B), home trim, pre-departure checklist ===== */
+/* ===== v15: day plan variants (A/B/C), home trim, pre-departure checklist ===== */
 const VAR_KEY15='shikoku-v15-plan-variant';
-let planVar15={1:'A',4:'A'};try{const v=JSON.parse(localStorage.getItem(VAR_KEY15)||'{}');for(const k of [1,4])if(v[k]==='A'||v[k]==='B')planVar15[k]=v[k];}catch(_){}
+let planVar15={1:'A',4:'A'};try{const v=JSON.parse(localStorage.getItem(VAR_KEY15)||'{}');for(const k of [1,4])if(v[k]==='A'||v[k]==='B'||(k===1&&v[k]==='C'))planVar15[k]=v[k];}catch(_){}
 function saveVar15(){try{localStorage.setItem(VAR_KEY15,JSON.stringify(planVar15))}catch(_){}}
 
 Object.assign(OFFICIAL,{
  naoFerry:{name:'四國汽船 高松—宮浦時刻表',url:'https://www.shikokukisen.com/takamatsu-miyanoura/'},
  naoNew:{name:'直島新美術館｜Benesse Art Site',url:'https://benesse-artsite.jp/art/nnmoa.html'},
  chichu:{name:'地中美術館（預約）',url:'https://benesse-artsite.jp/art/chichu.html'},
+ shodoFerry:{name:'小豆島フェリー｜高松—土庄時刻、票價與乘船方式',url:'https://www.shikokuferry.com/route2'},
+ shodoTide:{name:'天使之路｜2026 潮汐表',url:'https://www.shikokuferry.com/angel'},
+ shodoAccess:{name:'土庄町觀光｜天使之路交通與現場資訊',url:'https://www.town.tonosho.kagawa.jp/gyosei/soshiki/shoko/4/3/172.html'},
+ shodoBus:{name:'小豆島橄欖巴士｜時刻表',url:'https://www.shodoshima-olive-bus.com/dia/'},
+ shodoMaze:{name:'土庄町觀光｜迷路之町',url:'https://www.town.tonosho.kagawa.jp/gyosei/soshiki/shoko/4/3/511.html'},
+ kagawaFitCoupon:{name:'香川 FIT 三大電子優惠券活動說明（你提供的貼文）',url:'https://www.facebook.com/japankagawafans/posts/-2026%E5%B9%B44%E6%9C%881%E6%97%A5%E8%B5%B7%E9%A6%99%E5%B7%9D%E7%B8%A3%E8%87%AA%E7%94%B1%E8%A1%8C%E4%B8%89%E5%A4%A7%E5%84%AA%E6%83%A0%E5%88%B8-%E5%85%A8%E9%9D%A2%E5%8D%87%E7%B4%9A%E9%9B%BB%E5%AD%90%E7%89%88%E5%95%A6-%E6%BA%96%E5%82%99%E5%89%8D%E5%BE%80%E9%A6%99%E5%B7%9D%E7%80%A8%E6%88%B6%E5%85%A7%E6%B5%B7%E7%9A%84%E6%97%85%E5%AE%A2%E6%B3%A8%E6%84%8F%E5%9B%89%E5%A4%A7%E5%AE%B6%E6%9C%80%E6%84%9B%E7%9A%84%E9%A6%99%E5%B7%9D%E7%B8%A3fit%E5%84%AA%E6%83%A0%E5%88%B8%E8%BF%8E%E4%BE%86%E5%A4%A7%E6%94%B9%E7%89%88%E8%87%AA-202641-%E8%B5%B7%E6%AD%A3%E5%BC%8F%E5%91%8A/1279028757700010/'},
  matsuCastle:{name:'松山城',url:'https://www.matsuyamajo.jp/'}
 });
 Object.assign(ROUTE_PLACES,{
@@ -3152,18 +3164,23 @@ Object.assign(ROUTE_PLACES,{
  bansuiso:{name:'萬翠荘',q:'萬翠荘 松山市'},
  sakanoue:{name:'坂の上の雲ミュージアム',q:'坂の上の雲ミュージアム'},
  gintengai:{name:'銀天街商店街',q:'松山銀天街'},
- kururin:{name:'松山市站・くるりん摩天輪',q:'いよてつ高島屋 くるりん'}
+ kururin:{name:'松山市站・くるりん摩天輪',q:'いよてつ高島屋 くるりん'},
+  tonoshoPort:{name:'小豆島・土庄港',q:'34.48926,134.17179'},mazeTown:{name:'土庄本町・迷路之町',q:'土庄町本町 迷路のまち'},angelRoad:{name:'小豆島・天使之路',q:'34.47793,134.18900'},
+  shodoTakamatsu:{name:'高松港・小豆島渡輪中心',q:'34.3509,134.0528'}
 });
-const SP15={takPierN:[34.3512,134.0487],naoPort:[34.4636,133.9744],naoNew:[34.4596,133.9962],honmura:[34.4604,133.9951],chichu:[34.4492,133.9898],leeufan:[34.4478,133.9935],pumpkin:[34.4471,133.9925],naoSento:[34.4618,133.9752],benesse:[34.4466,133.9955],okaido:[33.8434,132.7702],ropeway:[33.8453,132.7710],castle:[33.8456,132.7656],bansuiso:[33.8438,132.7676],sakanoue:[33.8431,132.7688],gintengai:[33.8405,132.7652],kururin:[33.8363,132.7650]};
+const SP15={takPierN:[34.3512,134.0487],naoPort:[34.4636,133.9744],naoNew:[34.4596,133.9962],honmura:[34.4604,133.9951],chichu:[34.4492,133.9898],leeufan:[34.4478,133.9935],pumpkin:[34.4471,133.9925],naoSento:[34.4618,133.9752],benesse:[34.4466,133.9955],tonoshoPort:[34.48926,134.17179],mazeTown:[34.484,134.185],angelRoad:[34.47793,134.189],shodoTakamatsu:[34.3509,134.0528],okaido:[33.8434,132.7702],ropeway:[33.8453,132.7710],castle:[33.8456,132.7656],bansuiso:[33.8438,132.7676],sakanoue:[33.8431,132.7688],gintengai:[33.8405,132.7652],kururin:[33.8363,132.7650]};
 const sp14o=sp14;sp14=function(id){const c=SP15[id];return c?S14P(c[0],c[1]):sp14o(id)};
 
+const SHO_IMG15='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 520"><defs><linearGradient id="sea" x2="0" y2="1"><stop stop-color="#183e4b"/><stop offset="1" stop-color="#10242d"/></linearGradient><linearGradient id="land" x2="0" y2="1"><stop stop-color="#739681"/><stop offset="1" stop-color="#3c6658"/></linearGradient></defs><rect width="1200" height="520" fill="url(#sea)"/><circle cx="930" cy="112" r="58" fill="#e7c98f" opacity=".88"/><path d="M0 365Q120 322 220 352T438 338Q520 315 626 335T840 320Q930 304 1040 330T1200 312V520H0Z" fill="url(#land)"/><path d="M0 425Q210 389 400 413T800 398T1200 402" fill="none" stroke="#c49e58" stroke-width="5" opacity=".8"/><path d="M120 318Q300 260 470 312M485 310Q600 275 720 309M740 305Q900 245 1050 310" fill="none" stroke="#d7e1d1" stroke-width="3" stroke-dasharray="9 10" opacity=".7"/><circle cx="140" cy="319" r="13" fill="#e8c276"/><circle cx="520" cy="306" r="13" fill="#e8c276"/><circle cx="890" cy="284" r="13" fill="#e8c276"/><text x="92" y="280" fill="#eff4ed" font-size="22" font-family="sans-serif">高松港</text><text x="458" y="267" fill="#eff4ed" font-size="22" font-family="sans-serif">土庄港・迷路之町</text><text x="842" y="245" fill="#eff4ed" font-size="22" font-family="sans-serif">天使之路</text><text x="72" y="90" fill="#a7d9bf" font-size="20" letter-spacing="4" font-family="sans-serif">SHODOSHIMA / TONOSHO</text><text x="72" y="160" fill="#f4f0e8" font-size="48" font-family="serif">小豆島・土庄散策</text><text x="74" y="197" fill="#c4d4d0" font-size="19" font-family="sans-serif">渡輪約 60 分｜迷路之町・天使之路</text></svg>');
+const SHO_DAY15={title:'小豆島・土庄港散策與天使之路',tag:'海島散步・FIT 船券優勢',lead:'搭高松—土庄渡輪往返；上午走迷路之町，午後配合退潮前往天使之路，留足回港候船時間。若符合香川 FIT 優惠資格，可用電子優惠券兌領來回船券。',stay:'tak',anchor:'08:02 高松出航・09:02 抵土庄・16:30 回程渡輪',sources:['shodoFerry','shodoTide','shodoAccess','shodoBus','shodoMaze','kagawaFitCoupon'],notes:['船班依小豆島フェリー目前公布的平常班表：高松 08:02 → 土庄 09:02；土庄 16:30 → 高松 17:30，單程約 60 分。10/8 適用班次、臨時異動與乘船處請出發前再核對。','香川 FIT 三大電子優惠券活動若符合公告資格（台灣護照、台北—高松來回個人機票等條件），可使用高松—小豆島來回渡輪優惠，免另付該段船費；仍須持有效電子券／乘船憑證並按現場指示核銷，並非免票入場。請以活動公告確認 CI178／CI179 票種是否符合。','旅客單獨搭乘（不帶車）通常不接受事前預約，依現場先到順序購票／登船；沒有適用優惠券時仍須現場購票，成人現行往返票價 ¥1,330。免預約不等於免船票或保證有位。','官方潮汐表列 10/8 天使之路可通行時段 12:51–18:51；潮位與天候可能造成實際時間差，午後抵達後仍要以現場狀況為準。','土庄港至迷路之町可步行；天使之路可搭橄欖巴士（約 10 分鐘）或步行，巴士班距有限，去程與回程都先核當日班表。建議 15:30 前回到土庄港，保留 16:30 渡輪前的緩衝。','本方案只排土庄港周邊，不跨島前往橄欖公園或寒霞溪；天使之路遇天候／交通不順時，以提早回港為優先。'],stops:[{p:'stay:tak',time:'07:20',title:'北浜公寓出發',note:'步行前往小豆島渡輪中心；比平日提早出門，預留找售票處與候船時間。'},{p:'shodoTakamatsu',time:'07:40',title:'高松港・小豆島渡輪中心',note:'搭乘 08:02 高松發渡輪。若符合 FIT 優惠，先開啟有效動態電子券；未符合者於現場購票。',via:{from:'stay:tak',mode:'walk',duration:'步行約 15 分'}},{p:'tonoshoPort',time:'09:02',title:'抵達小豆島・土庄港',note:'下船後確認回程乘船處與 16:30 班次，再步行進入土庄本町。',via:{from:'shodoTakamatsu',mode:'ferry',duration:'約 60 分',time:'08:02 → 09:02',ref:'shodoFerry'}},{p:'mazeTown',time:'09:20–11:20',title:'迷路之町・土渕海峽散步',note:'由港口步行約 10 分，沿巷弄慢逛；小店開門時間各異，不把未確認營業的店排成硬性停留。',via:{from:'tonoshoPort',mode:'walk',duration:'步行約 10 分'}},{p:'mazeTown',time:'11:20–12:10',title:'土庄本町午餐',note:'在迷路之町周邊找午餐；島上店家選擇較少，遇公休可回港區用餐。'},{p:'tonoshoPort',time:'12:10–12:30',title:'回港區・確認橄欖巴士',note:'步行回土庄港一帶，按當日班表搭車前往天使之路；若班次不合，改搭計程車或步行並縮短停留。',via:{from:'mazeTown',mode:'walk',duration:'步行約 10 分'}},{p:'angelRoad',time:'約 12:45',title:'天使之路・退潮步道',note:'10/8 預測 12:51–18:51 可通行；先看潮況再下沙洲，預計停留約 1.5 小時。橄欖巴士單程約 10 分，依班次搭乘。',via:{from:'tonoshoPort',mode:'bus',duration:'約 10 分・依班次',ref:'shodoBus'}},{p:'tonoshoPort',time:'15:30 前',title:'返回土庄港・候船',note:'搭橄欖巴士或提早步行回港；不要把 16:30 回程渡輪壓線，至少預留 30 分鐘候船。',via:{from:'angelRoad',mode:'bus',duration:'約 10 分・依班次',ref:'shodoBus'}},{p:'shodoTakamatsu',time:'16:30 → 17:30',title:'渡輪返回高松',note:'土庄 16:30 開船，預計 17:30 抵高松。持 FIT 電子券者依現場流程核銷；班次與登船處以營運公告為準。',via:{from:'tonoshoPort',mode:'ferry',duration:'約 60 分',time:'16:30 → 17:30',ref:'shodoFerry'}},{p:'stay:tak',time:'約 17:50',title:'回北浜公寓・晚餐',note:'抵達高松港後步行返回住宿，再於高松市區晚餐。',via:{from:'shodoTakamatsu',mode:'walk',duration:'步行約 15 分'}}],options:[],brief:{title:'免預約・合資格可免船費',text:'散客搭乘小豆島渡輪通常不用事先訂位；符合香川 FIT 活動資格時可使用來回渡輪電子券，免另付船費，但仍要出示有效乘船憑證。',pace:'渡輪＋步行／橄欖巴士',sleep:'北浜公寓續住'}};
 const VARIANTS15={
  1:{
   A:{label:'方案 A・直島',short:'直島',rec:true,
    day:{"title":"直島・一座美術館與島上散策","tag":"藝術島嶼","lead":"上午只看直島新美術館；午餐後在本村挑一處小型展示，再散步看海。午後海岸或藝術澡堂擇一，不再趕第二座美術館。","stay":"tak","anchor":"08:12 高松出航・16:30 回宮浦候船・17:00 開船","sources":["naoFerry","naoNew","arthouse27","water27","sento27","gallery27","naoCalendar27","naoAccess27"],"notes":["船班沿用四國汽船現行表：高松 08:12 → 宮浦 09:02；宮浦 17:00 → 高松 18:00。一般成人往返 ¥1,360，現場購票、不接受預約。出發前再確認停航公告。","今天只有直島新美術館一個主要美術館。10:00–16:30（最後入館 16:00），線上 ¥1,500／現場 ¥1,700。10/8 落在官網 2026/6/7–11/23 展期內；票券仍須自行確認購買。","家プロジェクト只挑一處：角屋或はいしゃ的午後時段為 13:00–16:30；單點線上 ¥600／現場 ¥700，不必為本次安排買多館套票。","「水」、小畫廊與澡堂是候選活動，不是已預訂。各設施的 10/8 實際開放以官網日曆為準；沒有加入未確認的限定工作坊。","島內以町營巴士＋步行安排。表上的區間包含候車餘裕，是行程預留，不是巴士發車表；到港先核對往本村、つつじ荘及回宮浦的當日班次。","午後只選海岸或宮浦藝術澡堂／小畫廊其中一路。16:30 務必回到宮浦售票候船處，不為補逛追加晚船。小展覽、飲食與巴士支出不自動加進已登錄帳本。"],"stops":[{"p":"stay:tak","time":"07:40","title":"住宿出發","note":"早餐先在住宿或買好外帶；步行前往四國汽船乘船處。"},{"p":"takPierN","time":"07:55","title":"高松港・購票候船","note":"搭 08:12 渡輪；此處不是女木／男木的めおん碼頭。","via":{"from":"stay:tak","mode":"walk","duration":"約 10 分"}},{"p":"naoPort","time":"09:02","title":"抵達直島・宮浦港","note":"先核對島內往返巴士班次，再前往本村方向；不要把清早時段塞滿。","via":{"from":"takPierN","mode":"ferry","duration":"50 分・フェリー","time":"08:12 → 09:02","ref":"naoFerry"}},{"p":"naoNew","time":"10:00–11:30","title":"直島新美術館","note":"今天唯一的主要美術館。預留 90 分鐘看展與建築，想慢慢看可壓縮午後候選活動；線上 ¥1,500／現場 ¥1,700。","cat":"see","via":{"from":"naoPort","mode":"bus","duration":"巴士＋步行與候車預留約 45 分"}},{"p":"honmura","time":"11:40–12:40","title":"本村午餐（擇一）","note":"留在本村附近吃，不為午餐折返宮浦。以下沿用原候選店家，實際營業與候位請再確認。","pick":true,"groups":[{"label":"午餐","keys":["nakaoku","maimai","aisunao"],"multi":false}]},{"p":"z_honmura27","time":"12:40–14:00","title":"本村・小展覽與巷弄散步","note":"先逛巷弄；13:00 後看角屋或はいしゃ，挑一間約 30 分鐘即可。「水」或神社可替換，不用全部跑完。","pick":true,"zone":"honmura27","groups":[{"label":"小型展示／建築體驗，挑 1–2 處","keys":["kadoya27","haisha27","water27","goo27"],"multi":true}]},{"p":"z_naoAfternoon27","time":"14:00–16:15","title":"午後活動（兩條路線擇一）","note":"晴天：巴士到つつじ荘，走黃南瓜海岸，15:30 左右往宮浦回程。雨天或想放鬆：直接回宮浦，挑藝術澡堂或小畫廊。移動與候車都算在這段，不再加另一座美術館。","pick":true,"zone":"naoAfternoon27","groups":[{"label":"海岸／澡堂／小畫廊，只選一種","keys":["yellow27","sento27","gallery27"],"multi":false}]},{"p":"naoPort","time":"16:15–16:30","title":"宮浦港・紅南瓜與候船","note":"提早回港才順路看紅南瓜；若候車延誤就略過拍照，16:30 到售票候船處。","places":["o_red27"]},{"p":"takPierN","time":"18:00","title":"返抵高松港","note":"宮浦 17:00 開船；回高松後再吃晚餐。","via":{"from":"naoPort","mode":"ferry","duration":"60 分・フェリー","time":"17:00 → 18:00","ref":"naoFerry"}},{"p":"z_tak","time":"18:30","title":"高松晚餐（擇一）","note":"保留原本不同料理的候選，依胃口選一間。","pick":true,"groups":[{"label":"晚餐","keys":["renge","komatsu","kochi","tenkatsu"],"multi":false}]},{"p":"stay:tak","time":"晚餐後","title":"返回北浜公寓","note":"同一間公寓續住，依選定餐廳安排回程。"}],"options":[],"brief":{"title":"只看一座美術館","text":"上午新美術館，午餐後本村小展覽；午後海岸或宮浦活動擇一，16:30 回港候船。","pace":"巴士＋步行・午後可選","sleep":"北浜公寓續住"}},
    home:{"city":"直島","summary":"直島新美術館 → 本村小展覽 → 海岸／宮浦活動 → 高松","note":"只保留一個主要美術館；小展覽與活動自由選，17:00 渡輪回高松。","label":"直島・瀨戶內海"}
   },
-  B:{label:'方案 B・女木＋男木',short:'女木・男木'}
+   B:{label:'方案 B・女木＋男木',short:'女木・男木'},
+   C:{label:'方案 C・小豆島',short:'小豆島',day:SHO_DAY15,home:{city:'小豆島',summary:'高松港 → 土庄港・迷路之町 → 天使之路 → 高松',note:'若符合香川 FIT 活動資格，可使用來回渡輪電子券免另付船費；旅客通常免預約、現場依序登船，但仍需有效乘船憑證。',photos:[{src:SHO_IMG15,label:'小豆島・土庄散策示意'}],image:SHO_IMG15,label:'小豆島・土庄散策示意'}}
  },
  4:{
   A:{label:'方案 A・松山商店街',short:'松山',rec:true,
@@ -3191,13 +3208,13 @@ const VARIANTS15={
  }
 };
 const EVAL15={
- 1:{verdict:'推薦方案 A：直島',rows:[
-  ['想看的東西','一座新美術館＋本村小型展示，午後活動擇一','聚落、燈塔、海邊，偏散步放空'],
-  ['每人花費','渡輪 ¥1,360＋新美術館線上 ¥1,500；小展覽、巴士與餐費另計','船 ¥1,120，幾乎無門票'],
-  ['準備工作','只需確認新美術館票券；小展示依選擇單點購票','不用預約，現場買船票'],
-  ['時間彈性','去 08:12、回程 17:00；16:30 回港，巴士依當日班表','船每 2 小時一班，節奏較慢'],
-  ['風險','熱門島，巴士與餐廳人多','島小、店少，天候差時選擇有限']],
-  text:'A 保留你要的新美術館，其餘改成可選的小展示、巷弄與海岸，不再連跑多座美術館。B 保留為女木／男木島的替代安排。'},
+  1:{verdict:'推薦方案 A：直島',rows:[
+   ['想看的東西','一座新美術館＋本村小型展示，午後活動擇一','女木洞窟、男木聚落與燈塔','土庄迷路之町＋退潮時的天使之路'],
+   ['每人花費','渡輪 ¥1,360＋新美術館線上 ¥1,500；小展覽、巴士與餐費另計','船資約 ¥1,120，島上開銷另計','合資格 FIT 券含來回渡輪；否則成人現行往返 ¥1,330，巴士另計'],
+   ['準備工作','確認新美術館票券；小展示依選擇單點購票','核對女木／男木船班，現場購票','旅客免預約、依序登船；符合 FIT 條件可用動態電子券免另付船費'],
+   ['時間彈性','去 08:12、回程 17:00；16:30 回港，巴士依當日班表','船班間隔較長，需配合停留時間','08:02 去、16:30 回；配合 10/8 天使之路潮汐窗'],
+   ['風險','熱門島，巴士與餐廳人多','島小、店少，天候差時選擇有限','巴士班距與潮汐要先查；回程需提早回土庄港']],
+   text:'A 保留你要的直島新美術館，其餘改成可選的小展示、巷弄與海岸；B 是女木＋男木；C 改走小豆島土庄港周邊。小豆島 FIT 優惠以活動資格與現場核銷為準，電子券仍是乘船憑證。'},
  4:{verdict:'推薦方案 A：松山商店街',rows:[
   ['抵達松山','12:10（可更早 11:15）','約 15:17 以後'],
   ['每人花費','鐵路 ¥5,830 同樣要付；無額外費用','另加 KKday NT$1,165＋藤蔓橋門票'],
@@ -3209,33 +3226,35 @@ const EVAL15={
 function applyVar15(){
  for(const i of [1,4]){const v=VARIANTS15[i],a=v.A;
   if(!v.B.day){v.B.day=JSON.parse(JSON.stringify(BASE14[i]));v.B.home={city:D.days[i].city,summary:HD.summaries[i],note:HD.notes[i],photos:HD.photos[i],image:D.days[i].image};v.B.sections=SECTIONS14[i];}
-  const useA=planVar15[i]==='A',h=useA?a.home:v.B.home;
+  const selected=v[planVar15[i]]||v.B,useA=planVar15[i]==='A',h=selected.home||v.B.home;
   D.days[i].city=h.city;HD.summaries[i]=h.summary;HD.notes[i]=h.note;
-  if(i===1){HD.photos[i]=useA?[{src:NAO_IMG15,label:a.home.label}]:v.B.home.photos;D.days[i].image=useA?NAO_IMG15:v.B.home.image;}
-  if(useA)delete SECTIONS14[i];else SECTIONS14[i]=v.B.sections;
+  if(i===1){HD.photos[i]=useA?[{src:NAO_IMG15,label:a.home.label}]:h.photos||v.B.home.photos;D.days[i].image=useA?NAO_IMG15:h.image||v.B.home.image;}
+  if(i===1&&planVar15[i]!=='B')delete SECTIONS14[i];else SECTIONS14[i]=v.B.sections;
  }
 }
 const evaluateBase15=evaluate14;
-evaluate14=function(){applyVar15();const r=evaluateBase15();for(const i of [1,4])if(planVar15[i]==='A')PLAN_DAYS[i]=JSON.parse(JSON.stringify(VARIANTS15[i].A.day));return r};
+evaluate14=function(){applyVar15();const r=evaluateBase15();for(const i of [1,4]){const selected=VARIANTS15[i][planVar15[i]];if(selected?.day)PLAN_DAYS[i]=JSON.parse(JSON.stringify(selected.day));}return r};
 const nodesBase15=nodes14;
 nodes14=function(i){const n=smallNode14;
- if(i<0){let a=nodesBase15(i);if(planVar15[4]==='A')a=a.filter(x=>x.id!=='oboke');if(planVar15[1]==='A')a.splice(1,0,n('naoPort','直島','10/08 · 藝術島'));return a;}
+  if(i<0){let a=nodesBase15(i);if(planVar15[4]==='A')a=a.filter(x=>x.id!=='oboke');if(planVar15[1]==='A')a.splice(1,0,n('naoPort','直島','10/08 · 藝術島'));if(planVar15[1]==='C')a.splice(1,0,n('tonoshoPort','小豆島','10/08 · 土庄'));return a;}
  if(i===1&&planVar15[1]==='A')return[n('takPierN','高松港','渡輪往返','08:12／18:00','main'),n('naoPort','宮浦港','16:30 候船','09:02／17:00'),n('naoNew','直島新美術館','唯一主要美術館','10:00–11:30'),n('stay:tak',hotel14('tak')?.short,'住宿','晚餐後','stay')];
+  if(i===1&&planVar15[1]==='C')return[n('shodoTakamatsu','高松港・小豆島線','08:02 出發','07:40','main'),n('tonoshoPort','土庄港','09:02 抵達／16:30 回程','09:02'),n('mazeTown','迷路之町','土庄本町散步','09:20'),n('angelRoad','天使之路','12:51 起退潮可通行','12:45'),n('stay:tak',hotel14('tak')?.short,'住宿','約 17:50','stay')];
  if(i===4&&planVar15[4]==='A')return[n('kotoJR','JR 琴平','09:42 出發'),n('tadotsu','多度津','10:15 特急'),n('matsuJR','JR 松山','12:10 抵達／寄物'),n('castle','松山城','13:40'),n('gintengai','銀天街','16:10'),n('stay:mat',hotel14('mat')?.short,'住宿','約 17:35','stay')];
  return nodesBase15(i)};
 const pathBase15=path14;
 path14=function(i){const p=sp14;
  if(i===1&&planVar15[1]==='A')return spline14([p('stay:tak'),p('takPierN'),[1000,160],p('naoPort')])+spline14([p('naoPort'),p('naoNew'),p('honmura')]);
+  if(i===1&&planVar15[1]==='C')return spline14([p('stay:tak'),p('shodoTakamatsu'),[1055,145],p('tonoshoPort'),p('mazeTown'),p('tonoshoPort'),p('angelRoad'),p('tonoshoPort')])+spline14([p('tonoshoPort'),p('shodoTakamatsu'),p('stay:tak')]);
  if(i===4&&planVar15[4]==='A')return spline14([p('kotoJR'),p('tadotsu'),[818,283],[746,316],[663,343],[551,369],[440,409],[370,458],p('matsuJR'),p('okaido'),p('castle'),p('gintengai'),p('matsuJR'),p('stay:mat')]);
  return pathBase15(i)};
 const segBase15=segmentHTML;
-segmentHTML=function(s,opt={}){let h=segBase15(s,opt);if(s.ref==='naoFerry')h=h.split(OFFICIAL.ferry.url).join(OFFICIAL.naoFerry.url).split('雌雄島海運').join('四國汽船');return h};
+segmentHTML=function(s,opt={}){let h=segBase15(s,opt);if(s.ref==='naoFerry')h=h.split(OFFICIAL.ferry.url).join(OFFICIAL.naoFerry.url).split('雌雄島海運').join('四國汽船');if(s.ref==='shodoFerry')h=h.split(OFFICIAL.ferry.url).join(OFFICIAL.shodoFerry.url);return h};
 const quoteBase15=quoteCard;quoteCard=function(c){return planVar15[4]==='A'?'':quoteBase15(c)};
 const luggageBase15=proposalLuggage;
 proposalLuggage=function(i){if(i===4&&planVar15[4]==='A')return `<section class="logistics-block"><div><span class="status-tag">行李規劃</span><h3>車站寄物・傍晚取回</h3></div><p>抵達 JR 松山站後把大件行李放站內置物櫃（¥400–800／格），輕裝逛城山與商店街；17:00 左右回站取件，再搭 JR 往堀江。</p><p class="micro">大型行李箱格位有限，若客滿可洽車站周邊寄物服務。</p></section>`;return luggageBase15(i)};
-function varSwitch15(i){const v=VARIANTS15[i];if(!v)return '';const e=EVAL15[i],cur=planVar15[i];
- return `<section class="var15"><div class="var15-head"><div><span class="eyebrow">PLAN OPTIONS</span><b>本日兩案擇一</b></div><div class="segmented var15-seg">${['A','B'].map(k=>`<button data-var15="${i}:${k}" class="${cur===k?'active':''}" aria-pressed="${cur===k}">${E.esc(v[k].label)}${v[k].rec?' <em>推薦</em>':''}</button>`).join('')}</div></div>
- <details class="var15-eval"><summary><span>${icon('info')}${E.esc(e.verdict)}</span><small>比較與評估 ${icon('chev')}</small></summary><div class="var15-table"><div class="var15-row hd"><span></span><b>方案 A</b><b>方案 B</b></div>${e.rows.map(r=>`<div class="var15-row"><span>${E.esc(r[0])}</span><p>${E.esc(r[1])}</p><p>${E.esc(r[2])}</p></div>`).join('')}</div><p class="var15-text">${E.esc(e.text)}</p></details></section>`}
+function varSwitch15(i){const v=VARIANTS15[i];if(!v)return '';const e=EVAL15[i],cur=planVar15[i],keys=Object.keys(v),three=keys.length===3;
+  return `<section class="var15"><div class="var15-head"><div><span class="eyebrow">PLAN OPTIONS</span><b>本日${keys.length}案擇一</b></div><div class="segmented var15-seg">${keys.map(k=>`<button data-var15="${i}:${k}" class="${cur===k?'active':''}" aria-pressed="${cur===k}">${E.esc(v[k].label)}${v[k].rec?' <em>推薦</em>':''}</button>`).join('')}</div></div>
+  <details class="var15-eval"><summary><span>${icon('info')}${E.esc(e.verdict)}</span><small>比較與評估 ${icon('chev')}</small></summary><div class="var15-table ${three?'three-plan':''}"><div class="var15-row hd"><span></span>${keys.map(k=>`<b>方案 ${k}</b>`).join('')}</div>${e.rows.map(r=>`<div class="var15-row"><span>${E.esc(r[0])}</span>${keys.map((k,j)=>`<p>${E.esc(r[j+1]||'—')}</p>`).join('')}</div>`).join('')}</div><p class="var15-text">${E.esc(e.text)}</p></details>${i===1&&cur==='C'?'<div class="var15-benefit"><b>小豆島船券優勢：</b>符合香川 FIT 活動資格，可用電子優惠券兌領高松—小豆島來回船券，免另付渡輪船費。旅客免預約但仍需有效電子乘船憑證；未符合資格仍要現場買票。詳情見下方「執行條件與參考來源」。</div>':''}</section>`}
 const drtBase15=dayRouteTop;
 dayRouteTop=function(i,d){let h=drtBase15(i,d);if(i===4&&planVar15[4]==='A')h=h.replace(/<div class="proposal-checkpoints">.*?<\/div>/,'');return varSwitch15(i)+h};
 document.addEventListener('click',e=>{const b=e.target.closest('[data-var15]');if(!b)return;e.preventDefault();e.stopImmediatePropagation();const [i,k]=b.dataset.var15.split(':');planVar15[+i]=k;saveVar15();const y=window.scrollY;render();window.scrollTo(0,y)},true);
@@ -3253,6 +3272,7 @@ const TODO15=[
   ['card','海外刷卡','信用卡開通海外交易，帶一張備用卡。']]},
  {g:'預約與票券',items:[
   ['naoNewRes','直島新美術館線上票（方案 A）','官網購票 ¥1,500（現場 ¥1,700）。'],
+   ['kagawaFit','香川 FIT 三大電子優惠券（華航 CI178／CI179）','依活動公告核對台灣護照與台北—高松來回個人票（非團體）等資格；符合者抵達高松機場後依說明至 1F 旅客諮詢中心領取，可含機場巴士、渡輪與栗林公園優惠。小豆島段可免另付渡輪船費，但乘船仍須出示有效動態電子券／憑證；需手機網路，勿以截圖或列印代替。活動期間依公告至 2027/03/31，請再確認。'],
   ['bike','HELLO CYCLING 帳號','10/09 高松騎行用，先註冊並綁卡。'],
   ['kkday','KKday 祖谷接駁（僅方案 B）','若改走方案 B 才需要；若已訂而改走 A，10/03 前免費取消。']]},
  {g:'行李與其他',items:[
