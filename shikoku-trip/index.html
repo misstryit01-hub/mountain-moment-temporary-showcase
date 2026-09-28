@@ -7109,16 +7109,16 @@ dayRouteTop=function(i,d){if(i!==1||planVar15[1]!=='A')return nao42RouteBase(i,d
 evaluate14();render();
 </script>
 <style id="naoshima-single-map-style">
-.proposal-geography.nao42-map-frame{height:clamp(300px,35vw,390px)!important;min-height:300px!important;position:relative!important;overflow:hidden!important;background:#10232a!important;border:1px solid #355158!important;border-radius:10px!important}
-.nao42-map-toggle{position:absolute;z-index:4;top:9px;left:10px;display:flex;gap:4px;padding:3px;border:1px solid #52666a;border-radius:8px;background:#101b20ed;box-shadow:0 4px 16px #06101566}
+.proposal-geography.nao42-map-frame{display:grid!important;grid-template-rows:36px minmax(0,1fr) 27px!important;gap:0!important;box-sizing:border-box;height:clamp(300px,35vw,390px)!important;min-height:300px!important;position:relative!important;overflow:hidden!important;background:#10232a!important;border:1px solid #355158!important;border-radius:10px!important}
+.nao42-map-toggle{position:relative!important;inset:auto!important;z-index:4;display:flex!important;align-items:center;gap:4px;padding:3px;border:1px solid #52666a;border-radius:8px 8px 0 0;background:#101b20ed;box-shadow:0 4px 16px #06101566}
 .nao42-map-toggle button{border:0;border-radius:5px;padding:5px 10px;color:#b7c6c5;font:600 10px/1.3 var(--sans);white-space:nowrap}
 .nao42-map-toggle button[aria-pressed="true"]{background:#a7d9bf;color:#101b20}
-.nao42-map-canvas{position:absolute;inset:43px 0 27px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#58776b #17252b}
+.nao42-map-canvas{position:relative!important;inset:auto!important;z-index:1;display:block!important;width:100%;height:100%;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#58776b #17252b}
 .nao42-map-canvas svg{display:block;width:100%;height:100%;min-width:760px;min-height:225px}
-.nao42-map-credit{position:absolute;z-index:2;left:10px;bottom:4px;max-width:calc(100% - 20px);font-size:9px;line-height:1.4;color:#c0cfca;text-shadow:0 1px 3px #071319;background:#101b20b8;padding:2px 6px;border-radius:4px}
+.nao42-map-credit{position:relative!important;left:auto!important;bottom:auto!important;z-index:2;max-width:100%;min-height:25px;box-sizing:border-box;font-size:9px;line-height:1.4;color:#c0cfca;text-shadow:0 1px 3px #071319;background:#101b20b8;padding:4px 8px;border-radius:0 0 8px 8px}
 .nao42-map-credit a{color:#a7d9bf;text-decoration:none}
 .nao42-map-svg .sea{fill:#133440}.nao42-map-svg .land{fill:#273a37;stroke:#739287;stroke-width:2}.nao42-map-svg .island-coast{fill:none;stroke:#8da99c;stroke-width:1;opacity:.4}.nao42-map-svg .region-route{fill:none;stroke:#eac68f;stroke-width:4;stroke-linecap:round;stroke-dasharray:7 7}.nao42-map-svg .region-flow{fill:none;stroke:#fff0ca;stroke-width:1.5;stroke-dasharray:2 10;stroke-linecap:round}.nao42-map-svg .region-dot{fill:#eac68f;stroke:#10232a;stroke-width:3}.nao42-map-svg .region-hub{fill:#a7d9bf;stroke:#10232a;stroke-width:3}.nao42-map-svg .map-label{font:700 15px var(--sans);fill:#f0f1e8;paint-order:stroke;stroke:#10232a;stroke-width:4px;stroke-linejoin:round}.nao42-map-svg .map-small{font:500 11px var(--sans);fill:#bed0c9;paint-order:stroke;stroke:#10232a;stroke-width:3px;stroke-linejoin:round}.nao42-detail-svg .sea{fill:#102e38}.nao42-detail-svg .land{fill:#293e37;stroke:#8aa494;stroke-width:2}.nao42-detail-svg .road{fill:none;stroke:#657a6e;stroke-width:4;stroke-linecap:round;opacity:.75}.nao42-detail-svg .road-minor{fill:none;stroke:#718376;stroke-width:2;stroke-linecap:round;opacity:.7}.nao42-detail-svg .cycle-route{fill:none;stroke:#eac68f;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}.nao42-detail-svg .walk-route{fill:none;stroke:#a7d9bf;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3 8}.nao42-detail-svg .bus-route{fill:none;stroke:#93c5dc;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:10 8}.nao42-detail-svg .marker{cursor:pointer;outline:none}.nao42-detail-svg .marker circle{fill:#17272c;stroke:#f0d292;stroke-width:3}.nao42-detail-svg .marker text.num{font:700 12px var(--sans);fill:#f4d99e;text-anchor:middle;dominant-baseline:central;pointer-events:none}.nao42-detail-svg .marker text.label{font:650 12px var(--sans);fill:#f1f1e8;paint-order:stroke;stroke:#102e38;stroke-width:4px;stroke-linejoin:round;pointer-events:none}.nao42-detail-svg .marker.transport circle{stroke:#a7d9bf}.nao42-detail-svg .marker.bus circle{stroke:#93c5dc}.nao42-detail-svg .marker:hover circle,.nao42-detail-svg .marker:focus circle{fill:#315448;stroke:#fff0c4;stroke-width:4}.nao42-detail-svg .north{font:700 12px var(--sans);fill:#dce7df;letter-spacing:.08em}
-@media(max-width:680px){.proposal-geography.nao42-map-frame{height:300px!important;min-height:300px!important}.nao42-map-toggle{top:7px;left:7px}.nao42-map-toggle button{padding:5px 7px;font-size:9px}.nao42-map-canvas{inset:42px 0 27px}.nao42-map-canvas svg{min-width:760px}.nao42-map-credit{font-size:8px}}
+@media(max-width:680px){.proposal-geography.nao42-map-frame{height:300px!important;min-height:300px!important}.nao42-map-toggle button{padding:5px 7px;font-size:9px}.nao42-map-canvas svg{min-width:760px}.nao42-map-credit{font-size:8px}}
 </style>
 <script>
 /* 10/08 is now a single Naoshima plan; the map switch keeps the original regional map and adds a plotted island route. */
@@ -7159,7 +7159,7 @@ function nao42MapMarkup(){
 function mountNaoshimaMap42(){
  const el=document.getElementById('proposal-geography');if(!el)return;
  proposalGeo?.destroy?.();proposalGeo=null;
- el.className='proposal-geography nao42-map-frame';el.removeAttribute('data-source');el.innerHTML=nao42MapMarkup();
+ el.className='journey-map proposal-geography nao42-map-frame';el.removeAttribute('data-source');el.innerHTML=nao42MapMarkup();
 }
 const nao42EnhanceBase=enhanceNaoshima42;
 enhanceNaoshima42=function(){nao42EnhanceBase();mountNaoshimaMap42()};
