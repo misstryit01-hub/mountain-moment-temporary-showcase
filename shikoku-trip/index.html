@@ -7023,6 +7023,6 @@ const nao42PlanBase=plan;
 plan=function(){const active=view==='plan'&&day===1&&planVar15[1]==='A';if(active)planPane='timeline';else document.body.classList.remove('nao42-active');nao42PlanBase();if(active)enhanceNaoshima42()};
 const nao42RouteBase=dayRouteTop;
 dayRouteTop=function(i,d){if(i!==1||planVar15[1]!=='A')return nao42RouteBase(i,d);const prior=proposalMode;let html;proposalMode='geo';try{html=nao42RouteBase(i,d)}finally{proposalMode=prior}return html.replace(/<div class="segmented"><button data-proposal-mode="flow"[\s\S]*?<\/div>/,'').replace(/<b>當日路線<\/b><small>[\s\S]*?<\/small>/,'<b>渡輪往返・本村步行動線</b>')};
-render();
+evaluate14();render();
 </script>
 </body></html>
