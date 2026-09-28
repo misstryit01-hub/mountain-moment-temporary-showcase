@@ -4717,7 +4717,7 @@ const NAO_TICKETS30=[
  {name:'Valley Gallery',online:'已含',onsite:'已含',rule:'包含在 Benesse House Museum 票券內，不另外買票',url:NAO_BOOK30.benesse,tag:'同票',sub:1},
  {name:'杉本博司藝廊「時之迴廊」',online:'¥1,600',onsite:'¥1,700',rule:'指定日期＋時段・名額制',url:NAO_BOOK30.sugimoto,tag:'指定時段',timed:1},
  {name:'李禹煥美術館',online:'¥1,200',onsite:'¥1,400',rule:'可線上購票',url:NAO_BOOK30.lee,tag:'線上可訂'},
- {name:'家計畫・南寺 Minamidera',online:'¥600',onsite:'¥700',rule:'指定日期＋時段；5 歲以下不可入場。10/8 小作品優先候選。',url:NAO_BOOK30.minami,tag:'指定時段',timed:1,highlight:1},
+ {name:'家計畫・南寺 Minamidera',online:'¥600',onsite:'¥700',rule:'指定日期＋時段；5 歲以下不可入場。10/8 主線預計 12:45，餘位須以訂票頁確認。',url:NAO_BOOK30.minami,tag:'指定時段',timed:1,highlight:1},
  {name:'家計畫・Kinza',online:'¥600',onsite:'¥700',rule:'指定日期＋時段；每一時段僅 1 人',url:NAO_BOOK30.kinza,tag:'指定時段',timed:1},
  {name:'家計畫・角屋 Kadoya',online:'¥600',onsite:'¥700',rule:'可買單館票；也包含在五館共通票',url:NAO_BOOK30.single,tag:'單館／共通',sub:1},
  {name:'家計畫・護王神社 Go’o Shrine',online:'¥600',onsite:'¥700',rule:'可買單館票；也包含在五館共通票',url:NAO_BOOK30.single,tag:'單館／共通',sub:1},
@@ -6902,6 +6902,8 @@ render();
  .nao42-active .proposal-route-toolbar small{display:none!important}
  .nao42-active .proposal-route-toolbar>div:first-child{justify-content:flex-start!important}
  .nao42-active .proposal-route-toolbar b{font-size:12px!important}
+ .nao42-active .sail40-col:first-child .sail40-t:not(:first-child){display:none!important}
+ .nao42-active .sail40-col:nth-child(2) .sail40-t:not(:nth-child(2)){display:none!important}
  .nao42-detail{display:grid;grid-template-columns:124px minmax(0,1fr);gap:11px;align-items:start;margin-top:8px}
  .nao42-photo{display:block;width:124px;height:88px;padding:4px;border:1px solid var(--line,#30474a);border-radius:8px;background:#f1efe8;overflow:hidden}
  .nao42-photo img{display:block;width:100%;height:100%;object-fit:contain}
@@ -6999,8 +7001,6 @@ const nao42TicketInfo={
 function enhanceNaoshima42(){
  const main=app.querySelector('.day-main');if(!main)return;
  document.body.classList.add('nao42-active');
- const sail=app.querySelector('.sail40');
- if(sail)sail.querySelectorAll('.sail40-col').forEach((col,index)=>{const keep=index===0?'08:12':'17:00';col.querySelectorAll('.sail40-t').forEach(row=>{if(!row.textContent.includes(keep))row.remove()})});
  const tools=main.querySelector('.itinerary-tools');
  if(tools){const tiny=tools.querySelector('.micro');if(tiny)tiny.textContent='08:12 渡輪去程・17:00 渡輪回程｜本村各站依序步行';tools.querySelector('.segmented')?.remove();tools.insertAdjacentHTML('afterend',nao42TicketPanel());}
  main.querySelectorAll('.stop-entry').forEach((entry,index)=>{
