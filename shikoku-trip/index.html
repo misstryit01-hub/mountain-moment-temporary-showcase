@@ -7156,16 +7156,31 @@ function nao42MapMarkup(){
  const detail=nao42MapMode==='detail';
  return `<div class="nao42-map-toggle" role="group" aria-label="切換行程地圖"><button data-nao-map-mode="overview" aria-pressed="${!detail}">四國大地圖</button><button data-nao-map-mode="detail" aria-pressed="${detail}">直島細部小地圖</button></div><div class="nao42-map-canvas">${detail?nao42DetailSVG():nao42OverviewSVG()}</div><div class="nao42-map-credit">${detail?'金線騎行・薄荷虛線步行・藍線巴士｜手機可左右滑看全圖　':'高松港 ⇄ 宮浦港　08:12 去程・17:00 回程　'}<a href="https://benesse-artsite.jp/en/Naoshima_en_2604.pdf" target="_blank" rel="noopener noreferrer">官方直島地圖 ↗</a></div>`;
 }
+function styleNaoshimaMap42(el){
+ if(!el)return;
+ el.style.setProperty('display','grid','important');
+ el.style.setProperty('grid-template-rows','36px minmax(0,1fr) 27px','important');
+ el.style.setProperty('height','300px','important');
+ el.style.setProperty('min-height','300px','important');
+ el.style.setProperty('position','relative','important');
+ el.style.setProperty('overflow','hidden','important');
+ const toggle=el.querySelector('.nao42-map-toggle'),canvas=el.querySelector('.nao42-map-canvas'),credit=el.querySelector('.nao42-map-credit'),svg=el.querySelector('svg');
+ if(toggle)toggle.style.cssText='position:relative!important;inset:auto!important;z-index:4;display:flex!important;align-items:center;min-height:36px;box-sizing:border-box;padding:3px;background:#101b20;border-bottom:1px solid #52666a';
+ if(canvas)canvas.style.cssText='position:relative!important;inset:auto!important;z-index:1;display:block!important;width:100%;height:100%;min-height:0;overflow:auto;overscroll-behavior:contain';
+ if(svg)svg.style.cssText='display:block!important;width:100%;height:100%;min-width:760px;min-height:225px';
+ if(credit)credit.style.cssText='position:relative!important;left:auto!important;bottom:auto!important;z-index:2;display:block!important;box-sizing:border-box;width:100%;min-height:27px;padding:4px 8px;background:#101b20;color:#c0cfca;font:9px/1.4 var(--sans)';
+}
 function mountNaoshimaMap42(){
  const el=document.getElementById('proposal-geography');if(!el)return;
  proposalGeo?.destroy?.();proposalGeo=null;
  el.className='journey-map proposal-geography nao42-map-frame';el.removeAttribute('data-source');el.innerHTML=nao42MapMarkup();
+ styleNaoshimaMap42(el);
 }
 const nao42EnhanceBase=enhanceNaoshima42;
 enhanceNaoshima42=function(){nao42EnhanceBase();mountNaoshimaMap42()};
 document.addEventListener('click',e=>{
  const mode=e.target.closest('[data-nao-map-mode]');
- if(mode){e.preventDefault();e.stopImmediatePropagation();nao42MapMode=mode.dataset.naoMapMode==='detail'?'detail':'overview';const frame=document.getElementById('proposal-geography');if(frame)frame.innerHTML=nao42MapMarkup();return}
+ if(mode){e.preventDefault();e.stopImmediatePropagation();nao42MapMode=mode.dataset.naoMapMode==='detail'?'detail':'overview';const frame=document.getElementById('proposal-geography');if(frame){frame.innerHTML=nao42MapMarkup();styleNaoshimaMap42(frame)}return}
  const pin=e.target.closest('[data-nao-jump]');
  if(pin){e.preventDefault();e.stopImmediatePropagation();document.getElementById('stop-'+pin.dataset.naoJump)?.scrollIntoView({behavior:'smooth',block:'center'})}
 },true);
