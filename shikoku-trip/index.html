@@ -6724,4 +6724,36 @@ render();
   schedule();
 })();
 </script>
+<script id="m43-final-stay-photo">
+(()=>{
+  const app=document.getElementById('app');
+  if(!app)return;
+  const photo='https://www.ozucastle.mom/wp2023/wp-content/uploads/2024/01/oki_202_room_01.jpg';
+  const region=D.regions.find(r=>r.id==='dogo');
+  const hotel=region?.hotels?.find(h=>h.id==='nipponia')||region?.hotels?.[0];
+  if(hotel){hotel.image=photo;hotel.photoType='官方客房參考照・實際房型依訂房為準';}
+  function apply(){
+    const card=app.querySelector('.h40-days .h40-day[data-home-day="6"]');
+    if(!card)return;
+    const box=card.querySelector('.ph');
+    if(!box)return;
+    let img=box.querySelector('img');
+    if(!img){img=document.createElement('img');box.insertBefore(img,box.querySelector('.num'));}
+    img.alt='NIPPONIA HOTEL 大洲城下町官方客房參考照；實際房型依訂房為準';
+    img.loading='eager';
+    img.decoding='async';
+    if(img.getAttribute('src')!==photo)img.src=photo;
+    const caption=card.querySelector('.cap>span');
+    if(caption&&caption.dataset.m43Stay!=='1'){
+      caption.textContent='NIPPONIA・最後一晚';
+      caption.title='10/13 最後一晚入住 NIPPONIA HOTEL 大洲城下町';
+      caption.dataset.m43Stay='1';
+    }
+    const aria='10/13 內子・大洲行程；最後一晚入住 NIPPONIA HOTEL 大洲城下町';
+    if(card.getAttribute('aria-label')!==aria)card.setAttribute('aria-label',aria);
+  }
+  apply();
+  new MutationObserver(()=>requestAnimationFrame(apply)).observe(app,{childList:true,subtree:true});
+})();
+</script>
 </body></html>
