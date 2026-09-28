@@ -7010,7 +7010,6 @@ function enhanceNaoshima42(){
   const copy=document.createElement('div');copy.className='nao42-detail-copy';
   const ticket=stop.ticket&&nao42TicketInfo[stop.ticket];
   if(ticket){const a=document.createElement('a');a.className='nao42-ticket-chip';a.href=ticket.url;a.target='_blank';a.rel='noopener noreferrer';a.textContent=ticket.text+' ↗';copy.append(a)}
-  copy.append(p);
   if(stop.leg){const row=document.createElement('div');row.className='nao42-leg';const route=stop.leg;const url=route.mode==='ferry'?OFFICIAL.naoFerry.url:nao42Directions(route.from,route.to,route.mode);row.innerHTML=`<span>${E.esc(route.label)}</span>${url?`<a href="${E.esc(url)}" target="_blank" rel="noopener noreferrer">${route.mode==='ferry'?'船班資訊 ↗':route.mode==='transit'?'交通導航 ↗':'Google Maps ↗'}</a>`:''}`;copy.append(row)}
   wrap.append(copy);p.replaceWith(wrap);copy.append(p);
   entry.querySelector('.stop-acts16 .here16')?.remove();
