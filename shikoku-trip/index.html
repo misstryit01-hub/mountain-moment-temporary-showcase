@@ -7019,6 +7019,9 @@ function enhanceNaoshima42(){
  const ticketRef=document.querySelector('[data-nao-tickets29]');
  const intro=ticketRef?.querySelector('header p');
  if(intro)intro.textContent='10/8 主線已固定為新美術館＋家計畫五館＋南寺 12:45；本清單其餘設施僅供票券與作品內容參考，不列入當日行程。';
+ const minamiCard=[...(ticketRef?.querySelectorAll('.nao-ticket29')||[])].find(card=>card.querySelector('.nao-ticket29-name b')?.textContent.includes('南寺'));
+ const minamiRule=minamiCard?.querySelector('p');
+ if(minamiRule)minamiRule.textContent='指定日期＋時段；5 歲以下不可入場。10/8 主線預計 12:45，餘位以訂票頁確認。';
 }
 const nao42PlanBase=plan;
 plan=function(){const active=view==='plan'&&day===1&&planVar15[1]==='A';if(active)planPane='timeline';else document.body.classList.remove('nao42-active');nao42PlanBase();if(active)enhanceNaoshima42()};
