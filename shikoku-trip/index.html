@@ -6975,8 +6975,6 @@ const NAO42_DAY={
 };
 NAO42_DAY.home={city:'直島',summary:'高松港 → 直島新美術館 → 本村五館＋南寺 → 宮浦港 → 高松',note:'10/8 唯一直島路線；新美術館一座主要美術館，家計畫五館＋南寺依票券入場，17:00 渡輪回高松。',label:'直島・新美術館與本村家計畫'};
 VARIANTS15[1].A.day=NAO42_DAY;
-SL40.A.out=SL40.A.out.filter(choice=>Object.prototype.hasOwnProperty.call(choice,'08:12'));
-SL40.A.back=SL40.A.back.filter(choice=>Object.prototype.hasOwnProperty.call(choice,'17:00'));
 EVAL15[1].rows=[
  ['想看的東西','新美術館＋角屋、碁會所、護王神社、南寺、石橋、はいしゃ','女木洞窟、男木聚落與燈塔','土庄迷路之町＋退潮時的天使之路'],
  ['每人入場票','新美術館 ¥1,500＋五館共通票 ¥1,200＋南寺 ¥600＝線上約 ¥3,300；船、巴士另計','船資約 ¥1,120，島上開銷另計','合資格 FIT 券含來回渡輪；否則成人現行往返 ¥1,330，巴士另計'],
@@ -7001,6 +6999,8 @@ const nao42TicketInfo={
 function enhanceNaoshima42(){
  const main=app.querySelector('.day-main');if(!main)return;
  document.body.classList.add('nao42-active');
+ const sail=app.querySelector('.sail40');
+ if(sail)sail.querySelectorAll('.sail40-col').forEach((col,index)=>{const keep=index===0?'08:12':'17:00';col.querySelectorAll('.sail40-t').forEach(row=>{if(!row.textContent.includes(keep))row.remove()})});
  const tools=main.querySelector('.itinerary-tools');
  if(tools){const tiny=tools.querySelector('.micro');if(tiny)tiny.textContent='08:12 渡輪去程・17:00 渡輪回程｜本村各站依序步行';tools.querySelector('.segmented')?.remove();tools.insertAdjacentHTML('afterend',nao42TicketPanel());}
  main.querySelectorAll('.stop-entry').forEach((entry,index)=>{
