@@ -6673,4 +6673,55 @@ render();
 })();
 
 </script>
+<style id="m42-home-summary-style">
+@media(max-width:740px){
+  .m42-home-summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px;align-items:stretch;margin:8px 0 12px}
+  .m42-home-summary>.h40-costcard,.m42-flight-card{box-sizing:border-box;min-width:0;min-height:100%;border:1px solid var(--line);border-radius:12px;background:var(--panel);padding:10px}
+  .m42-home-summary>.h40-costcard{display:grid;grid-template-columns:minmax(0,1fr);align-content:start;gap:7px}
+  .m42-home-summary .h40-cc-main{min-width:0}
+  .m42-home-summary .h40-cc-main small{font-size:10px;line-height:1.35}
+  .m42-home-summary .h40-cc-main b{display:block;font-size:clamp(13px,4vw,16px)!important;line-height:1.25;white-space:normal;overflow-wrap:anywhere}
+  .m42-home-summary .h40-cc-rows{display:none}
+  .m42-home-summary .h40-costcard>.btn{justify-self:start;min-height:30px;max-width:100%;padding:5px 8px;font-size:10px;white-space:nowrap}
+  .m42-flight-card{padding:9px 8px}
+  .m42-flight-title{margin:0 0 4px;color:var(--mint);font-size:10px;font-weight:650;letter-spacing:.04em}
+  .m42-flight-card .m41-flights{margin:0;padding:0;border:0;border-radius:0;background:transparent}
+  .m42-flight-card .m41-flights>div{box-sizing:border-box;height:auto!important;min-height:39px;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-template-rows:auto auto;align-items:center;gap:2px 4px;padding:5px 0!important}
+  .m42-flight-card .m41-flights .d{grid-column:1;grid-row:1;font-size:10px;line-height:1.2;white-space:nowrap}
+  .m42-flight-card .m41-flights .mid{grid-column:2;grid-row:1;display:flex!important;justify-content:flex-end;gap:3px;min-width:0;overflow:hidden;font-size:8px!important;line-height:1.2;white-space:nowrap}
+  .m42-flight-card .m41-flights .mid i{display:none}
+  .m42-flight-card .m41-flights>div>strong{grid-row:2;font-size:12px;line-height:1.2;white-space:nowrap}
+  .m42-flight-card .m41-flights>div>strong:first-of-type{grid-column:1;text-align:left}
+  .m42-flight-card .m41-flights>div>strong:last-child{grid-column:2;text-align:right}
+}
+</style>
+<script id="m42-home-summary-script">
+(()=>{
+  const app=document.getElementById('app');
+  if(!app)return;
+  const mobile=()=>matchMedia('(max-width:740px)').matches;
+  let queued=false;
+  function apply(){
+    if(!mobile()||document.documentElement.dataset.view!=='home'||(typeof homeDay==='number'&&homeDay>=0))return;
+    const home=app.querySelector('.h40');
+    const right=home?.querySelector('.h40-right');
+    const info=right?.querySelector(':scope > .h40-info');
+    const cost=right?.querySelector(':scope > .h40-costcard');
+    const flights=info?.querySelector('.m41-flights');
+    if(!right||!cost||!flights)return;
+    let panel=right.querySelector(':scope > .m42-home-summary');
+    if(!panel){panel=document.createElement('div');panel.className='m42-home-summary';panel.setAttribute('aria-label','旅費與去回班機摘要')}
+    let flightCard=panel.querySelector('.m42-flight-card');
+    if(!flightCard){flightCard=document.createElement('section');flightCard.className='m42-flight-card';flightCard.setAttribute('aria-label','去回班機');const title=document.createElement('h2');title.className='m42-flight-title';title.textContent='往返班機';flightCard.appendChild(title)}
+    if(cost.parentElement!==panel)panel.appendChild(cost);
+    if(flights.parentElement!==flightCard)flightCard.appendChild(flights);
+    if(flightCard.parentElement!==panel)panel.appendChild(flightCard);
+    if(panel.parentElement!==right)right.appendChild(panel);
+  }
+  function schedule(){if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;apply()})}
+  new MutationObserver(schedule).observe(app,{childList:true,subtree:true});
+  window.addEventListener('resize',schedule,{passive:true});
+  schedule();
+})();
+</script>
 </body></html>
