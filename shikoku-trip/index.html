@@ -6293,6 +6293,9 @@ const SHOE_PRICE_AUDIT40={on:{
  '1168450':{skuCode:'1168450',price:3948,maxPrice:3948,list:6580,url:'https://www.ispo.com.tw/SalePage/Index/11610361',stock:true,title:'HOKA Mafate Speed 4 Lite'},
  '1172912':{skuCode:'1172912',price:6552,maxPrice:6552,list:7280,url:'https://www.ispo.com.tw/SalePage/Index/11132792',stock:true,title:'HOKA Transport Hike GTX'}
 }};
+// HOKA 型錄同時收錄 1176250 與 1176250M；兩者指向同一 iSPO 品番，僅由無尾碼型號代表計價。
+SHOE_PRICE_AUDIT40.hoka['1176250M'].kind='related';
+SHOE_PRICE_AUDIT40.hoka['1176250M'].note='型錄尾碼 M 別名對應同一 iSPO 品番 1176250；保留此型錄項目作參考，不在總結重複計價。';
 function shoeBuildCatalog40(brand,source,prices,legacyModels){
  const oldByCode={};legacyModels.forEach(function(m){oldByCode[String(m.style_code||'').toUpperCase()]=m});
   const priceByCode=Object.fromEntries(prices);
