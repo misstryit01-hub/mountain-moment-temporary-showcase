@@ -7187,4 +7187,167 @@ document.addEventListener('click',e=>{
 },true);
 evaluate14();render();
 </script>
+<style id="shoe-function-overview-style">
+.shoe43-overview{margin:18px 0 14px;padding:15px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
+.shoe43-overview-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:10px}
+.shoe43-overview-head small{color:#a8d8c1;letter-spacing:.13em;font-size:10px}
+.shoe43-overview-head h2{margin:3px 0;font:600 20px/1.25 var(--serif);color:var(--ink)}
+.shoe43-overview-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
+.shoe43-count{white-space:nowrap;color:var(--muted);font-size:11px}
+.shoe43-table{width:100%;border-collapse:collapse}
+.shoe43-table th,.shoe43-table td{padding:10px 9px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
+.shoe43-table th{color:var(--muted);font-size:10px;font-weight:600}
+.shoe43-table td:first-child{width:155px;color:var(--ink);font-weight:700}
+.shoe43-table td:nth-child(2){width:245px;color:var(--ink2);font-size:12px;line-height:1.5}
+.shoe43-model-list{display:flex;flex-wrap:wrap;gap:5px}
+.shoe43-group-models{margin:4px 0}
+.shoe43-group-models>summary{cursor:pointer;list-style:none;color:#a8d8c1;font-size:11px}
+.shoe43-group-models>summary::-webkit-details-marker{display:none}
+.shoe43-group-models>summary:after{content:"　＋"}
+.shoe43-group-models[open]>summary:after{content:"　−"}
+.shoe43-group-models .shoe43-model-list{padding-top:7px}
+.shoe43-select{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:#122229;color:var(--ink2);font:500 11px/1.3 var(--sans);cursor:pointer;text-align:left}
+.shoe43-select:hover,.shoe43-select:focus-visible{border-color:#8dbfa7;background:#1d3b35;color:var(--ink)}
+.shoe43-select small{color:var(--muted);font-size:9px;white-space:nowrap}
+.shoe43-note{margin:9px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
+.shoe43-guide{margin:8px 0 10px;padding:11px 12px;border:1px solid #38594f;border-radius:10px;background:#132c29}
+.shoe43-guide-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px 9px;margin-bottom:7px}
+.shoe43-guide-head>span{color:#a8d8c1;font-size:10px;letter-spacing:.08em}
+.shoe43-guide-head strong{color:var(--ink);font-size:13px}
+.shoe43-tag{display:inline-flex;padding:2px 6px;border:1px solid #42675a;border-radius:999px;color:#c2dfd0;font-size:9px}
+.shoe43-guide-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px 16px}
+.shoe43-guide-grid div{min-width:0}
+.shoe43-guide-grid b{display:block;margin-bottom:2px;color:#c4e2d3;font-size:10px}
+.shoe43-guide-grid p{margin:0;color:var(--ink2);font-size:11px;line-height:1.5}
+@media(max-width:760px){
+ .shoe43-overview{padding:11px;margin:12px 0}
+ .shoe43-overview-head{align-items:flex-start;flex-direction:column;gap:2px}
+ .shoe43-count{white-space:normal}
+ .shoe43-table,.shoe43-table tbody{display:block}
+ .shoe43-table thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+ .shoe43-table tr{display:block;padding:8px 0;border-top:1px solid var(--line)}
+ .shoe43-table td,.shoe43-table td:first-child,.shoe43-table td:nth-child(2){display:block;width:auto;padding:2px 0;border:0}
+ .shoe43-table td:first-child{font-size:13px}
+ .shoe43-table td:nth-child(2){font-size:11px}
+ .shoe43-group-models>summary{font-size:10px}
+ .shoe43-group-models .shoe43-model-list{padding:6px 0}
+ .shoe43-select{font-size:10px;padding:5px 6px}
+ .shoe43-guide-grid{grid-template-columns:1fr;gap:7px}
+}
+</style>
+<script id="shoe-function-overview">
+(function(){
+ const groups=[
+  {id:"walk",name:"城市步行・日常休閒",summary:"旅遊逛街、通勤與日常穿搭；不是以跑步訓練為主。"},
+  {id:"road",name:"日常路跑・緩震",summary:"日常慢跑、輕鬆跑與較長距離；中性鞋款，依緩震腳感挑選。"},
+  {id:"support",name:"穩定支撐",summary:"更重視落地穩定與足部包覆；不等於醫療矯正鞋。"},
+  {id:"speed",name:"速度訓練・競速",summary:"節奏跑、間歇或比賽；腳感較直接、有推進感，不是整天慢走首選。"},
+  {id:"training",name:"健身・綜合訓練",summary:"健身房、側向移動與混合體能；看重包覆、抓地和動作控制。"},
+  {id:"court",name:"球場・網球風格",summary:"網球／球場鞋與球場風格休閒鞋分開看，點進型號確認是否為性能款。"},
+  {id:"trail",name:"越野跑・健行",summary:"土路、山徑或戶外健行；依鞋底抓地、保護性與鞋筒／防水配置選擇。"},
+  {id:"recovery",name:"恢復・涼鞋",summary:"運動後放鬆、恢復或休閒套穿；不取代日常跑鞋。"},
+  {id:"work",name:"工作・久站",summary:"長時間站立或工作環境使用；SR 等防滑版本依工作地面挑選。"}
+ ];
+ function category(brand,name){
+  const n=String(name||"").toLowerCase();
+  if(brand==="on"){
+   if(/cloudpulse|cloud x/.test(n))return "training";
+   if(/the roger/.test(n))return "court";
+   if(/cloudspike|cloudboom|cloudflow|cloudmonster.*hyper/.test(n))return "speed";
+   if(/cloudrunner/.test(n))return "support";
+   if(/cloudultra|cloudvista|cloudrock|cloudsoma hike/.test(n))return "trail";
+   if(/cloudmonster 1 waterproof/.test(n))return "road";
+   if(/cloud 6|cloudaway|cloudtilt|cloudswift amp|cloudmonster 1|cloudmonster void|cloudmonster 3 mule|cloudsoma/.test(n))return "walk";
+   return "road";
+  }
+  if(/ora |ora$|restore tc/.test(n))return "recovery";
+  if(/bondi sr|arahi sr/.test(n))return "work";
+  if(/mafate speed 4 lite/.test(n))return "walk";
+  if(/arahi/.test(n))return "support";
+  if(/transport hike|speedgoat|challenger|mafate|tecton|torrent|stinson|kaha|anacapa|tor summit|hopara|infini hike/.test(n))return "trail";
+  if(/mach remastered|transport|project transport|bondi mary jane|skyward laceless/.test(n))return "walk";
+  if(/mach|rocket x|cielo x/.test(n))return "speed";
+  return "road";
+ }
+ function tags(brand,m,id){
+  const n=String(m.name||"");
+  const t=[];
+  if(/waterproof|\bgtx\b|gore-tex/i.test(n))t.push("防水");
+  if(/\bwide\b/i.test(n))t.push("寬楦");
+  if(id==="support")t.push("穩定支撐");
+  if(/cloudspike|cloudboom|cloudmonster.*hyper|cloud x tempo pro|rocket x|cielo x|tecton x|mach x/i.test(n))t.push("速度／競賽取向");
+  if(/hopara|infini hike|ora recovery|recovery slide|recovery flip|athletic slide/i.test(n))t.push("涼鞋／套鞋");
+  if(/bondi sr|arahi sr/i.test(n))t.push("工作防滑");
+  if(/mule|laceless|mary jane/i.test(n))t.push("便穿設計");
+  if(/mafate speed 4 lite/i.test(n))t.push("越野科技・生活外型");
+  return t;
+ }
+ function variant(brand,m,id){
+  const n=String(m.name||"");
+  if(/waterproof|\bgtx\b|gore-tex/i.test(n))return "防水版本：主差異是防水鞋面／膜，鞋內包覆感與透氣感可能和一般版不同。";
+  if(/arahi sr/i.test(n))return "Arahi 的穩定支撐結構加上 SR 防滑工作配置；選它是看工作地面與止滑需求，不等同一般 Arahi 路跑款。";
+  if(/mafate speed 4 lite/i.test(n))return "以越野科技元素搭配偏生活穿搭的輕量外型；若要正式跑山，另比較 Speedgoat／Mafate 主力越野跑款。";
+  if(/\bwide\b/i.test(n))return "寬楦版本：主要改變前掌空間，不代表支撐或緩震一定更強。";
+  if(/cloudrunner 3 max/i.test(n))return "Cloudrunner 同系列的高緩震、長距離取向；LN1 是限定配色，不是另一種功能分類。";
+  if(/cloudmonster 3 hyper/i.test(n))return "Cloudmonster 家族中更偏速度與高回彈的訓練款；與一般日常版分開比較。";
+  if(/mule|recovery|slide|flip|hopara|infini hike/i.test(n))return "套入／涼鞋結構：方便休閒或恢復穿著，包覆與固定性不同於繫帶跑鞋。";
+  if(/clifton pro/i.test(n))return "Clifton 系列的進階跑步取向，推進感比一般 Clifton 更明顯；建議實走比較。";
+  if(/bondi sr/i.test(n))return "Bondi 的工作／久站版本，重點是工作情境與止滑，不是一般 Bondi 路跑配置。";
+  if(/cloudmonster 1$/.test(n))return "第一代復刻的日常穿搭定位；外型和厚底腳感是特色，與 Cloudmonster 3 的跑步定位要分開看。";
+  if(/cloud x tempo pro/i.test(n))return "混合體能競賽取向：跑動之外，也為雪橇推拉等多方向動作設計。";
+  if(/cloudspike/i.test(n))return "田徑場釘鞋系列，依距離／項目挑釘款；不適合拿來當一般公路鞋。";
+  if(/cloudboom|rocket x|cielo x|tecton x/i.test(n))return "競賽取向系列；板材、賽道與距離依各型號不同，不能只看系列名推定規格。";
+  if(/cloudflow|mach x|\bmach [0-9]|cloud x tempo/i.test(n))return "比一般每日慢跑款更偏節奏與速度訓練；看重輕快轉換，不以極軟厚底為主。";
+  if(/cloudrunner|arahi/i.test(n))return "以穩定腳感和包覆為主；若你沒有特別需要支撐，仍應和中性款實穿比較。";
+  if(/cloudtilt/i.test(n))return "偏城市步行和長時間走路的平順腳感；和路跑系列相比，重點是日常移動。";
+  if(/speedgoat|mafate|challenger|torrent|cloudultra|cloudvista|cloudrock|cloudsoma|stinson|tecton|kaha|anacapa|tor summit|hopara|infini hike/i.test(n))return "戶外系列：越野跑、健行和涼鞋的用途不相同；請以鞋底齒紋、鞋面保護與型號頁用途再細分。";
+  if(/bondi/i.test(n))return "Bondi 著重厚實緩震，適合偏好柔軟落地、日常慢跑或長時間走路者；SR 版本另屬工作鞋。";
+  if(/clifton/i.test(n))return "Clifton 是較均衡的日常路跑／步行系列；防水與 PRO 版本的差別看上方標籤。";
+  if(/cloudmonster/i.test(n))return "Cloudmonster 著重厚實緩震與向前滾動感；日常跑款、Hyper 和 Mule 各自用途不同。";
+  if(/cloudsurfer/i.test(n))return "Cloudsurfer 著重平順轉換；Max 偏長距離緩震，Wide 是楦寬差異。";
+  if(/cloud 6|cloudaway|transport|project transport|skyward laceless/i.test(n))return "以日常移動、走路或通勤為主，和速度訓練鞋的設計目標不同。";
+  if(/ora|restore/i.test(n))return "恢復穿著取向，重點是運動後／休息時的放鬆；不是需要牢固鎖定的跑步鞋。";
+  if(/the roger/i.test(n))return "THE ROGER 是網球風格家族；Pro 系列偏球場性能，其餘款式以日常球場風格穿搭為主。";
+  return id==="road"?"中性路跑取向，適合日常跑步；同系列以緩震、重量與鞋面版本比較。":"用途先按品牌分類整理，特殊版本以型號標籤和官方商品頁為準。";
+ }
+ function overview(brand,models){
+  const bucket={};groups.forEach(function(g){bucket[g.id]=[]});
+  models.forEach(function(m){const id=category(brand,m.name);(bucket[id]||(bucket[id]=[])).push(m)});
+  const total=models.length,brandName=brand==="on"?"On":"HOKA";
+  const rows=groups.filter(function(g){return bucket[g.id]&&bucket[g.id].length}).map(function(g){
+   const items=bucket[g.id].map(function(m){
+    const note=variant(brand,m,g.id),badges=tags(brand,m,g.id);
+    const label=m.name+(m.style_code?" · "+m.style_code:"");
+    return '<button type="button" class="shoe43-select" data-shoe-model="'+E.esc(m.id)+'" title="'+E.esc(note)+'"><span>'+E.esc(m.name)+'</span><small>'+E.esc(m.style_code||"")+'</small>'+(badges.length?'<i>'+E.esc(badges.join("／"))+'</i>':"")+'</button>';
+   }).join("");
+   const picker='<details class="shoe43-group-models"><summary>展開 '+bucket[g.id].length+' 款鞋型</summary><div class="shoe43-model-list">'+items+'</div></details>';
+   return '<tr><td>'+E.esc(g.name)+'<small class="shoe43-row-count"> '+bucket[g.id].length+' 款</small></td><td>'+E.esc(g.summary)+'</td><td>'+picker+'</td></tr>';
+  }).join("");
+  return '<section class="shoe43-overview" aria-label="'+brandName+' 鞋型功能總表"><div class="shoe43-overview-head"><div><small>SHOE FUNCTION INDEX</small><h2>先按用途分，再看單鞋</h2><p>點型號，下面會切換成該鞋的詳細說明與配色。</p></div><span class="shoe43-count">'+brandName+' 男鞋型錄・'+total+' 個型號</span></div><table class="shoe43-table"><thead><tr><th>功能分類</th><th>快速區分</th><th>鞋型／點選查看</th></tr></thead><tbody>'+rows+'</tbody></table><p class="shoe43-note">分類依品牌用途與鞋系定位整理；GTX／防水、寬楦、競賽等差異以型號標籤提示。不同年份與限定版的細節請看所選鞋款的品牌商品頁。</p></section>';
+ }
+ const originalCard=shoeCard40;
+ shoeCard40=function(m,brand){
+  const id=category(brand,m.name),g=groups.find(function(x){return x.id===id});
+  const detail=[m.type&&m.type!==(brand==='on'?'On':'HOKA')+' 男鞋'?m.type:'',m.func&&!/^官方日本男鞋型錄款式/.test(m.func)?m.func:'',variant(brand,m,id)].filter(Boolean).join('；');
+  const badges=tags(brand,m,id);
+  const guide='<section class="shoe43-guide" aria-label="鞋型功能說明"><div class="shoe43-guide-head"><span>功能定位</span><strong>'+E.esc(g?g.name:"日常路跑")+'</strong>'+badges.map(function(x){return '<i class="shoe43-tag">'+E.esc(x)+'</i>'}).join("")+'</div><div class="shoe43-guide-grid"><div><b>主要用途</b><p>'+E.esc(g?g.summary:"日常路跑取向。")+'</p></div><div><b>這個型號怎麼分</b><p>'+E.esc(detail)+'</p></div></div></section>';
+  return originalCard(m,brand).replace('<p class="shoe40-func">',guide+'<p class="shoe40-func">');
+ };
+ const originalView=shoesView40;
+ shoesView40=function(){
+  let html=originalView();
+  const brand=shoeUi40.brand==="hoka"?"hoka":"on",models=brand==="hoka"?HOKA40.models:SHOE40.models;
+  const intro=html.indexOf('<p>先選品牌');
+  if(intro>=0){const end=html.indexOf('</p>',intro);if(end>=0)html=html.slice(0,intro)+'<p>先看用途總表，再點進鞋型比較功能、配色與價格。</p>'+html.slice(end+4)}
+  const at=html.indexOf('<details class="shoe40-picker">');
+  if(at>=0)html=html.slice(0,at)+overview(brand,models)+html.slice(at);
+  return html;
+ };
+ document.addEventListener("click",function(e){
+  const item=e.target&&e.target.closest?e.target.closest(".shoe43-select"):null;
+  if(!item)return;
+  requestAnimationFrame(function(){const detail=document.getElementById("sh40-active");if(detail)detail.scrollIntoView({behavior:"smooth",block:"start"})});
+ },true);
+})();
+</script>
 </body></html>
