@@ -7328,10 +7328,13 @@ evaluate14();render();
  const originalCard=shoeCard40;
  shoeCard40=function(m,brand){
   const id=category(brand,m.name),g=groups.find(function(x){return x.id===id});
-  const detail=[m.type&&m.type!==(brand==='on'?'On':'HOKA')+' 男鞋'?m.type:'',m.func&&!/^官方日本男鞋型錄款式/.test(m.func)?m.func:'',variant(brand,m,id)].filter(Boolean).join('；');
+  const detail=variant(brand,m,id),baseFunc=String(m.func||''),genericType=(brand==='on'?'On':'HOKA')+' 男鞋';
   const badges=tags(brand,m,id);
   const guide='<section class="shoe43-guide" aria-label="鞋型功能說明"><div class="shoe43-guide-head"><span>功能定位</span><strong>'+E.esc(g?g.name:"日常路跑")+'</strong>'+badges.map(function(x){return '<i class="shoe43-tag">'+E.esc(x)+'</i>'}).join("")+'</div><div class="shoe43-guide-grid"><div><b>主要用途</b><p>'+E.esc(g?g.summary:"日常路跑取向。")+'</p></div><div><b>這個型號怎麼分</b><p>'+E.esc(detail)+'</p></div></div></section>';
-  return originalCard(m,brand).replace('<p class="shoe40-func">',guide+'<p class="shoe40-func">');
+  const header='<small>'+(brand==='on'?'ON RUNNING':'HOKA')+' / '+E.esc(m.type||genericType)+'</small>';
+  const categoryHeader='<small>'+(brand==='on'?'ON RUNNING':'HOKA')+' / '+E.esc(!m.type||m.type===genericType?(g?g.name:'日常路跑'):m.type)+'</small>';
+  const funcText=baseFunc&&!/^官方日本男鞋型錄款式/.test(baseFunc)?baseFunc:detail;
+  return originalCard(m,brand).replace(header,categoryHeader).replace('<p class="shoe40-func">'+E.esc(baseFunc)+'</p>',guide+'<p class="shoe40-func">'+E.esc(funcText)+'</p>');
  };
  const originalView=shoesView40;
  shoesView40=function(){
