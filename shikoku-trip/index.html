@@ -7108,4 +7108,68 @@ const nao42RouteBase=dayRouteTop;
 dayRouteTop=function(i,d){if(i!==1||planVar15[1]!=='A')return nao42RouteBase(i,d);const prior=proposalMode;let html;proposalMode='geo';try{html=nao42RouteBase(i,d)}finally{proposalMode=prior}return html.replace(/<div class="segmented"><button data-proposal-mode="flow"[\s\S]*?<\/div>/,'').replace(/<b>當日路線<\/b><small>[\s\S]*?<\/small>/,'<b>渡輪往返・本村步行動線</b>')};
 evaluate14();render();
 </script>
+<style id="naoshima-single-map-style">
+.proposal-geography.nao42-map-frame{height:clamp(300px,35vw,390px)!important;min-height:300px!important;position:relative!important;overflow:hidden!important;background:#10232a!important;border:1px solid #355158!important;border-radius:10px!important}
+.nao42-map-toggle{position:absolute;z-index:4;top:9px;left:10px;display:flex;gap:4px;padding:3px;border:1px solid #52666a;border-radius:8px;background:#101b20ed;box-shadow:0 4px 16px #06101566}
+.nao42-map-toggle button{border:0;border-radius:5px;padding:5px 10px;color:#b7c6c5;font:600 10px/1.3 var(--sans);white-space:nowrap}
+.nao42-map-toggle button[aria-pressed="true"]{background:#a7d9bf;color:#101b20}
+.nao42-map-canvas{position:absolute;inset:43px 0 27px;overflow:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#58776b #17252b}
+.nao42-map-canvas svg{display:block;width:100%;height:100%;min-width:760px;min-height:225px}
+.nao42-map-credit{position:absolute;z-index:2;left:10px;bottom:4px;max-width:calc(100% - 20px);font-size:9px;line-height:1.4;color:#c0cfca;text-shadow:0 1px 3px #071319;background:#101b20b8;padding:2px 6px;border-radius:4px}
+.nao42-map-credit a{color:#a7d9bf;text-decoration:none}
+.nao42-map-svg .sea{fill:#133440}.nao42-map-svg .land{fill:#273a37;stroke:#739287;stroke-width:2}.nao42-map-svg .island-coast{fill:none;stroke:#8da99c;stroke-width:1;opacity:.4}.nao42-map-svg .region-route{fill:none;stroke:#eac68f;stroke-width:4;stroke-linecap:round;stroke-dasharray:7 7}.nao42-map-svg .region-flow{fill:none;stroke:#fff0ca;stroke-width:1.5;stroke-dasharray:2 10;stroke-linecap:round}.nao42-map-svg .region-dot{fill:#eac68f;stroke:#10232a;stroke-width:3}.nao42-map-svg .region-hub{fill:#a7d9bf;stroke:#10232a;stroke-width:3}.nao42-map-svg .map-label{font:700 15px var(--sans);fill:#f0f1e8;paint-order:stroke;stroke:#10232a;stroke-width:4px;stroke-linejoin:round}.nao42-map-svg .map-small{font:500 11px var(--sans);fill:#bed0c9;paint-order:stroke;stroke:#10232a;stroke-width:3px;stroke-linejoin:round}.nao42-detail-svg .sea{fill:#102e38}.nao42-detail-svg .land{fill:#293e37;stroke:#8aa494;stroke-width:2}.nao42-detail-svg .road{fill:none;stroke:#657a6e;stroke-width:4;stroke-linecap:round;opacity:.75}.nao42-detail-svg .road-minor{fill:none;stroke:#718376;stroke-width:2;stroke-linecap:round;opacity:.7}.nao42-detail-svg .cycle-route{fill:none;stroke:#eac68f;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}.nao42-detail-svg .walk-route{fill:none;stroke:#a7d9bf;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3 8}.nao42-detail-svg .bus-route{fill:none;stroke:#93c5dc;stroke-width:4;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:10 8}.nao42-detail-svg .marker{cursor:pointer;outline:none}.nao42-detail-svg .marker circle{fill:#17272c;stroke:#f0d292;stroke-width:3}.nao42-detail-svg .marker text.num{font:700 12px var(--sans);fill:#f4d99e;text-anchor:middle;dominant-baseline:central;pointer-events:none}.nao42-detail-svg .marker text.label{font:650 12px var(--sans);fill:#f1f1e8;paint-order:stroke;stroke:#102e38;stroke-width:4px;stroke-linejoin:round;pointer-events:none}.nao42-detail-svg .marker.transport circle{stroke:#a7d9bf}.nao42-detail-svg .marker.bus circle{stroke:#93c5dc}.nao42-detail-svg .marker:hover circle,.nao42-detail-svg .marker:focus circle{fill:#315448;stroke:#fff0c4;stroke-width:4}.nao42-detail-svg .north{font:700 12px var(--sans);fill:#dce7df;letter-spacing:.08em}
+@media(max-width:680px){.proposal-geography.nao42-map-frame{height:300px!important;min-height:300px!important}.nao42-map-toggle{top:7px;left:7px}.nao42-map-toggle button{padding:5px 7px;font-size:9px}.nao42-map-canvas{inset:42px 0 27px}.nao42-map-canvas svg{min-width:760px}.nao42-map-credit{font-size:8px}}
+</style>
+<script>
+/* 10/08 is now a single Naoshima plan; the map switch keeps the original regional map and adds a plotted island route. */
+if(planVar15[1]!=='A'){planVar15[1]='A';saveVar15()}
+if(VARIANTS15[1]){delete VARIANTS15[1].B;delete VARIANTS15[1].C}
+const nao42VarSwitchBase=varSwitch15;
+varSwitch15=function(i){return i===1?'':nao42VarSwitchBase(i)};
+mountIsl40=function(){};
+let nao42MapMode='overview';
+const NAO42_MAP_STOPS=[
+ {n:'01',name:'宮浦港・T.V.C取車',lat:34.456797,lon:133.974653,target:2,kind:'transport',dx:14,dy:25},
+ {n:'02',name:'直島新美術館',lat:34.4579956,lon:133.99872,target:4,kind:'art',dx:-12,dy:24,anchor:'end'},
+ {n:'03',name:'角屋',lat:34.4602046,lon:133.9975159,target:5,kind:'art',dx:-12,dy:-12,anchor:'end'},
+ {n:'04',name:'碁會所',lat:34.4605326,lon:133.9967741,target:6,kind:'art',dx:13,dy:-7},
+ {n:'05',name:'護王神社',lat:34.4597775,lon:133.9984809,target:7,kind:'art',dx:13,dy:18},
+ {n:'06',name:'南寺',lat:34.4588568,lon:133.996982,target:8,kind:'art',dx:13,dy:19},
+ {n:'07',name:'本村午餐',lat:34.4604,lon:133.9951,target:9,kind:'food',dx:-13,dy:-13,anchor:'end'},
+ {n:'08',name:'石橋',lat:34.4621114,lon:133.9950423,target:10,kind:'art',dx:-13,dy:-12,anchor:'end'},
+ {n:'09',name:'はいしゃ',lat:34.4598765,lon:133.9944882,target:11,kind:'art',dx:-13,dy:22,anchor:'end'},
+ {n:'10',name:'T.V.C.本村店・還車',lat:34.46095,lon:133.9938,target:12,kind:'transport',dx:-13,dy:-12,anchor:'end'},
+ {n:'11',name:'農協前・搭巴士',lat:34.4612,lon:133.9958,target:13,kind:'bus',dx:14,dy:19}
+];
+function nao42DetailSVG(){
+ const W=1000,H=440,lo0=133.973,lo1=134.001,la0=34.455,la1=34.464;
+ const xy=p=>[50+(p.lon-lo0)/(lo1-lo0)*900,28+(la1-p.lat)/(la1-la0)*370];
+ const pts=NAO42_MAP_STOPS.map(p=>({...p,x:xy(p)[0],y:xy(p)[1]}));
+ const by=n=>pts.find(p=>p.n===n),line=(ids)=>ids.map((n,i)=>`${i?'L':'M'} ${by(n).x.toFixed(1)} ${by(n).y.toFixed(1)}`).join(' ');
+ const marker=p=>`<g class="marker ${p.kind==='transport'?'transport':p.kind==='bus'?'bus':''}" tabindex="0" role="button" data-nao-jump="${p.target}" aria-label="${p.n} ${p.name}，跳到行程"><circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="13"/><text class="num" x="${p.x.toFixed(1)}" y="${p.y.toFixed(1)}">${p.n.slice(1)}</text><text class="label" x="${(p.x+p.dx).toFixed(1)}" y="${(p.y+p.dy).toFixed(1)}" text-anchor="${p.anchor||'start'}">${p.name}</text></g>`;
+ return `<svg class="nao42-map-svg nao42-detail-svg" viewBox="0 0 ${W} ${H}" role="img" aria-label="直島細部地圖：依序標出宮浦港、新美術館、本村家計畫景點、租車還車處與農協前巴士站"><rect class="sea" width="${W}" height="${H}"/><path class="land" d="M35 293 C48 252 86 223 139 216 C192 196 225 170 286 173 C355 176 393 145 454 139 C523 132 562 102 630 91 C702 78 759 83 824 60 C886 47 936 67 973 111 L984 170 C963 199 959 235 972 275 L946 330 C891 341 849 364 790 368 C714 385 665 402 584 398 C515 387 444 399 369 379 C286 363 219 376 155 350 C99 341 57 327 35 293Z"/><path class="island-coast" d="M46 291 C114 282 159 319 221 337 S342 348 407 362 M297 180 C370 207 418 178 477 157 S581 116 647 113 S756 111 818 81 S918 93 960 133"/><path class="road" d="M74 300 C147 277 191 298 257 283 S378 294 449 267 S564 271 635 244 S736 246 797 214 S878 206 941 173"/><path class="road-minor" d="M655 244 C687 213 694 179 737 151 S777 125 783 98 M736 250 C757 224 757 201 789 176 S836 158 855 132 M720 251 C701 222 692 204 671 187 M778 222 C810 237 837 249 882 258"/><path class="cycle-route" d="${line(['01','02'])}"/><path class="walk-route" d="${line(['02','03','04','05','06','07','08','09'])}"/><path class="cycle-route" d="${line(['09','10'])}"/><path class="walk-route" d="${line(['10','11'])}"/><path class="bus-route" d="${line(['11','01'])}"/><text class="north" x="950" y="38">N ↑</text><text class="map-small" x="54" y="420">騎行　· · ·　本村步行　╌ ╌　回程巴士</text>${pts.map(marker).join('')}</svg>`;
+}
+function nao42OverviewSVG(){
+ const I=ISL40,t=I.pts.tak,n=I.pts.nao,route=I.routes.naoshima,d=route.map((p,i)=>`${i?'L':'M'}${p[0]} ${p[1]}`).join(' ');
+ return `<svg class="nao42-map-svg nao42-overview-svg" viewBox="0 0 ${I.w} ${I.h}" role="img" aria-label="瀨戶內與高松、直島往返總覽地圖"><rect width="${I.w}" height="${I.h}" fill="#0e2330"/><path class="land" d="${I.land}"/><text class="map-small" x="${t[0]+110}" y="${t[1]-105}">瀨戶內海</text><path class="region-route" d="${d}"/><path class="region-flow" d="${d}"/><circle class="region-hub" cx="${t[0]}" cy="${t[1]}" r="7"/><circle class="region-dot" cx="${n[0]}" cy="${n[1]}" r="7"/><text class="map-label" x="${t[0]-14}" y="${t[1]+27}" text-anchor="end">高松港</text><text class="map-small" x="${t[0]-14}" y="${t[1]+44}" text-anchor="end">08:12 出發・17:00 回程</text><text class="map-label" x="${n[0]+15}" y="${n[1]-10}">直島・宮浦港</text><text class="map-small" x="${n[0]+15}" y="${n[1]+8}">10/08 單一主線</text></svg>`;
+}
+function nao42MapMarkup(){
+ const detail=nao42MapMode==='detail';
+ return `<div class="nao42-map-toggle" role="group" aria-label="切換行程地圖"><button data-nao-map-mode="overview" aria-pressed="${!detail}">四國大地圖</button><button data-nao-map-mode="detail" aria-pressed="${detail}">直島細部小地圖</button></div><div class="nao42-map-canvas">${detail?nao42DetailSVG():nao42OverviewSVG()}</div><div class="nao42-map-credit">${detail?'金線騎行・薄荷虛線步行・藍線巴士｜手機可左右滑看全圖　':'高松港 ⇄ 宮浦港　08:12 去程・17:00 回程　'}<a href="https://benesse-artsite.jp/en/Naoshima_en_2604.pdf" target="_blank" rel="noopener noreferrer">官方直島地圖 ↗</a></div>`;
+}
+function mountNaoshimaMap42(){
+ const el=document.getElementById('proposal-geography');if(!el)return;
+ proposalGeo?.destroy?.();proposalGeo=null;
+ el.className='proposal-geography nao42-map-frame';el.removeAttribute('data-source');el.innerHTML=nao42MapMarkup();
+}
+const nao42EnhanceBase=enhanceNaoshima42;
+enhanceNaoshima42=function(){nao42EnhanceBase();mountNaoshimaMap42()};
+document.addEventListener('click',e=>{
+ const mode=e.target.closest('[data-nao-map-mode]');
+ if(mode){e.preventDefault();e.stopImmediatePropagation();nao42MapMode=mode.dataset.naoMapMode==='detail'?'detail':'overview';const frame=document.getElementById('proposal-geography');if(frame)frame.innerHTML=nao42MapMarkup();return}
+ const pin=e.target.closest('[data-nao-jump]');
+ if(pin){e.preventDefault();e.stopImmediatePropagation();document.getElementById('stop-'+pin.dataset.naoJump)?.scrollIntoView({behavior:'smooth',block:'center'})}
+},true);
+evaluate14();render();
+</script>
 </body></html>
