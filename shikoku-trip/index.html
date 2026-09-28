@@ -7022,7 +7022,9 @@ const NAO42_DAY={
  sources:['naoFerry','naoBus42','naoRoute42','naoMuseum42','naoHours42','naoCalendar27'],
  notes:[
   '渡輪：高松 08:12 → 宮浦 09:02；回程宮浦 17:00 → 高松 18:00。成人 ¥680／單程，不受理預約、依序登船；07:30 到港候船。',
-  '町營巴士：09:06 自宮浦港發車，約 09:12 到農協前、09:14 到桃山；桃山站至新美術館官方建議步行約 10 分鐘，約 09:24 抵達，留至 10:00 開館。回程 16:19 農協前上車、16:25 宮浦港到站。成人 ¥100／程，降車投硬幣、無車內找零；小型巴士可能客滿。',
+  '島內交通主方案：宮浦港租電動輔助車，兩人各一台；參考 ¥1,500／台／日，合計約 ¥3,000。建議預約 T.V.C. 宮浦店，官方表示可在本村店還車；新美術館與本村聚落之間騎乘，家屋與南寺周邊停妥後步行參觀。T.V.C. 車況／預約名額須即時確認。',
+  '交通管制：非 Benesse House 住宿者不可騎車進入東 Gate—北 Gate 的 Benesse 私有區域；若改去該區景點，請停在つつじ荘、地中美術館票務中心或北 Gate 附近的指定停車處，再步行／搭場內免費接駁。全程只停合法駐輪場。',
+  '下雨、無車或不想騎坡時改町營巴士：宮浦港往本村可搭 09:06 班次；回程農協前 16:19、約 16:25 抵宮浦港。成人 ¥100／程，降車投硬幣、車內不找零且不可刷 ICOCA；小型巴士可能客滿。',
   '新美術館：10:00–16:30（最後入館 16:00），線上日期票 ¥1,500／人、現場 ¥1,700；本行程預留 90 分鐘看展與安藤忠雄建築，10/8 展覽日期在 2026/6/7–11/23 展期內。',
   '家計畫五館共通票：線上 ¥1,200／人，涵蓋角屋、護王神社、石橋、碁會所、はいしゃ；五處都排入本日。線上票可先買，也可到本村 Lounge & Archive 購票。',
   '南寺：不含在五館共通票內，另購指定日期／時間票；線上 ¥600／人。主線抓 12:45，請在訂票頁確認該時段餘票並提早抵達；館內不可拍照。',
@@ -7031,9 +7033,9 @@ const NAO42_DAY={
  stops:[
   nao42Stop('stay:tak','07:15','北浜公寓出發','走路前往高松港，目標 07:30 到售票／候船處。',{leg:{from:'stay:tak',to:'takPierN',mode:'walk',label:'北浜公寓 → 高松港・步行導航'}}),
   nao42Stop('takPierN','07:30','抵達高松港・購票候船','08:12 渡輪不接受預約、先到先上；預留買票與排隊時間。船資成人 ¥680／單程，與女木／男木的乘船處不同。',{ticket:'ferry',leg:{from:'takPierN',to:'naoPort',mode:'ferry',label:'高松港 → 宮浦港・渡輪 08:12–09:02'}}),
-  nao42Stop('naoPort','09:02','抵達直島・宮浦港','下船後到町營巴士乘車處；先留意 09:06 發車，巴士依序停農協前、桃山。',{via:{from:'takPierN',mode:'ferry',duration:'渡輪 50 分',time:'08:12 → 09:02',ref:'naoFerry'}}),
-  nao42Stop('naoMomoyama42','09:06–09:24','町營巴士到桃山・步行至新美術館','09:06 宮浦港發車；農協前約 09:12、桃山約 09:14。依官方動線步行約 10 分鐘，約 09:24 抵達；至 10:00 開館前有緩衝。車資 ¥100／程，降車投硬幣、無車內找零；不支援 ICOCA。',{ticket:'bus',leg:{from:'naoPort',to:'naoMomoyama42',mode:'transit',label:'宮浦港 → 桃山・町營巴士導航'}}),
-  nao42Stop('naoNew','10:00–11:30','直島新美術館・本日唯一主要美術館','看亞洲當代藝術展與安藤忠雄建築；本行程預留 90 分鐘。日期票線上 ¥1,500／人，請先確認 10/8 票券。',{cat:'see',ticket:'museum',photo:'museum',leg:{from:'naoMomoyama42',to:'naoNew',mode:'walk',label:'桃山站 → 新美術館・步行約 10 分（官方動線）'}}),
+  nao42Stop('naoPort','09:02','抵達直島・宮浦港','若已預約電動車，先至宮浦店辦理取車；無車／天候不佳時改走 09:06 町營巴士備案。',{via:{from:'takPierN',mode:'ferry',duration:'渡輪 50 分',time:'08:12 → 09:02',ref:'naoFerry'}}),
+  nao42Stop('naoNew','09:02–09:40','宮浦港取電動車・騎往新美術館','T.V.C. 宮浦店營業約 08:30–18:00；建議事先預約，兩台約 ¥3,000／日。預留下船、取車及騎乘時間，10:00 開館前抵達。若未訂到車，改搭 09:06 巴士。',{leg:{from:'naoPort',to:'naoNew',mode:'cycle',label:'宮浦港 → 直島新美術館・騎行導航'}}),
+  nao42Stop('naoNew','10:00–11:30','直島新美術館・本日唯一主要美術館','看亞洲當代藝術展與安藤忠雄建築；本行程預留 90 分鐘。日期票線上 ¥1,500／人，請先確認 10/8 票券。',{cat:'see',ticket:'museum',photo:'museum'}),
   nao42Stop('o_kadoya27','11:40–11:55','角屋 Kadoya','宮島達男《Sea of Time ’98》：老屋中的 LED 數字裝置。排在 12:00 午休前；使用家計畫五館共通票。',{cat:'see',ticket:'five',photo:'kadoya',leg:{from:'naoNew',to:'o_kadoya27',mode:'walk',label:'新美術館 → 角屋・步行導航'}}),
   nao42Stop('naoGokaisho42','11:58–12:10','碁會所 Gokaisho','須田悅弘以木雕山茶花回應傳統碁會所與庭院中的真實山茶花；使用五館共通票。',{cat:'see',ticket:'five',photo:'gokaisho',leg:{from:'o_kadoya27',to:'naoGokaisho42',mode:'walk',label:'角屋 → 碁會所・步行約 3 分'}}),
   nao42Stop('o_goo27','12:15–12:30','護王神社 Go’o Shrine','杉本博司設計；地上本殿與地下石室由玻璃階梯連結。使用五館共通票；12:30 前離開，避開 13:00–14:00 午休。',{cat:'see',ticket:'five',photo:'goo',leg:{from:'naoGokaisho42',to:'o_goo27',mode:'walk',label:'碁會所 → 護王神社・步行導航'}}),
@@ -7041,14 +7043,14 @@ const NAO42_DAY={
   nao42Stop('honmura','13:15–14:10','本村午餐','在本村用餐與休息；預留 55 分鐘，實際店家營業、候位依當日狀況。',{cat:'eat',leg:{from:'o_minamidera29',to:'honmura',mode:'walk',label:'南寺 → 本村午餐・步行導航'}}),
   nao42Stop('naoIshibashi42','14:15–14:40','石橋 Ishibashi','千住博《The Falls／瀑布》與《空之庭》；老鹽商家屋本身也納入作品。使用家計畫五館共通票。',{cat:'see',ticket:'five',photo:'ishibashi',leg:{from:'honmura',to:'naoIshibashi42',mode:'walk',label:'本村午餐 → 石橋・步行導航'}}),
   nao42Stop('o_haisha27','14:50–15:15','はいしゃ Haisha','大竹伸朗將舊牙醫診所改造成拼貼感強烈的整體作品《舌上夢／ボッコン覗》；使用五館共通票。',{cat:'see',ticket:'five',photo:'haisha',leg:{from:'naoIshibashi42',to:'o_haisha27',mode:'walk',label:'石橋 → はいしゃ・步行導航'}}),
-  nao42Stop('honmura','15:15–15:55','本村散步・商店・延誤緩衝','保留約 40 分鐘，不再加景點；15:55 前往農協前巴士站，為回程留步行與候車時間。',{leg:{from:'o_haisha27',to:'naoNokyo42',mode:'walk',label:'はいしゃ → 農協前巴士站・步行導航'}}),
-  nao42Stop('naoNokyo42','16:19','農協前搭町營巴士回宮浦','這是巴士在農協前的通過時間；16:13 從つつじ荘發車，約 16:25 抵宮浦港。¥100／程，備硬幣。',{ticket:'bus',leg:{from:'naoNokyo42',to:'naoPort',mode:'transit',label:'農協前 16:19 → 宮浦港 16:25・巴士導航'}}),
+  nao42Stop('honmura','15:15–15:55','本村散步・商店・還車緩衝','不再加景點；若租 T.V.C. 宮浦店的車，可在 T.V.C. 本村店還車後步行至農協前。非 T.V.C. 車輛須按原店規則歸還，並改騎回宮浦預留時間。',{leg:{from:'o_haisha27',to:'naoTvcHonmura42',mode:'cycle',label:'はいしゃ → T.V.C. 本村店・騎行還車導航'}}),
+  nao42Stop('naoNokyo42','16:19','農協前搭町營巴士回宮浦','僅適用於已在 T.V.C. 本村店還車的走法；16:19 農協前上車，約 16:25 抵宮浦港。成人 ¥100／程，備硬幣。若在宮浦店還車，請直接騎回宮浦，不要再搭這班巴士。',{ticket:'bus',via:{from:'naoTvcHonmura42',mode:'walk',duration:'步行至農協前巴士站'},leg:{from:'naoNokyo42',to:'naoPort',mode:'transit',label:'農協前 16:19 → 宮浦港 16:25・巴士導航'}}),
   nao42Stop('naoPort','16:25–16:55','宮浦港・紅南瓜與回程候船','抵港先確認 17:00 渡輪乘船處；有餘裕再看紅南瓜、海之站，不要離開港區太遠。',{ticket:'ferry',leg:{from:'naoPort',to:'takPierN',mode:'ferry',label:'宮浦港 → 高松港・渡輪 17:00–18:00'}}),
   nao42Stop('takPierN','17:00–18:00','渡輪返回高松','宮浦港 17:00 開船，預計 18:00 抵高松港；實際航行依當日營運公告。',{via:{from:'naoPort',mode:'ferry',duration:'渡輪約 60 分',time:'17:00 → 18:00',ref:'naoFerry'}}),
   nao42Stop('z_tak','18:30','高松晚餐（擇一）','回高松市區晚餐，沿用原本候選店家。',{pick:true,groups:[{label:'晚餐',keys:['renge','komatsu','kochi','tenkatsu'],multi:false}]}),
   nao42Stop('stay:tak','晚餐後','返回北浜公寓','直島當日結束，高松住宿續住。')
  ],
- options:[],brief:{title:'高松往返・五館＋南寺',text:'新美術館只排一座；家計畫五館使用共通票，南寺另訂 12:45 指定時段。回程巴士在農協前 16:19 上車，17:00 渡輪回高松。',pace:'渡輪＋町營巴士＋本村步行',sleep:'北浜公寓續住'}
+ options:[],brief:{title:'高松往返・五館＋南寺',text:'新美術館只排一座；家計畫五館使用共通票，南寺另訂 12:45 指定時段。島內以電動輔助車銜接、聚落步行；租不到車時改巴士，17:00 渡輪回高松。',pace:'渡輪＋電動車／巴士備案＋本村步行',sleep:'北浜公寓續住'}
 };
 NAO42_DAY.home={city:'直島',summary:'高松港 → 直島新美術館 → 本村五館＋南寺 → 宮浦港 → 高松',note:'10/8 唯一直島路線；新美術館一座主要美術館，家計畫五館＋南寺依票券入場，17:00 渡輪回高松。',label:'直島・新美術館與本村家計畫'};
 VARIANTS15[1].A.day=NAO42_DAY;
@@ -7056,16 +7058,18 @@ EVAL15[1].rows=[
  ['想看的東西','新美術館＋角屋、碁會所、護王神社、南寺、石橋、はいしゃ','女木洞窟、男木聚落與燈塔','土庄迷路之町＋退潮時的天使之路'],
  ['每人入場票','新美術館 ¥1,500＋五館共通票 ¥1,200＋南寺 ¥600＝線上約 ¥3,300；船、巴士另計','船資約 ¥1,120，島上開銷另計','合資格 FIT 券含來回渡輪；否則成人現行往返 ¥1,330，巴士另計'],
  ['準備工作','買新美術館日期票、五館共通票；另訂南寺 12:45 時段','核對女木／男木船班，現場購票','旅客免預約、依序登船；符合 FIT 條件可用動態電子券免另付船費'],
- ['時間銜接','08:12 去、17:00 回；09:06 町營巴士，農協前 16:19 回程','船班間隔較長，需配合停留時間','08:02 去、16:30 回；配合 10/8 天使之路潮汐窗'],
- ['風險','南寺時段票未確認前不要視為已訂；巴士客滿時需等後續班次','島小、店少，天候差時選擇有限','巴士班距與潮汐要先查；回程需提早回土庄港']
+ ['時間銜接','08:12 去、17:00 回；宮浦取車、T.V.C. 本村店可還車；巴士為備案','船班間隔較長，需配合停留時間','08:02 去、16:30 回；配合 10/8 天使之路潮汐窗'],
+ ['風險','南寺時段票與電動車都須先確認；Benesse 私有區禁騎，巴士為雨天備案','島小、店少，天候差時選擇有限','巴士班距與潮汐要先查；回程需提早回土庄港']
 ];
 EVAL15[1].text='A 是固定的直島單日行程，不再提供其他直島替代路線；B 為女木＋男木，C 為小豆島。A 僅一座主要美術館，入場票與南寺時段票分開計算。小豆島 FIT 優惠仍以資格及現場核銷規則為準。';
 ROUTE_PLACES.naoMomoyama42={name:'桃山（直島新美術館）',q:'桃山 直島新美術館 香川県直島町'};
 ROUTE_PLACES.naoNokyo42={name:'農協前（直島町營巴士站）',q:'農協前 直島町 香川県'};
+ROUTE_PLACES.naoTvcHonmura42={name:'T.V.C.直島レンタル 本村店',q:'T.V.C.直島レンタル 本村店 直島'};
 ROUTE_PLACES.naoGokaisho42={name:'家プロジェクト 碁会所',q:'家プロジェクト 碁会所 直島'};
 ROUTE_PLACES.naoIshibashi42={name:'家プロジェクト 石橋',q:'家プロジェクト 石橋 直島'};
-function nao42Directions(from,to,mode){const a=point(from),b=point(to);if(!a?.q||!b?.q)return '';const p=new URLSearchParams({api:'1',origin:a.q,destination:b.q,travelmode:mode==='transit'?'transit':'walking'});return 'https://www.google.com/maps/dir/?'+p.toString()}
+function nao42Directions(from,to,mode){const a=point(from),b=point(to);if(!a?.q||!b?.q)return '';const p=new URLSearchParams({api:'1',origin:a.q,destination:b.q,travelmode:mode==='transit'?'transit':mode==='cycle'?'bicycling':'walking'});return 'https://www.google.com/maps/dir/?'+p.toString()}
 function nao42TicketPanel(){return `<section class="nao42-tickets" aria-label="10月8日直島門票"><div class="nao42-tickets-head"><b>10/8 先準備 3 種入場票</b><strong>線上價約 ¥3,300／人・¥6,600／2人</strong></div><div class="nao42-tickets-grid"><a class="nao42-ticket" href="${NAO_BOOK30.newMuseum}" target="_blank" rel="noopener noreferrer"><small>唯一主要美術館・日期票</small><b>直島新美術館</b><span>¥1,500／人 ↗</span></a><a class="nao42-ticket" href="${NAO_BOOK30.multi}" target="_blank" rel="noopener noreferrer"><small>同一張票涵蓋本日五處</small><b>家計畫五館共通票</b><span>¥1,200／人 ↗</span></a><a class="nao42-ticket" href="${NAO_BOOK30.minami}" target="_blank" rel="noopener noreferrer"><small>不含於五館通票・指定時段</small><b>南寺・選 12:45</b><span>¥600／人 ↗</span></a></div><p class="nao42-tickets-note">南寺 12:45 餘位尚未確認，請以訂票頁為準。以上只計門票；高松—宮浦渡輪 ¥680／程，町營巴士 ¥100／程另付。</p></section>`}
+function nao42BikePanel(){return `<section class="nao42-tickets nao42-bike-panel" aria-label="直島租車與騎乘注意"><div class="nao42-tickets-head"><b>10/8 島內交通・電動輔助車</b><strong>¥1,500／台・兩台約 ¥3,000</strong></div><div class="nao42-tickets-grid"><a class="nao42-ticket" href="https://tvc-service.com/bicycle-rental_jp/" target="_blank" rel="noopener noreferrer"><small>優先詢問／預約・宮浦港店</small><b>T.V.C. 電動輔助車</b><span>¥1,500／台・1日租至18:00 ↗</span></a><a class="nao42-ticket" href="https://ougiya-naoshima.jp/yoyaku_1.html?ym=2026-10" target="_blank" rel="noopener noreferrer"><small>おうぎや・宮浦港</small><b>10/8 預約頁顯示額滿</b><span>官方頁 2026/9/29 查詢；狀態會變動 ↗</span></a><a class="nao42-ticket" href="https://naoshima.net/ja/access/rental/" target="_blank" rel="noopener noreferrer"><small>無預約備案・宮浦港</small><b>ゆうなぎ 電動輔助車</b><span>¥1,500／台・不接受事前預約 ↗</span></a></div><p class="nao42-tickets-note">建議先確認 T.V.C. 10/8 兩台庫存並預約；宮浦店租車可在本村店還車，營業約 08:30–18:00，帶身分證（未帶證件可能需每台 ¥1,000 押金）。普通變速車約 ¥500／台，但直島坡多，這天建議電動車。路線：宮浦取車 → 新美術館 → 本村合法停車後步行逛家屋與南寺 → 15:55 前還車、步行至農協前搭 16:19 巴士。若改租需原店歸還的店家，須提早騎回宮浦；巴士備案每程 ¥100 現金硬幣、不支援 ICOCA。Benesse 東 Gate 至北 Gate 私有區禁騎，請停指定駐輪場。<br><a href="https://tvc-service.com/appointment-calendar_jp/" target="_blank" rel="noopener noreferrer">T.V.C. 預約狀態 ↗</a>　<a href="https://naoshima.net/ja/naoshima-2/" target="_blank" rel="noopener noreferrer">直島觀光協會：島內交通與禁騎區 ↗</a></p></section>`}
 const nao42TicketInfo={
  ferry:{text:'渡輪票另購・成人 ¥680／單程',url:OFFICIAL.naoFerry.url},
  bus:{text:'町營巴士 ¥100／程・硬幣現金，不可刷 ICOCA',url:OFFICIAL.naoBus42.url},
@@ -7077,7 +7081,7 @@ function enhanceNaoshima42(){
  const main=app.querySelector('.day-main');if(!main)return;
  document.body.classList.add('nao42-active');
  const tools=main.querySelector('.itinerary-tools');
- if(tools){const tiny=tools.querySelector('.micro');if(tiny)tiny.textContent='08:12 渡輪去程・17:00 渡輪回程｜本村各站依序步行';tools.querySelector('.segmented')?.remove();tools.insertAdjacentHTML('afterend',nao42TicketPanel());}
+ if(tools){const tiny=tools.querySelector('.micro');if(tiny)tiny.textContent='08:12 渡輪去程・宮浦租電動車・17:00 渡輪回程｜本村各站步行';tools.querySelector('.segmented')?.remove();tools.insertAdjacentHTML('afterend',nao42TicketPanel()+nao42BikePanel());const fareNote=main.querySelector('.nao42-tickets-note');if(fareNote)fareNote.textContent='南寺 12:45 餘位尚未確認，請以訂票頁為準。門票線上約 ¥3,300／人；電動車另計 ¥1,500／台／日，町營巴士 ¥100／程為備案。'}
  main.querySelectorAll('.stop-entry').forEach((entry,index)=>{
   const stop=PLAN_DAYS[1]?.stops?.[index];if(!stop)return;
   const body=entry.querySelector('.stop-body'),p=body?.querySelector(':scope > p');if(!body||!p)return;
