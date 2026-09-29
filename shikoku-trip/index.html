@@ -7189,19 +7189,7 @@ document.addEventListener('click',e=>{
 },true);
 evaluate14();render();
 </script>
-<style id="shoe-function-overview-style">
-.shoe43-overview{margin:18px 0 14px;padding:15px;border:1px solid var(--line);border-radius:14px;background:var(--panel)}
-.shoe43-overview-head{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-bottom:10px}
-.shoe43-overview-head small{color:#a8d8c1;letter-spacing:.13em;font-size:10px}
-.shoe43-overview-head h2{margin:3px 0;font:600 20px/1.25 var(--serif);color:var(--ink)}
-.shoe43-overview-head p{margin:4px 0 0;color:var(--muted);font-size:12px}
-.shoe43-count{white-space:nowrap;color:var(--muted);font-size:11px}
-.shoe43-table{width:100%;border-collapse:collapse}
-.shoe43-table th,.shoe43-table td{padding:10px 9px;border-top:1px solid var(--line);text-align:left;vertical-align:top}
-.shoe43-table th{color:var(--muted);font-size:10px;font-weight:600}
-.shoe43-table td:first-child{width:155px;color:var(--ink);font-weight:700}
-.shoe43-table td:nth-child(2){width:245px;color:var(--ink2);font-size:12px;line-height:1.5}
-.shoe43-model-list{display:flex;flex-wrap:wrap;gap:5px}
+<style id="shoe-function-picker-style">
 .shoe40-model-group{grid-column:1/-1;border-top:1px solid var(--line)}
 .shoe40-model-group:first-child{border-top:0}
 .shoe40-model-group>summary{display:flex;align-items:center;gap:8px;padding:9px 4px;cursor:pointer;list-style:none;color:var(--ink);font-size:12px;font-weight:650}
@@ -7216,16 +7204,9 @@ evaluate14();render();
 .shoe40-model-option>small{flex:none}
 .shoe40-model-option.on{border-color:var(--mint);background:var(--soft);color:var(--mint)}
 .shoe40-model-group[hidden]{display:none!important}
-.shoe43-group-models{margin:4px 0}
-.shoe43-group-models>summary{cursor:pointer;list-style:none;color:#a8d8c1;font-size:11px}
-.shoe43-group-models>summary::-webkit-details-marker{display:none}
-.shoe43-group-models>summary:after{content:"　＋"}
-.shoe43-group-models[open]>summary:after{content:"　−"}
-.shoe43-group-models .shoe43-model-list{padding-top:7px}
 .shoe43-select{display:inline-flex;align-items:center;gap:6px;max-width:100%;padding:5px 8px;border:1px solid var(--line);border-radius:7px;background:#122229;color:var(--ink2);font:500 11px/1.3 var(--sans);cursor:pointer;text-align:left}
 .shoe43-select:hover,.shoe43-select:focus-visible{border-color:#8dbfa7;background:#1d3b35;color:var(--ink)}
 .shoe43-select small{color:var(--muted);font-size:9px;white-space:nowrap}
-.shoe43-note{margin:9px 0 0;color:var(--muted);font-size:10px;line-height:1.5}
 .shoe43-guide{margin:8px 0 10px;padding:11px 12px;border:1px solid #38594f;border-radius:10px;background:#132c29}
 .shoe43-guide-head{display:flex;align-items:center;flex-wrap:wrap;gap:6px 9px;margin-bottom:7px}
 .shoe43-guide-head>span{color:#a8d8c1;font-size:10px;letter-spacing:.08em}
@@ -7251,17 +7232,6 @@ evaluate14();render();
  .shoe40-model-group>summary{padding:10px 4px;font-size:12px}
  .shoe40-model-group-list{gap:5px}
  .shoe40-model-option{min-height:44px;padding:6px 7px}
- .shoe43-overview{padding:11px;margin:12px 0}
- .shoe43-overview-head{align-items:flex-start;flex-direction:column;gap:2px}
- .shoe43-count{white-space:normal}
- .shoe43-table,.shoe43-table tbody{display:block}
- .shoe43-table thead{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
- .shoe43-table tr{display:block;padding:8px 0;border-top:1px solid var(--line)}
- .shoe43-table td,.shoe43-table td:first-child,.shoe43-table td:nth-child(2){display:block;width:auto;padding:2px 0;border:0}
- .shoe43-table td:first-child{font-size:13px}
- .shoe43-table td:nth-child(2){font-size:11px}
- .shoe43-group-models>summary{font-size:10px}
- .shoe43-group-models .shoe43-model-list{padding:6px 0}
  .shoe43-select{font-size:10px;padding:5px 6px}
  .shoe43-guide-grid{grid-template-columns:1fr;gap:7px}
 }
@@ -7341,21 +7311,6 @@ evaluate14();render();
   if(/the roger/i.test(n))return "THE ROGER 是網球風格家族；Pro 系列偏球場性能，其餘款式以日常球場風格穿搭為主。";
   return id==="road"?"中性路跑取向，適合日常跑步；同系列以緩震、重量與鞋面版本比較。":"用途先按品牌分類整理，特殊版本以型號標籤和官方商品頁為準。";
  }
- function overview(brand,models){
-  const bucket={};groups.forEach(function(g){bucket[g.id]=[]});
-  models.forEach(function(m){const id=category(brand,m.name);(bucket[id]||(bucket[id]=[])).push(m)});
-  const total=models.length,brandName=brand==="on"?"On":"HOKA";
-  const rows=groups.filter(function(g){return bucket[g.id]&&bucket[g.id].length}).map(function(g){
-   const items=bucket[g.id].map(function(m){
-    const note=variant(brand,m,g.id),badges=tags(brand,m,g.id);
-    const label=m.name+(m.style_code?" · "+m.style_code:"");
-    return '<button type="button" class="shoe43-select" data-shoe-model="'+E.esc(m.id)+'" title="'+E.esc(note)+'"><span>'+E.esc(m.name)+'</span><small>'+E.esc(m.style_code||"")+'</small>'+(badges.length?'<i>'+E.esc(badges.join("／"))+'</i>':"")+'</button>';
-   }).join("");
-   const picker='<details class="shoe43-group-models"><summary>展開 '+bucket[g.id].length+' 款鞋型</summary><div class="shoe43-model-list">'+items+'</div></details>';
-   return '<tr><td>'+E.esc(g.name)+'<small class="shoe43-row-count"> '+bucket[g.id].length+' 款</small></td><td>'+E.esc(g.summary)+'</td><td>'+picker+'</td></tr>';
-  }).join("");
-  return '<section class="shoe43-overview" aria-label="'+brandName+' 鞋型功能總表"><div class="shoe43-overview-head"><div><small>SHOE FUNCTION INDEX</small><h2>先按用途分，再看單鞋</h2><p>點型號，下面會切換成該鞋的詳細說明與配色。</p></div><span class="shoe43-count">'+brandName+' 男鞋型錄・'+total+' 個型號</span></div><table class="shoe43-table"><thead><tr><th>功能分類</th><th>快速區分</th><th>鞋型／點選查看</th></tr></thead><tbody>'+rows+'</tbody></table><p class="shoe43-note">分類依品牌用途與鞋系定位整理；GTX／防水、寬楦、競賽等差異以型號標籤提示。不同年份與限定版的細節請看所選鞋款的品牌商品頁。</p></section>';
- }
  function colorMark(m,c){
   if(!c)return "";
   const colorMeta=[c.name_en,c.name_ja,c.name,c.color_code,c.label,c.edition,c.note,c.status,c.url].filter(Boolean).join(" ");
@@ -7398,9 +7353,7 @@ evaluate14();render();
   let html=originalView();
   const brand=shoeUi40.brand==="hoka"?"hoka":"on",models=brand==="hoka"?HOKA40.models:SHOE40.models;
   const intro=html.indexOf('<p>先選品牌');
-  if(intro>=0){const end=html.indexOf('</p>',intro);if(end>=0)html=html.slice(0,intro)+'<p>先看用途總表，再點進鞋型比較功能、配色與價格。</p>'+html.slice(end+4)}
-  const at=html.indexOf('<details class="shoe40-picker">');
-  if(at>=0)html=html.slice(0,at)+overview(brand,models)+html.slice(at);
+  if(intro>=0){const end=html.indexOf('</p>',intro);if(end>=0)html=html.slice(0,intro)+'<p>依用途分類挑選鞋型，點選鞋款查看詳細功能、配色與價格。</p>'+html.slice(end+4)}
   const pickerTemplate=document.createElement('template');pickerTemplate.innerHTML=html;
   const picker=pickerTemplate.content.querySelector('.shoe40-picker'),tray=picker&&picker.querySelector('.shoe40-models');
   if(picker&&tray){
