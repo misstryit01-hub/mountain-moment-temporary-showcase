@@ -7605,6 +7605,67 @@ shoesView40=function(){
 </script>
 <!-- /SHOE45 -->
 
+<!-- SHOE46: official market-list markers and high-step travel recommendations. -->
+<style id="shoe46-market-walk-style">
+.shoe46-tags{display:flex;gap:4px;flex-wrap:wrap;grid-column:1/-1}
+.shoe46-tag{display:inline-flex;align-items:center;padding:2px 6px;border:1px solid #53766d;border-radius:999px;background:#142e2b;color:#b5dcc8;font:650 9px/1.4 var(--sans);white-space:normal}
+.shoe46-tag.market-both{border-color:#36504b;background:#16272a;color:#a9c3bb}
+.shoe46-tag.market-alert{border-color:#8b7650;background:#302b20;color:#f1d4a2}
+.shoe46-tag.recommend{border-color:#79ac92;background:#1d4035;color:#d0f0dc}
+.shoe46-guide{margin:9px 0;padding:10px 11px;border:1px solid #38594f;border-radius:9px;background:#132c29;color:var(--ink2);font-size:11px;line-height:1.65}
+.shoe46-guide b{color:var(--ink)}.shoe46-guide a{color:var(--mint);text-decoration:underline;text-underline-offset:2px}.shoe46-guide p{margin:3px 0}
+</style>
+<script id="shoe46-market-walk">
+const SHOE46_MARKET={
+ '3MG1010':{labels:[['日本官網列售','market-alert'],['台灣上架待確認','market-alert']],note:'On 台灣 Cloudrunner 系列頁有介紹 Waterproof，但台灣男鞋商品結果沒有這款的購買商品卡；所以先標「待確認」，不把未列清單直接當成台灣買不到。'},
+ '3MG1091':{labels:[['台日官網均列季末款','market-alert']],note:'Cloudmonster Void 在台灣與日本官方季末鞋款頁皆有列出；各配色折扣及尺寸庫存不同。'},
+ '3MF1012':{labels:[['台灣部分配色季末優惠','market-alert']],note:'Cloudsurfer 2 在台灣官方頁有部分配色列季末價，不代表整個鞋型或所有顏色皆折扣。'}
+};
+const SHOE46_WALK={
+ '3ME1010':['30,000 步旅走首選','Walking／輕量，適合城市長時間步行；先試走確認前掌與腳背不壓。'],
+ '3MF1012':['柔軟順步備選','官方定位日常跑步、步感柔順；可試作長走備選，但確認長時間走路時足弓與前掌感受。'],
+ '3MF1007':['輕量日常備選','偏日常全天穿著，較簡潔輕便；緩震感不如 Cloudtilt 明顯，務必實走比較。']
+};
+const shoe46BaseView=shoesView40;
+shoesView40=function(){
+ const t=document.createElement('template');t.innerHTML=shoe46BaseView();
+ if(shoeUi40.brand!=='hoka'){
+  const picker=t.content.querySelector('.shoe40-picker');
+  if(picker){
+   const p=picker.querySelector('.shoe45-key');
+   if(p)p.innerHTML='<b>On 販售地區・30,000 步旅走標記（2026/09/29）</b> 本頁 54 款日本官網鞋型中，53 款也能在台灣 On 官網查到同鞋型，選款會標「台日官網都列」；Cloudrunner 3 Waterproof 則標「台灣上架待確認」。未列於商品結果不等於確定買不到。Cloudmonster Void 兩地官網均列季末款；Cloudsurfer 2 為台灣部分配色季末優惠。鞋型同名不代表配色、品番、尺碼與庫存相同。<br><a href="https://www.on.com/ja-jp/shop/mens/shoes" target="_blank" rel="noopener noreferrer">On 日本男鞋官網 ↗</a>　<a href="https://www.on.com/en-tw/shop/mens/shoes" target="_blank" rel="noopener noreferrer">On 台灣男鞋官網 ↗</a>';
+   const summary=document.createElement('div');summary.className='shoe46-guide';summary.innerHTML='<b>每天約 30,000 步・日本旅行選鞋</b><p>首選 Cloudtilt（官方定位 Walking／輕量）；再比較 Cloudsurfer 2（柔軟順步）與 Cloud 6（較輕、日常全天穿著）。這是用途建議，不保證走三萬步不疲勞；不要第一次穿新鞋就出國，帶平常襪子試走並比較 US 8.5（26.5 cm）與 US 9（27 cm）。</p>';
+   picker.querySelector('summary')?.after(summary);
+   const models=SHOE40.models||[];
+   t.content.querySelectorAll('[data-shoe-model]').forEach(function(button){
+    const m=models.find(function(x){return x.id===button.dataset.shoeModel});if(!m)return;
+    const tags=[];
+    if(!SHOE46_MARKET[m.style_code])tags.push(['台日官網都列','market-both']);
+    (SHOE46_MARKET[m.style_code]?.labels||[]).forEach(function(row){tags.push(row)});
+    if(SHOE46_WALK[m.style_code])tags.push([SHOE46_WALK[m.style_code][0],'recommend']);
+    if(!tags.length)return;
+    const wrap=document.createElement('span');wrap.className='shoe46-tags';
+    tags.forEach(function(row){const badge=document.createElement('span');badge.className='shoe46-tag '+row[1];badge.textContent=row[0];const market=SHOE46_MARKET[m.style_code];const walk=SHOE46_WALK[m.style_code];badge.title=(row[1]==='market-both'?'兩地官網目前均可查到同鞋型；實際配色、品番、尺碼及庫存可能不同。':market?.note)||walk?.[1]||row[0];wrap.appendChild(badge)});
+    button.appendChild(wrap);
+   });
+  }
+  }else{
+   const picker=t.content.querySelector('.shoe40-picker'),models=HOKA40.models||[];
+   if(picker){
+    const p=picker.querySelector('.shoe45-key'),same=models.filter(m=>m.taiwan&&['match','unavailable'].includes(m.taiwan.kind)).length,related=models.filter(m=>m.taiwan?.kind==='related').length,missing=models.filter(m=>!m.taiwan).length;
+    if(p)p.innerHTML='<b>HOKA 販售地區參考・iSPO 台灣比對（2026/09/29）</b> 本頁日本官網鞋型以 iSPO 商品品番核對：'+same+' 款有同品番商品頁，'+related+' 款只有相關款，'+missing+' 款尚未找到 iSPO 同品番。選單標籤說明核對狀態；「未找到」只代表 iSPO 未查到，不等於台灣沒有販售，可能有其他店家或不同性別／品番。<br><a href="https://www.ispo.com.tw/tagCategory/HOKA%2C%E8%B7%AF%E8%B7%91%E9%9E%8B" target="_blank" rel="noopener noreferrer">iSPO HOKA 台灣參考 ↗</a>';
+    t.content.querySelectorAll('[data-shoe-model]').forEach(function(button){
+     const m=models.find(function(x){return x.id===button.dataset.shoeModel});if(!m)return;
+     const kind=m.taiwan?.kind,label=kind==='match'?'iSPO 同品番':kind==='unavailable'?'iSPO 同品番頁・缺貨':kind==='related'?'iSPO 僅相關款': 'iSPO 未找到同品番';
+     const badge=document.createElement('span');badge.className='shoe46-tag '+(kind==='match'?'market-both':'market-alert');badge.textContent=label;badge.title=m.taiwan?.note||'目前 iSPO 參考資料沒有這個型號的同品番頁；不代表台灣其他通路沒有販售。';
+     const wrap=document.createElement('span');wrap.className='shoe46-tags';wrap.appendChild(badge);button.appendChild(wrap);
+    });
+   }
+ }
+ return t.innerHTML;
+};
+</script>
+
 <!-- DAILY45: same bundled Leaflet + OSM approach as Naoshima; no API keys. -->
 <style id="daily45-host-style">
 .street45-active .split20{display:block!important;height:auto!important;min-height:0!important}
