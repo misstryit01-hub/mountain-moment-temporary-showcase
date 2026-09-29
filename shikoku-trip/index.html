@@ -7021,13 +7021,15 @@ const NAO42_TICKETS={
 };
 const nao42Stop=(p,time,title,note,extra={})=>({p,time,title,note,...extra});
 const NAO42_DAY={
- title:'直島・新美術館與本村家計畫',tag:'直島・固定主線',lead:'只安排直島新美術館一座主要美術館；之後依序走本村五館與南寺，使用三種對應票券，不另排直島替代行程。',stay:'tak',anchor:'07:30 抵高松港・08:12 去程・17:00 回程',
+  title:'直島・新美術館與本村家計畫',tag:'直島・固定主線',lead:'只安排直島新美術館一座主要美術館；宮浦取電動車、本村指定駐輪後步行逛家屋與南寺，最後騎回宮浦原店還車。',stay:'tak',anchor:'07:30 抵高松港・08:12 去程・17:00 回程',
  sources:['naoFerry','naoBus42','naoRoute42','naoMuseum42','naoHours42','naoCalendar27'],
  notes:[
   '渡輪：高松 08:12 → 宮浦 09:02；回程宮浦 17:00 → 高松 18:00。成人 ¥680／單程，不受理預約、依序登船；07:30 到港候船。',
-  '島內交通主方案：宮浦港租電動輔助車，兩人各一台；參考 ¥1,500／台／日，合計約 ¥3,000。建議預約 T.V.C. 宮浦店，官方表示可在本村店還車；新美術館與本村聚落之間騎乘，家屋與南寺周邊停妥後步行參觀。T.V.C. 車況／預約名額須即時確認。',
+    '已約兩台 T.V.C. 電動輔助車：宮浦店地址為直島町宮ノ浦 2249-6，宮浦港對街步行約 1 分鐘；電動車參考 ¥1,500／台／日，兩台約 ¥3,000。主線在同一間宮浦店取車、還車；官方店家資料列營業 09:00–18:00，目標 16:00 前還車，保留約 1 小時搭 17:00 渡輪。',
+    '省力主線：宮浦取車 → 新美術館 → 騎到本村町指定駐輪場鎖車 → 五館、南寺與午餐全程步行 → 回原停車點取車 → 騎回 T.V.C. 宮浦店還車。直島町要求本村家計畫周邊只能停官方指定駐輪場，石橋附近沒有駐輪場；請開町官方駐輪場圖，並依現場 P 標示停放。',
+   '電動輔助騎法：平路用 Eco、省電；上坡提早切低檔並切強助力，慢慢踩、不硬衝；下坡控速不急煞。直島道路較窄，靠左單列、勿並排；只停官方／店家指定駐輪處。',
   '交通管制：非 Benesse House 住宿者不可騎車進入東 Gate—北 Gate 的 Benesse 私有區域；若改去該區景點，請停在つつじ荘、地中美術館票務中心或北 Gate 附近的指定停車處，再步行／搭場內免費接駁。全程只停合法駐輪場。',
-  '下雨、無車或不想騎坡時改町營巴士：宮浦港往本村可搭 09:06 班次；回程農協前 16:19、約 16:25 抵宮浦港。成人 ¥100／程，降車投硬幣、車內不找零且不可刷 ICOCA；小型巴士可能客滿。',
+    '備案（不是主線）：若天候或體力不適合騎回，先詢問 T.V.C. 能否跨店還到本村店；確認可還且完成還車後，才考慮農協前 16:19 町營巴士回宮浦（約 16:25）。巴士成人 ¥100／程、下車投硬幣，不找零且不可刷 ICOCA；可能客滿。',
   '新美術館：10:00–16:30（最後入館 16:00），線上日期票 ¥1,500／人、現場 ¥1,700；本行程預留 90 分鐘看展與安藤忠雄建築，10/8 展覽日期在 2026/6/7–11/23 展期內。',
   '家計畫五館共通票：線上 ¥1,200／人，涵蓋角屋、護王神社、石橋、碁會所、はいしゃ；五處都排入本日。線上票可先買，也可到本村 Lounge & Archive 購票。',
   '南寺：不含在五館共通票內，另購指定日期／時間票；線上 ¥600／人。主線抓 12:45，請在訂票頁確認該時段餘票並提早抵達；館內不可拍照。',
@@ -7036,38 +7038,42 @@ const NAO42_DAY={
  stops:[
   nao42Stop('stay:tak','07:15','北浜公寓出發','走路前往高松港，目標 07:30 到售票／候船處。',{leg:{from:'stay:tak',to:'takPierN',mode:'walk',label:'北浜公寓 → 高松港・步行導航'}}),
   nao42Stop('takPierN','07:30','抵達高松港・購票候船','08:12 渡輪不接受預約、先到先上；預留買票與排隊時間。船資成人 ¥680／單程，與女木／男木的乘船處不同。',{ticket:'ferry',leg:{from:'takPierN',to:'naoPort',mode:'ferry',label:'高松港 → 宮浦港・渡輪 08:12–09:02'}}),
-  nao42Stop('naoPort','09:02','抵達直島・宮浦港','若已預約電動車，先至宮浦店辦理取車；無車／天候不佳時改走 09:06 町營巴士備案。',{via:{from:'takPierN',mode:'ferry',duration:'渡輪 50 分',time:'08:12 → 09:02',ref:'naoFerry'}}),
-  nao42Stop('naoNew','09:02–09:40','宮浦港取電動車・騎往新美術館','T.V.C. 宮浦店營業約 08:30–18:00；建議事先預約，兩台約 ¥3,000／日。預留下船、取車及騎乘時間，10:00 開館前抵達。若未訂到車，改搭 09:06 巴士。',{leg:{from:'naoPort',to:'naoNew',mode:'cycle',label:'宮浦港 → 直島新美術館・騎行導航'}}),
+  nao42Stop('naoPort','09:02','抵達直島・宮浦港','下船後到對街 T.V.C. 宮浦店（直島町宮ノ浦 2249-6）領已預約的兩台電動車；店在渡輪碼頭步行約 1 分鐘。',{via:{from:'takPierN',mode:'ferry',duration:'渡輪 50 分',time:'08:12 → 09:02',ref:'naoFerry'}}),
+  nao42Stop('naoNew','09:02–09:40','至對街 T.V.C. 領車・騎往新美術館','T.V.C. 宮浦店地址：直島町宮ノ浦 2249-6，從渡輪碼頭步行約 1 分鐘。確認兩台車、電量、座高與助力；騎往新美術館約 15–25 分鐘，停在指定駐輪處，預留約 20 分鐘等 10:00 開館。',{leg:{from:'naoTvcMiyanoura42',to:'naoNew',mode:'cycle',label:'T.V.C. 宮浦店 → 直島新美術館・騎行導航'}}),
   nao42Stop('naoNew','10:00–11:30','直島新美術館・本日唯一主要美術館','看亞洲當代藝術展與安藤忠雄建築；本行程預留 90 分鐘。日期票線上 ¥1,500／人，請先確認 10/8 票券。',{cat:'see',ticket:'museum',photo:'museum'}),
-  nao42Stop('o_kadoya27','11:40–11:55','角屋 Kadoya','宮島達男《Sea of Time ’98》：老屋中的 LED 數字裝置。排在 12:00 午休前；使用家計畫五館共通票。',{cat:'see',ticket:'five',photo:'kadoya',leg:{from:'naoNew',to:'o_kadoya27',mode:'walk',label:'新美術館 → 角屋・步行導航'}}),
+  nao42Stop('naoBikeParking42','11:30–11:40','騎至本村指定駐輪場・鎖車','把車停在直島町官方駐輪場圖標示的 P，不可停路邊；石橋附近沒有駐輪場。這裡是步行家屋計畫的起點，晚點回同一處取車。',{leg:{from:'naoNew',to:'naoBikeParking42',mode:'cycle',label:'新美術館 → 本村指定駐輪場區域・騎行導航'}}),
+  nao42Stop('o_kadoya27','11:40–11:55','角屋 Kadoya','宮島達男《Sea of Time ’98》：老屋中的 LED 數字裝置。排在 12:00 午休前；使用家計畫五館共通票。',{cat:'see',ticket:'five',photo:'kadoya',leg:{from:'naoBikeParking42',to:'o_kadoya27',mode:'walk',label:'本村指定駐輪場 → 角屋・步行導航'}}),
   nao42Stop('naoGokaisho42','11:58–12:10','碁會所 Gokaisho','須田悅弘以木雕山茶花回應傳統碁會所與庭院中的真實山茶花；使用五館共通票。',{cat:'see',ticket:'five',photo:'gokaisho',leg:{from:'o_kadoya27',to:'naoGokaisho42',mode:'walk',label:'角屋 → 碁會所・步行約 3 分'}}),
   nao42Stop('o_goo27','12:15–12:30','護王神社 Go’o Shrine','杉本博司設計；地上本殿與地下石室由玻璃階梯連結。使用五館共通票；12:30 前離開，避開 13:00–14:00 午休。',{cat:'see',ticket:'five',photo:'goo',leg:{from:'naoGokaisho42',to:'o_goo27',mode:'walk',label:'碁會所 → 護王神社・步行導航'}}),
   nao42Stop('o_minamidera29','12:45–13:10','南寺 Minamidera・預約 12:45 場','James Turrell《Backside of the Moon》：黑暗中的光與視覺體驗。須另買指定時段票（線上 ¥600／人），不含於五館通票；請先確認 12:45 餘位、提早報到，館內禁止拍照。',{cat:'see',ticket:'minami',photo:'minami',leg:{from:'o_goo27',to:'o_minamidera29',mode:'walk',label:'護王神社 → 南寺・步行導航'}}),
   nao42Stop('honmura','13:15–14:10','本村午餐','在本村用餐與休息；預留 55 分鐘，實際店家營業、候位依當日狀況。',{cat:'eat',leg:{from:'o_minamidera29',to:'honmura',mode:'walk',label:'南寺 → 本村午餐・步行導航'}}),
   nao42Stop('naoIshibashi42','14:15–14:40','石橋 Ishibashi','千住博《The Falls／瀑布》與《空之庭》；老鹽商家屋本身也納入作品。使用家計畫五館共通票。',{cat:'see',ticket:'five',photo:'ishibashi',leg:{from:'honmura',to:'naoIshibashi42',mode:'walk',label:'本村午餐 → 石橋・步行導航'}}),
   nao42Stop('o_haisha27','14:50–15:15','はいしゃ Haisha','大竹伸朗將舊牙醫診所改造成拼貼感強烈的整體作品《舌上夢／ボッコン覗》；使用五館共通票。',{cat:'see',ticket:'five',photo:'haisha',leg:{from:'naoIshibashi42',to:'o_haisha27',mode:'walk',label:'石橋 → はいしゃ・步行導航'}}),
-  nao42Stop('honmura','15:15–15:55','本村散步・商店・還車緩衝','不再加景點；若租 T.V.C. 宮浦店的車，可在 T.V.C. 本村店還車後步行至農協前。非 T.V.C. 車輛須按原店規則歸還，並改騎回宮浦預留時間。',{leg:{from:'o_haisha27',to:'naoTvcHonmura42',mode:'cycle',label:'はいしゃ → T.V.C. 本村店・騎行還車導航'}}),
-  nao42Stop('naoNokyo42','16:19','農協前搭町營巴士回宮浦','僅適用於已在 T.V.C. 本村店還車的走法；16:19 農協前上車，約 16:25 抵宮浦港。成人 ¥100／程，備硬幣。若在宮浦店還車，請直接騎回宮浦，不要再搭這班巴士。',{ticket:'bus',via:{from:'naoTvcHonmura42',mode:'walk',duration:'步行至農協前巴士站'},leg:{from:'naoNokyo42',to:'naoPort',mode:'transit',label:'農協前 16:19 → 宮浦港 16:25・巴士導航'}}),
-  nao42Stop('naoPort','16:25–16:55','宮浦港・紅南瓜與回程候船','抵港先確認 17:00 渡輪乘船處；有餘裕再看紅南瓜、海之站，不要離開港區太遠。',{ticket:'ferry',leg:{from:'naoPort',to:'takPierN',mode:'ferry',label:'宮浦港 → 高松港・渡輪 17:00–18:00'}}),
+  nao42Stop('naoBikeParking42','15:15–15:30','步行回本村駐輪場・取車','はいしゃ參觀後走回同一個官方指定駐輪點；石橋一帶沒有駐輪場，不要臨停。確認車鎖、電量與助力後再出發。',{leg:{from:'o_haisha27',to:'naoBikeParking42',mode:'walk',label:'はいしゃ → 本村指定駐輪場・步行導航'}}),
+  nao42Stop('naoTvcMiyanoura42','15:30–16:00','騎回 T.V.C. 宮浦原店','沿可通行公共道路直接騎回租車原店；回程有坡，預設電動強助力、低檔慢踩，預留 30 分鐘，不趕路。',{leg:{from:'naoBikeParking42',to:'naoTvcMiyanoura42',mode:'cycle',label:'本村指定駐輪場 → T.V.C. 宮浦店・騎回還車導航'}}),
+  nao42Stop('naoTvcMiyanoura42','16:00','T.V.C. 宮浦原店還車','同店歸還兩台車，確認鎖車與結清；宮浦店官方列營業至 18:00。完成後步行約 1 分鐘回港，準備 17:00 渡輪。',{leg:{from:'naoTvcMiyanoura42',to:'naoPort',mode:'walk',label:'T.V.C. 宮浦店 → 宮浦港・步行導航'}}),
+  nao42Stop('naoPort','16:05–16:55','宮浦港・紅南瓜與回程候船','提前約 55 分鐘回到港區；先確認 17:00 渡輪乘船處。有餘裕再看紅南瓜、海之站，不要離開港區太遠。',{ticket:'ferry',leg:{from:'naoPort',to:'takPierN',mode:'ferry',label:'宮浦港 → 高松港・渡輪 17:00–18:00'}}),
   nao42Stop('takPierN','17:00–18:00','渡輪返回高松','宮浦港 17:00 開船，預計 18:00 抵高松港；實際航行依當日營運公告。',{via:{from:'naoPort',mode:'ferry',duration:'渡輪約 60 分',time:'17:00 → 18:00',ref:'naoFerry'}}),
   nao42Stop('z_tak','18:30','高松晚餐（擇一）','回高松市區晚餐，沿用原本候選店家。',{pick:true,groups:[{label:'晚餐',keys:['renge','komatsu','kochi','tenkatsu'],multi:false}]}),
   nao42Stop('stay:tak','晚餐後','返回北浜公寓','直島當日結束，高松住宿續住。')
  ],
- options:[],brief:{title:'高松往返・五館＋南寺',text:'新美術館只排一座；家計畫五館使用共通票，南寺另訂 12:45 指定時段。島內以電動輔助車銜接、聚落步行；租不到車時改巴士，17:00 渡輪回高松。',pace:'渡輪＋電動車／巴士備案＋本村步行',sleep:'北浜公寓續住'}
+  options:[],brief:{title:'高松往返・五館＋南寺',text:'新美術館只排一座；兩台電動車由宮浦原店取還，本村停官方駐輪場後走完景點，再騎回宮浦、16:00 前還車，17:00 渡輪回高松。',pace:'電動車往返＋本村步行',sleep:'北浜公寓續住'}
 };
-NAO42_DAY.home={city:'直島',summary:'高松港 → 直島新美術館 → 本村五館＋南寺 → 宮浦港 → 高松',note:'10/8 唯一直島路線；新美術館一座主要美術館，家計畫五館＋南寺依票券入場，17:00 渡輪回高松。',label:'直島・新美術館與本村家計畫'};
+NAO42_DAY.home={city:'直島',summary:'高松港 → 宮浦 T.V.C. 取車 → 新美術館 → 本村官方駐輪場＋家計畫步行 → 騎回宮浦 T.V.C. 還車 → 高松',note:'10/8 唯一直島路線；新美術館一座主要美術館，家計畫五館＋南寺依票券入場；電動車原店取還，16:00 前還車、17:00 渡輪回高松。',label:'直島・新美術館與本村家計畫'};
 VARIANTS15[1].A.day=NAO42_DAY;
 EVAL15[1].rows=[
  ['想看的東西','新美術館＋角屋、碁會所、護王神社、南寺、石橋、はいしゃ','女木洞窟、男木聚落與燈塔','土庄迷路之町＋退潮時的天使之路'],
  ['每人入場票','新美術館 ¥1,500＋五館共通票 ¥1,200＋南寺 ¥600＝線上約 ¥3,300；船、巴士另計','船資約 ¥1,120，島上開銷另計','合資格 FIT 券含來回渡輪；否則成人現行往返 ¥1,330，巴士另計'],
- ['準備工作','買新美術館日期票、五館共通票；另訂南寺 12:45 時段','核對女木／男木船班，現場購票','旅客免預約、依序登船；符合 FIT 條件可用動態電子券免另付船費'],
- ['時間銜接','08:12 去、17:00 回；宮浦取車、T.V.C. 本村店可還車；巴士為備案','船班間隔較長，需配合停留時間','08:02 去、16:30 回；配合 10/8 天使之路潮汐窗'],
- ['風險','南寺時段票與電動車都須先確認；Benesse 私有區禁騎，巴士為雨天備案','島小、店少，天候差時選擇有限','巴士班距與潮汐要先查；回程需提早回土庄港']
+  ['準備工作','買新美術館日期票、五館共通票；另訂南寺 12:45 時段；本村依直島町官方 P 駐輪圖停車','核對女木／男木船班，現場購票','旅客免預約、依序登船；符合 FIT 條件可用動態電子券免另付船費'],
+  ['時間銜接','08:12 去、17:00 回；兩台電動車宮浦原店取還，抓 16:00 前還車','船班間隔較長，需配合停留時間','08:02 去、16:30 回；配合 10/8 天使之路潮汐窗'],
+  ['風險','南寺時段票與電動車都須確認；本村只停指定駐輪場，回宮浦有坡，預留約 1 小時渡輪緩衝','島小、店少，天候差時選擇有限','巴士班距與潮汐要先查；回程需提早回土庄港']
 ];
 EVAL15[1].text='A 是固定的直島單日行程，不再提供其他直島替代路線；B 為女木＋男木，C 為小豆島。A 僅一座主要美術館，入場票與南寺時段票分開計算。小豆島 FIT 優惠仍以資格及現場核銷規則為準。';
 ROUTE_PLACES.naoMomoyama42={name:'桃山（直島新美術館）',q:'桃山 直島新美術館 香川県直島町'};
 ROUTE_PLACES.naoNokyo42={name:'農協前（直島町營巴士站）',q:'農協前 直島町 香川県'};
-ROUTE_PLACES.naoTvcHonmura42={name:'T.V.C.直島レンタル 本村店',q:'T.V.C.直島レンタル 本村店 直島'};
+ROUTE_PLACES.naoTvcMiyanoura42={name:'T.V.C.直島レンタル 宮浦店・2249-6',q:'T.V.C.直島レンタルサービス宮浦店 香川県香川郡直島町宮ノ浦2249-6'};
+ROUTE_PLACES.naoTvcHonmura42={name:'T.V.C.直島レンタル 本村店・4771-5',q:'T.V.C.直島レンタルサービス本村店 香川県香川郡直島町本村4771-5'};
+ROUTE_PLACES.naoBikeParking42={name:'本村指定駐輪場（依直島町官方 P 駐輪場圖）',q:'Honmura Lounge & Archive, Naoshima'};
 ROUTE_PLACES.naoGokaisho42={name:'家プロジェクト 碁会所',q:'家プロジェクト 碁会所 直島'};
 ROUTE_PLACES.naoIshibashi42={name:'家プロジェクト 石橋',q:'家プロジェクト 石橋 直島'};
 function nao42Directions(from,to,mode){const a=point(from),b=point(to);if(!a?.q||!b?.q)return '';const p=new URLSearchParams({api:'1',origin:a.q,destination:b.q,travelmode:mode==='transit'?'transit':mode==='cycle'?'bicycling':'walking'});return 'https://www.google.com/maps/dir/?'+p.toString()}
@@ -7108,7 +7114,17 @@ function enhanceNaoshima42(){
 const nao42PlanBase=plan;
 plan=function(){const active=view==='plan'&&day===1&&planVar15[1]==='A';if(active)planPane='timeline';else document.body.classList.remove('nao42-active');nao42PlanBase();if(active)enhanceNaoshima42()};
 const nao42RouteBase=dayRouteTop;
-dayRouteTop=function(i,d){if(i!==1||planVar15[1]!=='A')return nao42RouteBase(i,d);const prior=proposalMode;let html;proposalMode='geo';try{html=nao42RouteBase(i,d)}finally{proposalMode=prior}return html.replace(/<div class="segmented"><button data-proposal-mode="flow"[\s\S]*?<\/div>/,'').replace(/<b>當日路線<\/b><small>[\s\S]*?<\/small>/,'<b>渡輪往返・本村步行動線</b>')};
+dayRouteTop=function(i,d){if(i!==1||planVar15[1]!=='A')return nao42RouteBase(i,d);const prior=proposalMode;let html;proposalMode='geo';try{html=nao42RouteBase(i,d)}finally{proposalMode=prior}return html.replace(/<div class="segmented"><button data-proposal-mode="flow"[\s\S]*?<\/div>/,'').replace(/<b>當日路線<\/b><small>[\s\S]*?<\/small>/,'<b>渡輪往返・電動車本村環線</b>')};
+nao42BikePanel=function(){
+ const pickup=ROUTE_PLACES.naoTvcMiyanoura42.q,parking=ROUTE_PLACES.naoBikeParking42.q;
+ const mapUrl='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(pickup);
+ const parkingMap='https://www.town.naoshima.lg.jp/about/item/9fc146a7285cad547fd029d03abdaf0e557b11b7.pdf';
+ const ride1=nao42Directions('naoTvcMiyanoura42','naoNew','cycle');
+ const ride2=nao42Directions('naoNew','naoBikeParking42','cycle');
+ const rideBack=nao42Directions('naoBikeParking42','naoTvcMiyanoura42','cycle');
+ const parkingSearch='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(parking);
+ return `<section class="nao42-tickets nao42-bike-panel" aria-label="已預約直島電動車與原店往返路線"><div class="nao42-tickets-head"><b>10/8 已預約・T.V.C. 電動輔助車 2 台</b><strong>¥1,500／台・兩台 ¥3,000</strong></div><div class="nao42-tickets-grid" style="grid-template-columns:repeat(auto-fit,minmax(min(100%,260px),1fr))"><a class="nao42-ticket" href="${E.esc(mapUrl)}" target="_blank" rel="noopener noreferrer"><small>同一間店取車＋還車・港口對街約 1 分鐘</small><b>T.V.C. 宮浦店</b><span>直島町宮ノ浦 2249-6・16:00 前回店還車 ↗</span></a><a class="nao42-ticket" href="${E.esc(parkingMap)}" target="_blank" rel="noopener noreferrer"><small>本村家計畫周邊・町官方指定停車圖</small><b>本村駐輪場 P 位置</b><span>照官方地圖及現場標示停放；石橋附近無駐輪場 ↗</span></a></div><p class="nao42-tickets-note">主線直接原店往返：① 宮浦 T.V.C. → 新美術館 ${ride1?`<a href="${E.esc(ride1)}" target="_blank" rel="noopener noreferrer">騎乘導航 ↗</a>`:''}；② 新美術館 → 本村官方駐輪場、停車後走完家屋；③ はいしゃ → 同一駐輪點取車 → 宮浦 T.V.C. 原店（抓 15:30–16:00）${ride2?`<a href="${E.esc(ride2)}" target="_blank" rel="noopener noreferrer">去程到本村導航 ↗</a>`:''} ${rideBack?`<a href="${E.esc(rideBack)}" target="_blank" rel="noopener noreferrer">騎回原店導航 ↗</a>`:''}。回程上坡先切低檔與強助力，輕踩慢行；預留 30 分鐘，16:00 前還車、17:00 渡輪。直島町要求本村停官方 P、靠左單列，且石橋附近沒有駐輪場。若天候或體力不允許，跨店還車＋巴士只作備案，須先問店家並確認還車成功。<br><a href="https://tvc-service.com/bicycle-rental_jp/" target="_blank" rel="noopener noreferrer">T.V.C. 官方租車與費用 ↗</a>　<a href="${E.esc(parkingMap)}" target="_blank" rel="noopener noreferrer">直島町官方本村駐輪場圖 ↗</a>　<a href="https://naoshima.net/ja/access/rental/" target="_blank" rel="noopener noreferrer">直島觀光協會租車資訊 ↗</a></p></section>`
+};
 evaluate14();render();
 </script>
 <style id="naoshima-single-map-style">
@@ -7187,6 +7203,95 @@ document.addEventListener('click',e=>{
  const pin=e.target.closest('[data-nao-jump]');
  if(pin){e.preventDefault();e.stopImmediatePropagation();document.getElementById('stop-'+pin.dataset.naoJump)?.scrollIntoView({behavior:'smooth',block:'center'})}
 },true);
+/* Replace the horizontally oversized hand-drawn map with a responsive, numbered route diagram. */
+nao42MapMode='detail';
+NAO42_MAP_STOPS.splice(0,NAO42_MAP_STOPS.length,
+  {n:'01',name:'T.V.C. 宮浦店・取車／還車',short:'T.V.C. 宮浦店・原店取還',lat:34.457646352243,lon:133.97480026024,target:3,kind:'transport',phase:'bike'},
+  {n:'02',name:'直島新美術館',short:'直島新美術館',lat:34.458167,lon:133.998722,target:4,kind:'art',phase:'bike'},
+  {n:'03',name:'本村官方指定駐輪區（區域示意）',short:'本村町官方駐輪場 P（照官方圖）',lat:34.4604,lon:133.9960,target:5,kind:'transport',phase:'bike',bx:-17,by:-15},
+  {n:'04',name:'角屋 Kadoya',short:'角屋 Kadoya',lat:34.4602046,lon:133.9975159,target:6,kind:'art',phase:'walk'},
+  {n:'05',name:'碁會所 Gokaisho',short:'碁會所 Gokaisho',lat:34.4605326,lon:133.9967741,target:7,kind:'art',phase:'walk'},
+  {n:'06',name:'護王神社',short:'護王神社',lat:34.4597775,lon:133.9984809,target:8,kind:'art',phase:'walk'},
+  {n:'07',name:'南寺 Minamidera',short:'南寺 Minamidera',lat:34.4588568,lon:133.996982,target:9,kind:'art',phase:'walk'},
+  {n:'08',name:'本村午餐',short:'本村午餐',lat:34.4604,lon:133.9951,target:10,kind:'food',phase:'walk'},
+  {n:'09',name:'石橋 Ishibashi（附近無駐輪場）',short:'石橋 Ishibashi・步行到訪',lat:34.4621114,lon:133.9950423,target:11,kind:'art',phase:'walk'},
+  {n:'10',name:'はいしゃ Haisha',short:'はいしゃ Haisha',lat:34.4598765,lon:133.9944882,target:12,kind:'art',phase:'walk'},
+  {n:'11',name:'回本村官方駐輪點取車',short:'回本村官方 P 取車',lat:34.4604,lon:133.9960,target:13,kind:'transport',phase:'walk',bx:17,by:15},
+  {n:'12',name:'騎回 T.V.C. 宮浦原店還車',short:'騎回 T.V.C. 宮浦原店還車',lat:34.457646352243,lon:133.97480026024,target:14,kind:'transport',phase:'bike',bx:18,by:-16}
+);
+nao42DetailSVG=function(){
+ const W=900,H=520,lo0=133.970,lo1=134.003,la0=34.4535,la1=34.4648;
+ const xy=function(p){return [54+(p.lon-lo0)/(lo1-lo0)*792,38+(la1-p.lat)/(la1-la0)*430]};
+ const pts=NAO42_MAP_STOPS.map(function(p){const v=xy(p);return Object.assign({},p,{x:v[0],y:v[1]})});
+ const by=function(id){return pts.find(function(p){return p.n===id})};
+ const path=function(ids){return ids.map(function(id,i){const p=by(id);return (i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)}).join(' ')};
+ const marker=function(p){
+  const label=p.n+' '+p.name;
+  const mx=p.x+(p.bx||0),my=p.y+(p.by||0);
+  return '<a class="marker '+p.kind+'" href="#stop-'+p.target+'" data-nao-jump="'+p.target+'" aria-label="'+label+'，跳到行程"><title>'+label+'</title><circle cx="'+mx.toFixed(1)+'" cy="'+my.toFixed(1)+'" r="17"/><text class="num" x="'+mx.toFixed(1)+'" y="'+my.toFixed(1)+'">'+p.n.slice(1)+'</text></a>';
+ };
+ const start=by('01'),museum=by('02'),drop=by('03');
+  return '<svg class="nao42-map-svg nao42-detail-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="直島點位順序圖：宮浦 T.V.C 原店取還車、新美術館、本村官方駐輪場、本村家計畫步行環線">'+
+  '<defs><linearGradient id="nao42Sea" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#102a35"/><stop offset="1" stop-color="#173c43"/></linearGradient><pattern id="nao42Grid" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M40 0H0V40" fill="none" stroke="#a9c8bd" stroke-opacity=".055" stroke-width="1"/></pattern><filter id="nao42Shadow" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#071419" flood-opacity=".7"/></filter></defs>'+
+  '<rect class="sea" width="900" height="520" style="fill:url(#nao42Sea)"/><rect width="900" height="520" fill="url(#nao42Grid)"/>'+
+  '<path class="land nao42-island" d="M24 300 C56 239 90 196 151 172 C216 146 273 157 329 182 C390 208 447 190 504 159 C560 129 611 125 662 145 C715 166 759 130 801 133 C848 137 883 181 886 230 C890 277 855 310 822 340 C778 380 736 399 674 389 C610 378 565 411 505 424 C439 439 385 420 326 397 C262 372 213 391 151 379 C93 369 47 347 24 300 Z"/>'+
+  '<path class="nao42-route-bike" d="'+path(['01','02','03'])+'"/><path class="nao42-route-walk" d="'+path(['03','04','05','06','07','08','09','10','11'])+'"/><path class="nao42-route-bike" d="'+path(['11','12'])+'"/>'+
+  '<text class="nao42-area-label" x="'+(start.x-12).toFixed(1)+'" y="'+(start.y+48).toFixed(1)+'">宮浦・原店取還</text><text class="nao42-area-label" x="'+(drop.x-30).toFixed(1)+'" y="'+(drop.y+53).toFixed(1)+'">本村・官方駐輪區域</text>'+
+  '<g class="nao42-north" transform="translate(846 54)"><path d="M0 30V0M0 0L-6 10M0 0L6 10"/><text x="0" y="45">N</text></g>'+
+  pts.map(marker).join('')+'</svg>';
+};
+function nao42RouteGuide(){
+ const group=function(title,desc,ids){return '<section class="nao42-phase"><header><b>'+title+'</b><small>'+desc+'</small></header><ol>'+ids.map(function(id){const p=NAO42_MAP_STOPS.find(function(s){return s.n===id});return '<li><a href="#stop-'+p.target+'" data-nao-jump="'+p.target+'"><i>'+p.n.slice(1)+'</i><span>'+p.short+'</span></a></li>'}).join('')+'</ol></section>'};
+ return '<aside class="nao42-route-guide" aria-label="直島當日路線順序"><div class="nao42-guide-title"><b>照這個順序走</b><small>點站名可跳至時間軸</small></div>'+
+  group('電動車・去程','宮浦原店取車 → 新美術館 → 本村官方 P 駐車',['01','02','03'])+
+  group('本村步行・依序','停好車後走五館、南寺與午餐；石橋附近無駐輪場',['04','05','06','07','08','09','10'])+
+  group('電動車・回程','15:15 回官方 P 取車 → 騎回宮浦原店，16:00 前還車',['11','12'])+'</aside>';
+}
+nao42MapMarkup=function(){
+ const detail=nao42MapMode==='detail';
+ return '<div class="nao42-map-toggle" role="group" aria-label="切換行程地圖"><button data-nao-map-mode="overview" aria-pressed="'+(!detail)+'">四國大地圖</button><button data-nao-map-mode="detail" aria-pressed="'+detail+'">直島騎乘動線</button></div>'+
+  '<div class="nao42-map-content '+(detail?'is-detail':'is-overview')+'"><div class="nao42-map-canvas">'+(detail?nao42DetailSVG():nao42OverviewSVG())+'</div>'+(detail?nao42RouteGuide():'')+'</div>'+
+  '<div class="nao42-map-credit">連線僅示順序，不代表道路；本村停車點為區域示意，請依直島町官方 P 駐輪場圖與現場標示停車（石橋旁無駐輪場）。騎行導航請點行程卡。 <a href="https://www.town.naoshima.lg.jp/about/item/9fc146a7285cad547fd029d03abdaf0e557b11b7.pdf" target="_blank" rel="noopener noreferrer">直島町官方駐輪場圖 ↗</a>　<a href="https://www.benesse-artsite.jp/BASNmap_jp.pdf#page=3" target="_blank" rel="noopener noreferrer">本村細部地圖 ↗</a></div>';
+};
+styleNaoshimaMap42=function(el){
+ if(!el)return;
+ el.className='journey-map proposal-geography nao42-map-frame';
+ el.style.setProperty('display','grid','important');
+ el.style.setProperty('grid-template-rows','42px auto auto','important');
+ el.style.setProperty('height','auto','important');
+ el.style.setProperty('min-height','0','important');
+ el.style.setProperty('max-height','none','important');
+ el.style.setProperty('overflow','hidden','important');
+};
+const nao42PolishStyle=document.createElement('style');
+nao42PolishStyle.id='naoshima-route-polish-style';
+nao42PolishStyle.textContent=[
+ '.proposal-geography.nao42-map-frame{grid-template-rows:42px auto auto!important;height:auto!important;min-height:0!important;max-height:none!important;overflow:hidden!important;border:1px solid #355158!important;border-radius:12px!important;background:#0f2026!important}',
+ '.nao42-map-toggle{position:relative!important;inset:auto!important;display:flex!important;align-items:center;gap:5px;padding:5px 7px!important;background:#101b20!important;border:0!important;border-bottom:1px solid #344b4e!important;box-shadow:none!important}',
+ '.nao42-map-toggle button{min-height:30px;border:1px solid #30484b!important;border-radius:7px!important;padding:5px 11px!important;background:#122329!important;color:#a8bdb8!important;font:600 11px/1.25 var(--sans)!important}',
+ '.nao42-map-toggle button[aria-pressed="true"]{background:#a7d9bf!important;border-color:#a7d9bf!important;color:#10221f!important}',
+ '.nao42-map-content{display:grid;grid-template-columns:minmax(0,1.55fr) minmax(250px,1fr);gap:10px;align-items:stretch;min-width:0;padding:10px}',
+ '.nao42-map-content.is-overview{grid-template-columns:minmax(0,1fr)}',
+ '.nao42-map-canvas{position:relative!important;inset:auto!important;min-width:0!important;width:100%!important;height:auto!important;min-height:0!important;overflow:hidden!important;border:1px solid #324d50;border-radius:10px;background:#102a35}',
+ '.nao42-map-svg{display:block!important;width:100%!important;height:auto!important;min-width:0!important;min-height:0!important;max-height:460px}',
+ '.nao42-detail-svg .nao42-island{fill:#263d39;stroke:#78948b;stroke-width:2.5}',
+ '.nao42-detail-svg .nao42-route-bike{fill:none;stroke:#edc77e;stroke-width:5;stroke-linecap:round;stroke-linejoin:round}',
+ '.nao42-detail-svg .nao42-route-walk{fill:none;stroke:#a7d9bf;stroke-width:3.5;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:3 8}',
+ '.nao42-detail-svg .nao42-route-bus{fill:none;stroke:#8db8ce;stroke-width:3;stroke-linecap:round;stroke-dasharray:2 9}',
+ '.nao42-detail-svg .marker{cursor:pointer;filter:url(#nao42Shadow)}.nao42-detail-svg .marker circle{fill:#152a2e;stroke:#a7d9bf;stroke-width:3}.nao42-detail-svg .marker.transport circle{fill:#254b42;stroke:#edc77e}.nao42-detail-svg .marker.bus circle{fill:#173848;stroke:#8db8ce}.nao42-detail-svg .marker.food circle{fill:#3a3325;stroke:#edc77e}',
+ '.nao42-detail-svg .marker .num{fill:#f7f4eb;font:700 13px var(--sans);text-anchor:middle;dominant-baseline:central;pointer-events:none}',
+ '.nao42-detail-svg .nao42-area-label{fill:#d4e1d8;font:600 14px var(--sans);letter-spacing:.04em;paint-order:stroke;stroke:#102a35;stroke-width:4px}',
+ '.nao42-detail-svg .nao42-north path{fill:none;stroke:#c5d5cc;stroke-width:2}.nao42-detail-svg .nao42-north text{fill:#c5d5cc;font:700 12px var(--sans);text-anchor:middle}',
+ '.nao42-route-guide{min-width:0;display:grid;align-content:start;gap:7px;padding:10px;border:1px solid #30494b;border-radius:10px;background:#13272c}',
+ '.nao42-guide-title{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:1px 2px 4px;color:#edf0e8}.nao42-guide-title small{color:#91a9a3;font-size:9px}',
+ '.nao42-phase{min-width:0;padding:7px 8px;border-left:3px solid #edc77e;border-radius:0 7px 7px 0;background:#182e31}.nao42-phase:nth-of-type(2){border-color:#a7d9bf}.nao42-phase:nth-of-type(3){border-color:#8db8ce}',
+ '.nao42-phase header{display:flex;align-items:baseline;justify-content:space-between;gap:5px;margin-bottom:4px;color:#e8eee7}.nao42-phase header small{color:#91a9a3;font-size:8px;text-align:right}',
+ '.nao42-phase ol{display:grid;grid-template-columns:1fr;gap:2px;margin:0;padding:0;list-style:none}.nao42-phase li{min-width:0}.nao42-phase a{display:flex;align-items:center;gap:6px;min-height:22px;color:#c3d2cc;text-decoration:none;font-size:10px;line-height:1.3}.nao42-phase a:hover{color:#b7e2ca}.nao42-phase i{display:inline-grid;place-items:center;flex:none;width:18px;height:18px;border:1px solid #668578;border-radius:50%;color:#d9e7dc;font-size:8px;font-style:normal}.nao42-phase:nth-of-type(3) i{border-color:#8db8ce}',
+ '.nao42-map-credit{position:relative!important;inset:auto!important;z-index:2;box-sizing:border-box;min-height:30px;padding:6px 10px!important;border-radius:0 0 10px 10px;background:#101b20!important;color:#93aaa4!important;font-size:9px!important;line-height:1.45!important}.nao42-map-credit a{color:#a7d9bf;text-decoration:none}',
+ '@media(max-width:680px){.nao42-map-content{grid-template-columns:minmax(0,1fr);gap:7px;padding:7px}.nao42-detail-svg .nao42-area-label{font-size:17px}.nao42-detail-svg .marker circle{r:19px}.nao42-detail-svg .marker .num{font-size:14px}.nao42-route-guide{gap:5px;padding:8px}.nao42-phase{padding:6px 7px}.nao42-phase ol{grid-template-columns:repeat(2,minmax(0,1fr));column-gap:6px}.nao42-phase a{font-size:10px;min-height:25px}.nao42-map-credit{font-size:8px!important}.nao42-map-svg{max-height:none}}',
+ '@media(min-width:681px) and (max-width:1050px){.nao42-map-content{grid-template-columns:minmax(0,1.2fr) minmax(230px,1fr);gap:7px;padding:7px}.nao42-route-guide{padding:7px}.nao42-phase a{font-size:9px}}'
+].join('\n');
+document.head.append(nao42PolishStyle);
 evaluate14();render();
 </script>
 <style id="shoe-function-picker-style">
@@ -7235,6 +7340,8 @@ evaluate14();render();
  .shoe43-select{font-size:10px;padding:5px 6px}
  .shoe43-guide-grid{grid-template-columns:1fr;gap:7px}
 }
+ .shoe40-summary-row>b{display:flex;align-items:center;flex-wrap:wrap;gap:4px 7px}
+ .shoe40-summary-type{display:inline-flex;align-items:center;padding:2px 7px;border:1px solid #42675a;border-radius:999px;background:#142b28;color:#c2dfd0;font-size:9px;font-weight:650;line-height:1.35;white-space:nowrap}
 </style>
 <script id="shoe-function-overview">
 (function(){
@@ -7369,6 +7476,15 @@ evaluate14();render();
     section.append(heading,description,list);tray.appendChild(section);
    });
   }
+   const comparison=pickerTemplate.content.querySelector('.shoe40-summary');
+   if(comparison){
+    const comparable=models.filter(function(m){return m.taiwan?.kind==='match'}).sort(function(a,b){return (b.taiwan.price-Math.round(b.price_jpy*SHOE_FX40.twdPerJpy))-(a.taiwan.price-Math.round(a.price_jpy*SHOE_FX40.twdPerJpy))});
+    comparison.querySelectorAll('.shoe40-summary-row').forEach(function(row,index){
+     const m=comparable[index],name=row.querySelector('b');if(!m||!name)return;
+     const group=groups.find(function(g){return g.id===category(brand,m.name)});if(!group)return;
+     const badge=document.createElement('small');badge.className='shoe40-summary-type';badge.textContent=group.name;badge.title=group.summary;name.appendChild(badge);
+    });
+   }
   return pickerTemplate.innerHTML;
  };
  document.addEventListener('input',function(e){
