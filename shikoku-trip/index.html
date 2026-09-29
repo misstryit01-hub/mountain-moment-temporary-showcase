@@ -6390,7 +6390,7 @@ shoesView40=function(){
  const comparison=tpl.content.querySelector('.shoe40-summary');
  if(comparison){
    const exact=comparison.querySelectorAll('.shoe40-summary-row').length;
-   const comparableModels=activeModels.filter(function(m){return m.taiwan?.kind==='match'}).sort(function(a,b){return (b.taiwan.price-Math.round(b.price_jpy*SHOE_FX40.twdPerJpy))-(a.taiwan.price-Math.round(a.price_jpy*SHOE_FX40.twdPerJpy))});
+   const comparableModels=activeModels.filter(function(m){return m.taiwan?.kind==='match'}).sort(function(a,b){return (b.taiwan.price-Math.round(Math.round(b.price_jpy/1.1)*SHOE_FX40.twdPerJpy))-(a.taiwan.price-Math.round(Math.round(a.price_jpy/1.1)*SHOE_FX40.twdPerJpy))});
   comparison.querySelectorAll('.shoe40-summary-row').forEach(function(row,index){const m=comparableModels[index];if(m&&nameCounts[m.name]>1){const code=document.createElement('small');code.textContent='（'+m.style_code+'）';row.querySelector('b').appendChild(code)}});
    const unmatched=comparison.querySelector('.shoe40-summary-missing');
    if(unmatched){const rest=document.createElement('details');rest.className='shoe40-unmatched';const label=document.createElement('summary');label.textContent='缺貨／相關款／尚無同品番資料・'+((shoeUi40.brand==='hoka'?HOKA40.models:SHOE40.models).length-exact)+' 款';const unavailable=activeModels.filter(function(m){return m.taiwan?.kind==='unavailable'}),related=activeModels.filter(function(m){return m.taiwan?.kind==='related'}),notFound=activeModels.filter(function(m){return !m.taiwan});const chunks=[];if(unavailable.length)chunks.push('同品番但缺貨：'+unavailable.map(function(m){return m.name+'（'+m.style_code+'）'}).join('、'));if(related.length)chunks.push('只有不同 SKU／性別／楦型參考，不列價差：'+related.map(function(m){return m.name+'（'+m.style_code+'）'}).join('、'));if(notFound.length)chunks.push('目前沒有已核實的 iSPO 同品番頁：'+notFound.map(function(m){return m.name+'（'+m.style_code+'）'}).join('、'));unmatched.textContent=chunks.join('。');unmatched.parentNode.replaceChild(rest,unmatched);rest.appendChild(label);rest.appendChild(unmatched)}
@@ -7564,7 +7564,7 @@ evaluate14();render();
   }
    const comparison=pickerTemplate.content.querySelector('.shoe40-summary');
    if(comparison){
-    const comparable=models.filter(function(m){return m.taiwan?.kind==='match'}).sort(function(a,b){return (b.taiwan.price-Math.round(b.price_jpy*SHOE_FX40.twdPerJpy))-(a.taiwan.price-Math.round(a.price_jpy*SHOE_FX40.twdPerJpy))});
+    const comparable=models.filter(function(m){return m.taiwan?.kind==='match'}).sort(function(a,b){return (b.taiwan.price-Math.round(Math.round(b.price_jpy/1.1)*SHOE_FX40.twdPerJpy))-(a.taiwan.price-Math.round(Math.round(a.price_jpy/1.1)*SHOE_FX40.twdPerJpy))});
     comparison.querySelectorAll('.shoe40-summary-row').forEach(function(row,index){
      const m=comparable[index],name=row.querySelector('b');if(!m||!name)return;
      const group=groups.find(function(g){return g.id===category(brand,m.name)});if(!group)return;
@@ -7772,4 +7772,78 @@ render();
 </script>
 <!-- /DAILY45 -->
 
+<script id="shoe-taxfree-fix-20260930">
+(function(){
+  if (typeof SHOE_FX40 === 'undefined' || typeof shoeSummary40 === 'undefined' || typeof shoeTaiwan40 === 'undefined') return;
+  // Keep the live exchange rate unchanged. Convert each tax-inclusive Japan MSRP
+  // to an estimated tax-free yen price only for Japan-vs-Taiwan comparisons.
+  function taxFreeYen40(price) { return Math.round(Number(price) / 1.1); }
+  var summaryWithGrossPrices = shoeSummary40;
+  shoeSummary40 = function(models, brand) {
+    var netModels = models.map(function(model) {
+      return Object.assign({}, model, { price_jpy: taxFreeYen40(model.price_jpy) });
+    });
+    return summaryWithGrossPrices(netModels, brand)
+      .replace(/日本含稅價 vs iSPO 現售價/g, '日本免稅估算價 vs iSPO 現售價')
+      .replace(/日本含稅價 vs iSPO 現售價・/g, '日本免稅估算價 vs iSPO 現售價・')
+      .replace(/日本約 /g, '日本免稅約 ')
+      .replace('使用日本含稅價、iSPO 現售價（有促銷則採折後價）；未計免稅、刷卡手續費與各色庫存，實際結帳價可能變動。', '使用日本免稅估算價（日幣含稅定價 ÷ 1.1）與 iSPO 現售價（有促銷則採折後價）比較；免稅適用與實際結帳金額以店家規定為準，未計刷卡手續費、匯差與各色庫存，實際價格可能變動。')
+      .replace('使用日本含稅價、iSPO 價格快照（2026/09/28–29，有促銷採折後價）；', '使用日本免稅估算價（日幣含稅定價 ÷ 1.1）、iSPO 價格快照（2026/09/28–29，有促銷採折後價）；')
+      .replace('日本價未扣免稅與刷卡費，台灣顏色／尺碼庫存及促銷以結帳頁為準。', '日本比價採免稅估算（日幣含稅定價 ÷ 1.1）；免稅適用與結帳金額以店家規定為準，未計刷卡手續費及匯差。台灣顏色／尺碼庫存及促銷以 iSPO 結帳頁為準。');
+  };
+  var taiwanCardWithGrossPrices = shoeTaiwan40;
+  shoeTaiwan40 = function(model) {
+    var netModel = Object.assign({}, model, { price_jpy: taxFreeYen40(model.price_jpy) });
+    return taiwanCardWithGrossPrices(netModel).replace(/日本含稅換算/g, '日本免稅估算');
+  };
+  if (typeof render === 'function') render();
+})();
+</script>
+<script id="shoe-favorites-mobile-20260930">
+(function(){
+ if(typeof shoesView40!=='function'||typeof shoeCard40!=='function'||typeof SHOE40==='undefined'||typeof HOKA40==='undefined'||typeof shoeUi40==='undefined')return;
+ const KEY='shikoku-shoe-favorites-v1',MAX=4;
+ const mobile=()=>window.matchMedia('(max-width: 760px)').matches;
+ let only=false,items=[];
+ try{const saved=JSON.parse(localStorage.getItem(KEY)||'[]');if(Array.isArray(saved))items=saved.filter(x=>x&&['on','hoka'].includes(x.brand)&&typeof x.id==='string').slice(0,MAX)}catch(_){items=[]}
+ const persist=()=>{try{localStorage.setItem(KEY,JSON.stringify(items))}catch(_){}};
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const modelsFor=b=>(b==='hoka'?HOKA40:SHOE40).models||[];
+ const find=f=>modelsFor(f.brand).find(m=>m.id===f.id);
+ const key=f=>f.brand+'|'+f.id;
+ const selected=()=>({brand:shoeUi40.brand==='hoka'?'hoka':'on',id:shoeUi40.model});
+ const selectedSaved=()=>items.some(f=>key(f)===key(selected()));
+ const imageFor=f=>{const m=find(f);if(!m)return '';const k=f.brand==='hoka'?'hoka_'+m.id:m.id,c=(m.colors||[])[Number(shoeSel40[k]||0)];return c?.img||m.img||''};
+ function tiles(){return items.map(f=>{const m=find(f);if(!m)return '';const k=esc(key(f)),img=imageFor(f);return `<div class="sfav-tile"><button type="button" class="sfav-open" data-sfav-open="${k}" aria-label="查看 ${esc(m.name)} 詳細介紹">${img?`<img src="${esc(img)}" alt="${esc(m.name)}" loading="lazy" referrerpolicy="no-referrer">`:'<span class="sfav-no-image">鞋款圖片</span>'}<span>${esc(m.name)}</span></button><button type="button" class="sfav-remove" data-sfav-remove="${k}" aria-label="移除 ${esc(m.name)}">×</button></div>`}).join('')}
+ function panel(viewOnly){const cur=selected(),m=find(cur),isSaved=selectedSaved();return `<section class="sfav-panel" aria-label="最愛鞋款"><div class="sfav-head"><div><small>SHOE SHORTLIST</small><h2>最愛鞋款 <span>${items.length} / ${MAX}</span></h2></div><div class="sfav-actions">${viewOnly?'<button type="button" data-sfav-mode>返回挑鞋</button>':`<button type="button" data-sfav-add ${!isSaved&&items.length>=MAX?'disabled':''}>${isSaved?'♥ 移除目前鞋款':`＋ 收藏「${esc(m?.name||'目前鞋款')}」`}</button><button type="button" data-sfav-mode>只看最愛 ↗</button>`}</div></div><div class="sfav-grid">${tiles()||`<p class="sfav-empty">${viewOnly?'目前還沒有收藏鞋款。':'先選一雙鞋，再按「收藏」；最多可放 4 雙。'}</p>`}</div><p class="sfav-status" aria-live="polite">${viewOnly?'點鞋款圖片即可查看功能、配色與價格。':''}</p></section>`}
+ const baseView=shoesView40;
+ shoesView40=function(){
+  if(!mobile())return baseView();
+  if(only)return `<div class="t40 sh40 shoe40 sfav-only"><header class="t40-head"><div><div class="eyebrow">SHOES / SHORTLIST</div><h1>最愛鞋款</h1><p>先看型號與圖片；點進去才看詳細介紹。</p></div></header>${panel(true)}</div>`;
+  const t=document.createElement('template');t.innerHTML=baseView();const root=t.content.querySelector('.shoe40');if(!root)return t.innerHTML;
+  const h=root.querySelector('.t40-head');if(h)h.insertAdjacentHTML('afterend',panel(false));return t.innerHTML;
+ };
+ function openDetail(f){const m=find(f);if(!m)return;shoeUi40.brand=f.brand;shoeUi40.model=f.id;try{localStorage.setItem(SHOE_UI_KEY40,JSON.stringify(shoeUi40))}catch(_){}render();
+  const d=document.createElement('dialog');d.className='sfav-dialog';d.setAttribute('aria-label',m.name+' 詳細介紹');d.innerHTML=`<div class="sfav-dialog-head"><div><small>${f.brand==='on'?'ON RUNNING':'HOKA'}</small><h2>${esc(m.name)}</h2></div><button type="button" data-sfav-close aria-label="關閉">×</button></div><div class="sfav-detail"></div><div class="sfav-dialog-actions"><button type="button" data-sfav-remove="${esc(key(f))}">移除此最愛</button></div>`;
+  const fill=()=>{const body=d.querySelector('.sfav-detail');if(!body)return;body.innerHTML=shoeCard40(m,f.brand);body.querySelector('#sh40-active')?.removeAttribute('id')};fill();document.body.append(d);d.showModal();
+  d.addEventListener('click',e=>{if(e.target===d||e.target.closest('[data-sfav-close]'))d.close();if(e.target.closest('[data-shoe-color]'))setTimeout(fill,0)});
+  d.addEventListener('close',()=>d.remove());
+ }
+ document.addEventListener('click',e=>{
+  if(!mobile())return;
+  const add=e.target.closest('[data-sfav-add]');if(add){e.preventDefault();const f=selected(),at=items.findIndex(x=>key(x)===key(f));if(at>=0)items.splice(at,1);else if(items.length>=MAX){const s=document.querySelector('.sfav-status');if(s)s.textContent='最愛最多只能收藏 4 雙；先移除一雙再加入。';return}else items.push(f);persist();render();return}
+  const remove=e.target.closest('[data-sfav-remove]');if(remove){e.preventDefault();const [brand,id]=remove.dataset.sfavRemove.split('|');items=items.filter(f=>!(f.brand===brand&&f.id===id));persist();const dlg=remove.closest('dialog');if(dlg)dlg.close();render();return}
+  const mode=e.target.closest('[data-sfav-mode]');if(mode){e.preventDefault();only=!only;render();window.scrollTo({top:0,behavior:'smooth'});return}
+  const open=e.target.closest('[data-sfav-open]');if(open){e.preventDefault();const [brand,id]=open.dataset.sfavOpen.split('|');openDetail({brand,id})}
+ },true);
+ const style=document.createElement('style');style.id='shoe-favorites-mobile-style';style.textContent=`
+ .sfav-panel{margin:12px 0;padding:12px;border:1px solid var(--line,#33464d);border-radius:14px;background:linear-gradient(145deg,#172b30,#102126);color:var(--ink,#e8eee9)}
+ .sfav-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px}.sfav-head small,.sfav-dialog-head small{display:block;color:#a8cbb9;font-size:9px;letter-spacing:.16em}.sfav-head h2{margin:2px 0 0;font:650 16px/1.25 var(--sans,system-ui)}.sfav-head h2 span{margin-left:5px;color:#e7c995;font-size:12px;font-variant-numeric:tabular-nums}
+ .sfav-actions{display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end}.sfav-actions button,.sfav-dialog-actions button{min-height:36px;padding:7px 10px;border:1px solid #48665d;border-radius:10px;background:#18342f;color:#dce9e1;font:600 11px/1.3 var(--sans,system-ui)}.sfav-actions button:disabled{opacity:.55}.sfav-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}.sfav-tile{position:relative;min-width:0;overflow:hidden;border:1px solid #344950;border-radius:11px;background:#101e24}.sfav-open{display:grid;width:100%;height:100%;grid-template-rows:92px auto;gap:6px;padding:7px 7px 9px;border:0;background:transparent;color:#e8eee9;text-align:left;font:650 12px/1.3 var(--sans,system-ui)}.sfav-open img{width:100%;height:92px;object-fit:contain;border-radius:7px;background:#f3f1ec}.sfav-open>span:last-child{display:-webkit-box;min-height:31px;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2}.sfav-no-image{display:grid;place-items:center;background:#f3f1ec;color:#647078;border-radius:7px;font-size:11px}.sfav-remove{position:absolute;right:5px;top:5px;width:27px;height:27px;border:1px solid #61796f;border-radius:50%;background:#102126eF;color:#fff;font-size:19px;line-height:1}.sfav-empty{grid-column:1/-1;margin:0;padding:12px;color:#9db4ae;font-size:12px}.sfav-status{min-height:14px;margin:7px 0 0;color:#e8c88d;font-size:11px}.sfav-only .sfav-panel{margin-top:8px}.sfav-only .sfav-grid{gap:10px}.sfav-only .sfav-open{grid-template-rows:min(38vw,150px) auto;padding:9px}.sfav-only .sfav-open img{height:min(38vw,150px)}
+ .sfav-dialog{width:min(760px,calc(100vw - 18px));max-width:none;max-height:92dvh;padding:12px;border:1px solid #55756b;border-radius:16px;background:#101d22;color:#e9eee9;overflow:auto;overscroll-behavior:contain}.sfav-dialog::backdrop{background:rgba(3,10,12,.78);backdrop-filter:blur(3px)}.sfav-dialog-head{position:sticky;z-index:2;top:-12px;display:flex;justify-content:space-between;align-items:center;gap:10px;margin:-12px -12px 10px;padding:11px 12px;background:#101d22ee;border-bottom:1px solid #30434a}.sfav-dialog-head h2{margin:2px 0 0;font:650 17px/1.25 var(--serif,Georgia)}.sfav-dialog-head>button{flex:none;width:34px;height:34px;border:1px solid #415b55;border-radius:50%;background:#172c30;color:#fff;font-size:22px}.sfav-dialog .shoe40-card{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:10px!important;padding:0!important;border:0!important;background:transparent!important}.sfav-dialog .shoe40-photo{max-height:34vh}.sfav-dialog .shoe40-info{min-width:0}.sfav-dialog .shoe40-details[open]{max-height:none}.sfav-dialog-actions{position:sticky;bottom:-12px;padding:9px 0 0;background:#101d22ee}.sfav-dialog-actions button{width:100%;border-color:#8b5f55;background:#342321;color:#ffd6cc}
+ @media(min-width:761px){.sfav-panel,.sfav-dialog{display:none!important}}
+ `;document.head.append(style);
+ window.addEventListener('resize',()=>{clearTimeout(window.__sfavResizeTimer);window.__sfavResizeTimer=setTimeout(()=>{if(typeof view!=='undefined'&&view==='shoes')render()},180)});
+})();
+</script>
 </body></html>
