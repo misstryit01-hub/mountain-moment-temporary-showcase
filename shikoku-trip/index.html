@@ -7219,6 +7219,11 @@ evaluate14();render();
 .shoe43-guide-grid div{min-width:0}
 .shoe43-guide-grid b{display:block;margin-bottom:2px;color:#c4e2d3;font-size:10px}
 .shoe43-guide-grid p{margin:0;color:var(--ink2);font-size:11px;line-height:1.5}
+.shoe40-colors button.shoe40-has-mark{height:68px;display:grid;grid-template-columns:30px minmax(0,1fr);grid-template-rows:30px auto;gap:3px 7px;align-content:center}
+.shoe40-colors button.shoe40-has-mark>span{grid-column:2;grid-row:1}
+.shoe40-colors button.shoe40-has-mark>.shoe40-color-mark{grid-column:2;grid-row:2;justify-self:start;display:inline-flex;align-items:center;min-height:14px;flex:none;width:auto;height:auto;object-fit:initial;padding:1px 5px;border:1px solid #806d42;border-radius:999px;background:#2d2a20;color:#f1d59f;font:700 8px/1.2 var(--sans);white-space:nowrap}
+.shoe40-code .shoe40-color-mark{display:inline-flex;vertical-align:middle;margin-left:5px;padding:2px 7px;border:1px solid #806d42;border-radius:999px;background:#2d2a20;color:#f1d59f;font-size:9px;font-weight:700;white-space:nowrap}
+.shoe40-variant-note{margin:0 0 6px;color:var(--muted);font-size:9px;line-height:1.45}
 @media(max-width:760px){
  .shoe43-overview{padding:11px;margin:12px 0}
  .shoe43-overview-head{align-items:flex-start;flex-direction:column;gap:2px}
@@ -7325,6 +7330,19 @@ evaluate14();render();
   }).join("");
   return '<section class="shoe43-overview" aria-label="'+brandName+' 鞋型功能總表"><div class="shoe43-overview-head"><div><small>SHOE FUNCTION INDEX</small><h2>先按用途分，再看單鞋</h2><p>點型號，下面會切換成該鞋的詳細說明與配色。</p></div><span class="shoe43-count">'+brandName+' 男鞋型錄・'+total+' 個型號</span></div><table class="shoe43-table"><thead><tr><th>功能分類</th><th>快速區分</th><th>鞋型／點選查看</th></tr></thead><tbody>'+rows+'</tbody></table><p class="shoe43-note">分類依品牌用途與鞋系定位整理；GTX／防水、寬楦、競賽等差異以型號標籤提示。不同年份與限定版的細節請看所選鞋款的品牌商品頁。</p></section>';
  }
+ function colorMark(m,c){
+  if(!c)return "";
+  const colorMeta=[c.name_en,c.name_ja,c.name,c.color_code,c.label,c.edition,c.note,c.status,c.url].filter(Boolean).join(" ");
+  const modelMeta=[m.name,m.name_ja,m.type,m.func].filter(Boolean).join(" ");
+  if(/\b(limited|exclusive|limited edition|limited color|special edition|collab(?:oration)?|anniversary)\b|限定|限量|別注|コラボ|特別仕様/i.test(colorMeta))return /\b(limited|exclusive)\b|限定|限量|別注/i.test(colorMeta)?"限定色":"特殊色";
+  const limitedModel=/\b(limited|exclusive|LN\d+)\b|限定|限量/i.test(modelMeta);
+  const specialModel=/\b(special edition|collab(?:oration)?|anniversary)\b|別注|コラボ|特別仕様/i.test(modelMeta);
+  const sku=String(c.color_code||"").toUpperCase(),style=String(m.style_code||"").toUpperCase();
+  const belongsToThisModel=!!sku&&!!style&&sku.startsWith(style);
+  const explicitlyRegular=/一般款|regular|standard/i.test(colorMeta);
+  if(belongsToThisModel&&!explicitlyRegular){if(limitedModel)return "限定色";if(specialModel)return "特殊色";}
+  return "";
+ }
  const originalCard=shoeCard40;
  shoeCard40=function(m,brand){
   const id=category(brand,m.name),g=groups.find(function(x){return x.id===id});
@@ -7334,7 +7352,20 @@ evaluate14();render();
   const header='<small>'+(brand==='on'?'ON RUNNING':'HOKA')+' / '+E.esc(m.type||genericType)+'</small>';
   const categoryHeader='<small>'+(brand==='on'?'ON RUNNING':'HOKA')+' / '+E.esc(!m.type||m.type===genericType?(g?g.name:'日常路跑'):m.type)+'</small>';
   const funcText=baseFunc&&!/^官方日本男鞋型錄款式/.test(baseFunc)?baseFunc:detail;
-  return originalCard(m,brand).replace(header,categoryHeader).replace('<p class="shoe40-func">'+E.esc(baseFunc)+'</p>',guide+'<p class="shoe40-func">'+E.esc(funcText)+'</p>');
+  let card=originalCard(m,brand);
+  const selectedMark=colorMark(m,m.colors&&m.colors[shoeSel40[(brand==='on'?m.id:'hoka_'+m.id)]||0]);
+  if(selectedMark){
+   const codeStart=card.indexOf('<p class="shoe40-code">'),codeEnd=card.indexOf('</p>',codeStart);
+   if(codeStart>=0&&codeEnd>=0)card=card.slice(0,codeEnd)+' <i class="shoe40-color-mark" aria-label="此配色標記：'+E.esc(selectedMark)+'">'+E.esc(selectedMark)+'</i>'+card.slice(codeEnd);
+  }
+  (m.colors||[]).forEach(function(c,k){
+   const mark=colorMark(m,c);if(!mark)return;
+   const token='data-shoe-color="'+brand+':'+E.esc(m.id)+':'+k+'"',buttonAt=card.indexOf(token);if(buttonAt<0)return;
+   const classAt=card.indexOf('class="',buttonAt),classEnd=card.indexOf('"',classAt+7),buttonEnd=card.indexOf('</button>',buttonAt);
+   if(classAt>=0&&classEnd>=0&&buttonEnd>=0){card=card.slice(0,classEnd)+' shoe40-has-mark'+card.slice(classEnd);buttonEnd=card.indexOf('</button>',buttonAt);card=card.slice(0,buttonEnd)+'<i class="shoe40-color-mark" aria-label="此配色標記：'+E.esc(mark)+'">'+E.esc(mark)+'</i>'+card.slice(buttonEnd);}
+  });
+  card=card.replace('</div>\n   <p class="shoe40-stock-note">','</div>\n   <p class="shoe40-variant-note">僅在品名、型號或品番有明確依據時標註「限定色／特殊色」；未標示不代表保證常態供貨。</p>\n   <p class="shoe40-stock-note">');
+  return card.replace(header,categoryHeader).replace('<p class="shoe40-func">'+E.esc(baseFunc)+'</p>',guide+'<p class="shoe40-func">'+E.esc(funcText)+'</p>');
  };
  const originalView=shoesView40;
  shoesView40=function(){
