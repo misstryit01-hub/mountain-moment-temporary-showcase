@@ -7202,6 +7202,20 @@ evaluate14();render();
 .shoe43-table td:first-child{width:155px;color:var(--ink);font-weight:700}
 .shoe43-table td:nth-child(2){width:245px;color:var(--ink2);font-size:12px;line-height:1.5}
 .shoe43-model-list{display:flex;flex-wrap:wrap;gap:5px}
+.shoe40-model-group{grid-column:1/-1;border-top:1px solid var(--line)}
+.shoe40-model-group:first-child{border-top:0}
+.shoe40-model-group>summary{display:flex;align-items:center;gap:8px;padding:9px 4px;cursor:pointer;list-style:none;color:var(--ink);font-size:12px;font-weight:650}
+.shoe40-model-group>summary::-webkit-details-marker{display:none}
+.shoe40-model-group>summary:after{content:"＋";margin-left:auto;color:var(--mint)}
+.shoe40-model-group[open]>summary:after{content:"−"}
+.shoe40-model-group>summary small{color:var(--muted);font-size:10px;font-weight:500}
+.shoe40-model-group>p{margin:0 4px 7px;color:var(--muted);font-size:10px;line-height:1.45}
+.shoe40-model-group-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px;padding-bottom:8px}
+.shoe40-model-option{width:100%;min-height:42px}
+.shoe40-model-option>span{overflow:hidden;text-overflow:ellipsis}
+.shoe40-model-option>small{flex:none}
+.shoe40-model-option.on{border-color:var(--mint);background:var(--soft);color:var(--mint)}
+.shoe40-model-group[hidden]{display:none!important}
 .shoe43-group-models{margin:4px 0}
 .shoe43-group-models>summary{cursor:pointer;list-style:none;color:#a8d8c1;font-size:11px}
 .shoe43-group-models>summary::-webkit-details-marker{display:none}
@@ -7234,6 +7248,9 @@ evaluate14();render();
  .shoe40-color-head{order:1;margin-top:0}
  .shoe40-colors{order:2;margin-top:-2px;padding-top:2px;padding-bottom:5px}
  .shoe40-heading{order:3}
+ .shoe40-model-group>summary{padding:10px 4px;font-size:12px}
+ .shoe40-model-group-list{gap:5px}
+ .shoe40-model-option{min-height:44px;padding:6px 7px}
  .shoe43-overview{padding:11px;margin:12px 0}
  .shoe43-overview-head{align-items:flex-start;flex-direction:column;gap:2px}
  .shoe43-count{white-space:normal}
@@ -7384,8 +7401,32 @@ evaluate14();render();
   if(intro>=0){const end=html.indexOf('</p>',intro);if(end>=0)html=html.slice(0,intro)+'<p>先看用途總表，再點進鞋型比較功能、配色與價格。</p>'+html.slice(end+4)}
   const at=html.indexOf('<details class="shoe40-picker">');
   if(at>=0)html=html.slice(0,at)+overview(brand,models)+html.slice(at);
-  return html;
+  const pickerTemplate=document.createElement('template');pickerTemplate.innerHTML=html;
+  const picker=pickerTemplate.content.querySelector('.shoe40-picker'),tray=picker&&picker.querySelector('.shoe40-models');
+  if(picker&&tray){
+   const selected=models.find(function(m){return m.id===shoeUi40.model}),selectedGroup=selected?category(brand,selected.name):'';
+   groups.forEach(function(group){
+    const items=models.filter(function(m){return category(brand,m.name)===group.id});if(!items.length)return;
+    const section=document.createElement('details');section.className='shoe40-model-group';section.dataset.shoeGroup=group.id;section.dataset.total=String(items.length);section.open=group.id===selectedGroup;
+    const heading=document.createElement('summary'),name=document.createElement('span'),count=document.createElement('small');name.textContent=group.name;count.className='shoe40-model-group-count';count.textContent=items.length+' 款';heading.append(name,count);
+    const description=document.createElement('p');description.textContent=group.summary;
+    const list=document.createElement('div');list.className='shoe40-model-group-list';
+    items.forEach(function(m){const button=document.createElement('button');button.type='button';button.className='shoe43-select shoe40-model-option'+(m.id===shoeUi40.model?' on':'');button.dataset.shoeModel=m.id;button.setAttribute('aria-pressed',String(m.id===shoeUi40.model));button.title=variant(brand,m,group.id);const label=document.createElement('span');label.textContent=m.name;const styleCode=document.createElement('small');styleCode.textContent=m.style_code||'';button.append(label,styleCode);list.appendChild(button)});
+    section.append(heading,description,list);tray.appendChild(section);
+   });
+  }
+  return pickerTemplate.innerHTML;
  };
+ document.addEventListener('input',function(e){
+  if(!e.target.matches('[data-shoe-model-search]'))return;
+  const query=e.target.value.trim(),picker=e.target.closest('.shoe40-picker');if(!picker)return;
+  picker.querySelectorAll('.shoe40-model-group').forEach(function(group){
+   const visible=Array.from(group.querySelectorAll('[data-shoe-model]')).filter(function(button){return !button.hidden}).length;
+   group.hidden=visible===0;const count=group.querySelector('.shoe40-model-group-count');if(count)count.textContent=query?visible+' / '+group.dataset.total+' 款':group.dataset.total+' 款';
+   if(query){if(!group.hasAttribute('data-search-restore'))group.dataset.searchRestore=String(group.open);group.open=visible>0}
+   else if(group.hasAttribute('data-search-restore')){group.open=group.dataset.searchRestore==='true';delete group.dataset.searchRestore}
+  });
+ });
  document.addEventListener("click",function(e){
   const item=e.target&&e.target.closest?e.target.closest(".shoe43-select"):null;
   if(!item)return;
