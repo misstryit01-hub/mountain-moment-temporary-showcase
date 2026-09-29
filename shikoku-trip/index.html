@@ -7361,7 +7361,7 @@ evaluate14();render();
   (m.colors||[]).forEach(function(c,k){
    const mark=colorMark(m,c);if(!mark)return;
    const token='data-shoe-color="'+brand+':'+E.esc(m.id)+':'+k+'"',buttonAt=card.indexOf(token);if(buttonAt<0)return;
-   const classAt=card.indexOf('class="',buttonAt),classEnd=card.indexOf('"',classAt+7),buttonEnd=card.indexOf('</button>',buttonAt);
+   const classAt=card.indexOf('class="',buttonAt),classEnd=card.indexOf('"',classAt+7);let buttonEnd=card.indexOf('</button>',buttonAt);
    if(classAt>=0&&classEnd>=0&&buttonEnd>=0){card=card.slice(0,classEnd)+' shoe40-has-mark'+card.slice(classEnd);buttonEnd=card.indexOf('</button>',buttonAt);card=card.slice(0,buttonEnd)+'<i class="shoe40-color-mark" aria-label="此配色標記：'+E.esc(mark)+'">'+E.esc(mark)+'</i>'+card.slice(buttonEnd);}
   });
   card=card.replace('</div>\n   <p class="shoe40-stock-note">','</div>\n   <p class="shoe40-variant-note">僅在品名、型號或品番有明確依據時標註「限定色／特殊色」；未標示不代表保證常態供貨。</p>\n   <p class="shoe40-stock-note">');
