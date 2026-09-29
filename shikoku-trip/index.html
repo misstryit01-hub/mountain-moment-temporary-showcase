@@ -7404,6 +7404,7 @@ evaluate14();render();
   const pickerTemplate=document.createElement('template');pickerTemplate.innerHTML=html;
   const picker=pickerTemplate.content.querySelector('.shoe40-picker'),tray=picker&&picker.querySelector('.shoe40-models');
   if(picker&&tray){
+   tray.replaceChildren();
    const selected=models.find(function(m){return m.id===shoeUi40.model}),selectedGroup=selected?category(brand,selected.name):'';
    groups.forEach(function(group){
     const items=models.filter(function(m){return category(brand,m.name)===group.id});if(!items.length)return;
