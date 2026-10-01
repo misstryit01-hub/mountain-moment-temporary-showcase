@@ -7767,6 +7767,26 @@ class DailyStreetMap45{
 const daily45PlanBase=plan;
 plan=function(){daily45PlanBase();document.body.classList.toggle('street45-active',day!==1);if(day===1)return;const host=document.getElementById('proposal-geography');if(!host)return;proposalGeo?.destroy?.();proposalGeo=null;host.replaceChildren();host.className='proposal-geography daily45-host';host.removeAttribute('data-source');for(const [k,v]of Object.entries({display:'block',height:'auto','min-height':'0','max-height':'none','aspect-ratio':'auto',overflow:'visible',position:'relative'}))host.style.setProperty(k,v,'important');proposalGeo=new DailyStreetMap45(host,day)};
 const daily45ModalBase=dayMapModal;
+// Receipt-backed Agoda lodging totals: show the card's actual TWD charge while
+// preserving the original JPY booking amount as a separate reference.
+const paidStayReceipts45={
+ kitahama:{currency:'TWD',totalTwd:7334,paid:true,pay:'2026/10/01 已付款（玉山信用卡實際入帳）',bookedCurrency:'JPY',bookedAmount:36323,actualPaid:{date:'2026/10/01',merchant:'Agoda.com',amount:7334,currency:'TWD'}},
+ nipponia:{currency:'TWD',totalTwd:27867,paid:true,pay:'2026/09/28 已付款（玉山信用卡實際入帳）',bookedCurrency:'JPY',bookedAmount:139461,actualPaid:{date:'2026/09/28',merchant:'Agoda.com NIPPONIA HOTEL',amount:27867,currency:'TWD'}}
+};
+for(const [id,receipt] of Object.entries(paidStayReceipts45)){
+ const h=D.regions.flatMap(r=>r.hotels).find(x=>x.id===id);
+ if(h)Object.assign(h,receipt);
+}
+const detailRowsBeforePaidReceipts45=E.detailRows;
+E.detailRows=function(h){
+ const rows=detailRowsBeforePaidReceipts45(h),r=h.actualPaid;
+ if(!r)return rows;
+ rows.splice(1,0,
+  ['Agoda 訂房原幣金額',`¥${E.fmt(h.bookedAmount)}（整筆・${h.nights} 晚）`],
+  ['信用卡實際入帳',`NT$${money22(r.amount)}（${E.esc(r.date)}・${E.esc(r.merchant)}）`]
+ );
+ return rows;
+};
 dayMapModal=function(i){if(i===1)return daily45ModalBase(i);E.modal('<div class="modal-head"><div><div class="eyebrow">10/'+(7+i)+' · STREET MAP</div><h2>'+E.esc(PLAN_DAYS[i].title)+'</h2></div><button class="close" data-close aria-label="關閉地圖">×</button></div><div id="daily45-modal" class="daily45-modal-host"></div>');modalMap14=new DailyStreetMap45(document.getElementById('daily45-modal'),i,{modal:true})};
 render();
 </script>
